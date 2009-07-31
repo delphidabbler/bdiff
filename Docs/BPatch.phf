@@ -1,0 +1,183 @@
+@PROJECT_NAME           BPatch
+@PROJECT_DESC           Applies patches created by BDiff to recreate files.
+@ROOT                   ..\Src\BPatch
+@LEGAL_NOTICE           See LICENSE for copyright and licensing details.
+@HISTORY(
+  @REVISION(
+    @VERSION            0.2.1 (build 1)
+    @DATE               29/11/2003
+    @COMMENTS           First Pascal translation of BPatch v0.2 by Stefan
+                        Reuther.
+    @COMPILERS          + Delphi 4
+                        + DelphiDabbler Version Information Editor v2.10
+                        + Borland BRCC32
+    @FILES(
+      @NEW(
+        @FILE           BPatch.dpr
+        @VERSION        1.0
+      )
+      @NEW(
+        @FILE           UBPatch.pas
+        @VERSION        1.0
+      )
+      @NEW(
+        @FILE           UBPatchTypes.pas
+        @VERSION        1.0
+      )
+      @NEW(
+        @FILE           UBPatchUtils.pas
+        @VERSION        1.0
+      )
+      @NEW(
+        @FILE           VBPatch.vi
+        @DATE           28/11/2003
+        @COMMENTS       First version: file version is 0.2.1 build 1 and product
+                        version is 0.2.1.
+      )
+    )
+  )
+  @REVISION(
+    @VERSION            0.2.1 (build 2)
+    @DATE               21/12/2003
+    @COMMENTS           Unchanged other than to update product and build number
+                        in version information.
+    @COMPILERS          + Delphi 4
+                        + DelphiDabbler Version Information Editor 2.10.1
+                        + Borland BRCC32
+    @FILES(
+      @UPDATED(
+        @FILE           VBPatch.vi
+        @DATE           21/12/2003
+        @COMMENTS       Updated file version to 0.2.1 build 2 and product number
+                        to 0.2.2
+      )
+    )
+  )
+  @REVISION(
+    @VERSION            0.2.3 (build 3)
+    @DATE               18/09/2007
+    @COMPILERS          + Delphi 7
+                        + DelphiDabbler Version Information Editor v2.11
+                        + Borland BRCC32 v5.4
+    @COMMENTS           + Fixed bug where the program could not overwrite
+                          existing files.
+                        + Fixed small bug in -h and -v switches.
+                        + Removed conditional compilation for unsupported target
+                          OSs.
+                        + Updated copyright statements on help screen.
+                        + Updated version to v0.2.3, skipping v0.2.2 to
+                          synchronise with BDiff.
+                        + Added batch file that can build the project.
+                        + Some minor refactoring.
+                        + Switched off various warnings in .cfg file.
+                        + Changed to new binary and source license.
+    @FILES(
+      @UPDATED(
+        @FILE           BPatch.dpr
+        @VERSION        1.1
+      )
+      @UPDATED(
+        @FILE           UBPatch.pas
+        @VERSION        1.1
+      )
+      @UPDATED(
+        @FILE           UBPatchTypes.pas
+        @VERSION        1.1
+      )
+      @UPDATED(
+        @FILE           UBPatchUtils.pas
+        @VERSION        1.1
+      )
+      @UPDATED(
+        @FILE           VBPatch.vi
+        @DATE           18/09/2007
+        @COMMENTS       + Added header comments license.
+                        + Removed RC comments and output dir path.
+                        + Modified LegalCopyright string table entry.
+                        + Updated file version to 0.2.3 build 3 and product
+                          version to 0.2.3.
+                        + Updated file description.
+                        + Changed comments to give overview of distribution and
+                          refer to License.txt.
+                        + Deleted identifier string to let default value be
+                          used.
+                        + Removed SpecialBuild string item and macro references.
+                        + Added build number to file version string.
+      )
+      @NEW(
+        @FILE           Build.bat
+        @VERSION        1.0
+        @COMMENTS       Batch file used to build the project.
+      )
+    )
+  )
+  @REVISION(
+    @VERSION            0.2.4 (build 4)
+    @DATE               07/04/2008
+    @COMPILERS          + Delphi 7
+                        + DelphiDabbler Version Information Editor v2.11
+                        + Borland BRCC32 v5.4
+    @COMMENTS           Renamed program from BPatch to BPtch and removed the
+                        word "patch" from version information. This was to
+                        prevent Windows Vista from requiring the program to be
+                        run in elevated state.
+    @FILES(
+      @UPDATED(
+        @FILE           BPtch.dpr
+        @VERSION        1.2
+        @RENAMED_FROM   BPatch.dpr
+      )
+      @UPDATED(
+        @FILE           VBPatch.vi
+        @DATE           07/04/2008
+        @COMMENTS       + Updated file version to 0.2.4 build 4 and product
+                          version to 0.2.4.
+                        + Rephrased text to avoid the use of the word "patch"
+                          due to problems with Windows Vista.
+                        + Changed OriginalFileName to BPtch.exe
+      )
+      @UPDATED(
+        @FILE           Build.bat
+        @VERSION        1.1
+      )
+    )
+  )
+  @REVISION(
+    @VERSION            0.2.5 (build 5)
+    @DATE               14/08/2008
+    @COMPILERS          + Delphi 7
+                        + DelphiDabbler Version Information Editor v2.11.2
+                        + Borland BRCC32 v5.4
+    @COMMENTS           + Renamed program back to BPatch from BPtch.
+                        + Added a manifest to resources that informs Vista to
+                          run the program as invoked. This overrides Vista's
+                          desire to run elevated because "patch" is in file
+                          name.
+    @FILES(
+      @UPDATED(
+        @FILE           BPatch.dpr
+        @VERSION        1.3
+        @RENAMED_FROM   BPtch.dpr
+      )
+      @NEW(
+        @FILE           BPatch.manifest
+        @VERSION        1.0
+      )
+      @NEW(
+        @FILE           BPatch.rc
+        @VERSION        1.0
+      )
+      @UPDATED(
+        @FILE           Build.bat
+        @VERSION        1.2
+      )
+      @UPDATED(
+        @FILE           VBPatch.vi
+        @DATE           14/08/2008
+        @COMMENTS       + Updated file version to 0.2.5 build 5 and product
+                          version to 0.2.5.
+                        + Changed OriginalFileName back to BPatch.exe.
+      )
+    )
+  )
+)

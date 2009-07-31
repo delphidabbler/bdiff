@@ -1,0 +1,102 @@
+
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+NOTES ON THE PASCAL TRANSLATION OF BDIFF / BPATCH
+________________________________________________________________________________
+
+
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+BDiff
+________________________________________________________________________________
+
+v0.2.1 (pas)
+¯¯¯¯¯¯¯¯¯¯¯¯
+This version of BDiff is a literal translation of Stefan Reuther's BDiff v0.2
+and exhibits near identical behaviour to the C version. Differences are:
+
++ The Pascal translation is only suitable for use on Windows targets - it
+  compiles to a Win32 console application and uses the Windows API.
+
++ When shell redirection is used in the original C version running under
+  MS-DOS/Windows to create binary difference files, the shell can write CRLF
+  whenever LF appears in the output. This modification does not occur in the
+  Pascal version and therefore it a safe to output binary files using
+  redirection meaning it is not necessary to use the --output switch.
+
++ The numeric parameter to the -m or --min-equal switches must be decimal
+  (i.e. base 10). The C version also supports parameters in C-style hex or
+  octal.
+
++ Windows version information is embedded in the executable file.
+
+
+v0.2.2.2(pas)
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+Modified UBlkSort.pas with translation of bug fix provided by Stefan Reuther.
+Also updated version information so that product number incremented to v0.2.2
+and build number added to file version number.
+
+
+v0.2.3.3 and later
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+From v0.2.3.3 the program broke its link to the C source and began develop
+separately. See the ChangeLog.txt for details of changes.
+
+
+v0.2.5.5 and later
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+A manifest was added to resources that instructed Windows Vista not to run the
+program elevated. 
+
+NOTE: There was no version 0.2.4 - this was skipped to keep in sync with BPatch.
+
+
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+BPatch
+________________________________________________________________________________
+
+v0.2.1(p)
+¯¯¯¯¯¯¯¯¯
+This version of BPatch is a literal translation of Stefan Reuther's BPatch v0.2
+and exhibits near identical behaviour to the C version. Differences are:
+
++ The Pascal translation of BPatch is only suitable for use on Windows targets -
+  it compiles to a Win32 console application and uses the Windows API.
+
++ Patch files read via shell redirection in the Pascal translation are read in
+  pure binary mode, removing necessity to use --input command line switch to
+  read patch file that is required in C implementation on MS-DOS/Windows
+  systems.
+
++ Windows version information is embedded in the executable file.
+
+When only one file is passed on command the program attempts to update the file
+in place but fails since it can't rename the temporary output file as the final
+since this files already exists (i.e. it is the input file). The C
+implementation also exhibits this behaviour.
+
+
+v0.2.1.2(pas)
+¯¯¯¯¯¯¯¯¯¯¯¯¯
+As v0.2.1(pas) except that version information's product number was updated to
+v0.2.2 and build number added to file version number.
+
+
+v0.2.3.3 and later
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+From v0.2.3.3 the program broke its link to the C source and began develop
+separately. See the ChangeLog.txt for details of changes.
+
+NOTE: There was no version 0.2.2 - this was skipped to keep in sync with BDiff.
+
+v0.2.4.4
+¯¯¯¯¯¯¯¯
+v0.2.4.4 of the program was renamed to BPtch and had its version information
+modified due to Windows Vista flagging BPatch as requiring elevation. This was
+simply because of the use of the word "Patch" in its file name and its version
+information! The program reverted to its original name at v0.2.5
+
+v0.2.5.5 and later
+¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+The program was renamed back to BPatch. A manifest was added to resources that
+instructed Windows Vista not to run the program elevated. This got round the
+naming problem identified above and enable restoration to the original name.

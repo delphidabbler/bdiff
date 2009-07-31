@@ -1,0 +1,309 @@
+{ ##
+  @FILE                     UBlkSort.pas
+  @COMMENTS                 Contains code that implements block sort mechanism
+                            of BDiff.
+  @PROJECT_NAME             BDiff
+  @PROJECT_DESC             Outputs difference of binary files (Pascal
+                            translation of original C code).
+  @AUTHOR                   Original C program: Stefan Reuther <Streu@gmx.de>\
+                            Pascal translation: Peter Johnson
+                            <peter@delphidabbler.com>
+  @WEBSITE                  Pascal versions: http://www.delphidabbler.com/
+  @COPYRIGHT                Original C program: copyright © 1999 by Stefan
+                            Reuther.\
+                            Pascal translation: copyright © 2003 by Peter
+                            Johnson.
+  @LEGAL_NOTICE             Copying this program is allowed, as long as you
+                            include original source code and Pascal translation
+                            and document changes you made in a user-visible way
+                            so people know they're using the new version, not
+                            the original C code or Pascal translation.
+  @HISTORY(
+    @REVISION(
+      @VERSION              1.0
+      @DATE                 28/11/2003
+      @COMMENTS             Original Pascal translation of original blksort.c.
+    )
+    @REVISION(
+      @VERSION              1.1
+      @DATE                 21/12/2003
+      @COMMENTS             Bug fix based on updated blksort.c provided by
+                            Stefan Reuther.
+    )
+  )
+}
+
+
+unit UBlkSort;
+
+
+interface
+
+uses
+  // Delphi
+  Windows, SysUtils,                    //#include <stdlib.h>
+  // Project
+  UBDiffTypes;
+
+
+{ "exported" functions: used by main BDiff engine }
+
+function block_sort(data: PShortIntArray; dlen: size_t): PBlock;
+
+function find_string(data: PShortIntArray; block: PBlock; len: size_t;
+                    sub: PShortInt; max: size_t;
+                    index: Psize_t): size_t;
+
+
+implementation
+
+
+{
+  GENERAL IMPLEMENTATION NOTE (Stefan Reuther)
+
+    + Block-sort part of bdiff:
+
+      Taking the data area of length N, we generate N substrings:
+      - first substring is data area, length N
+      - 2nd is data area sans first character, length N-1
+      - ith is data area sans first i-1 characters, length N-i+1
+      - Nth is last character of data area, length 1
+
+      These strings are sorted to allow fast (i.e., binary) searching in data
+      area. Of course, we don't really generate these N*N/2 bytes of strings: we
+      use an array of N size_t's indexing the data.
+
+  PASCAL IMPLEMENTATION NOTES (Peter Johnson)
+
+    + The fact that C's Char type is signed and Pascal's is unsigned is relevant
+      to the string sorting and accessing code described above. Thefore we use
+      Pascal's signed byte type - ShortInt - here to maintain the data buffer to
+      ensure that the the Pascal performs in the same way as the C code.
+}
+
+
+
+
+uses
+  // Project
+  UBDiffUtils;
+
+
+{
+  ABOUT THIS IMPLEMENTATION
+
+  This version of the block sort code is a literal translation of Stefan
+  Reuther's blksort.c file from BDiff v0.2.
+
+  The Pascal translation is on the left in the following code, while the
+  equivalent original C code is displayed on the right.
+}
+
+
+// ++++++++++++++++++++++++++++++++++++ // ++++++++++++++++++++++++++++++++++ //
+// +        PASCAL TRANSLATION        + // +            ORIGINAL C          + //
+// ++++++++++++++++++++++++++++++++++++ // ++++++++++++++++++++++++++++++++++ //
+                                        //
+                                        //
+{ compare positions a and b in data     //
+area, consider maximum length dlen }    //
+                                        //
+function block_sort_compare(a: size_t;  //int block_sort_compare(size_t a,
+  b: size_t; data: PShortIntArray;      //.. size_t b, char* data, size_t dlen)
+  dlen: size_t): Integer;               //
+var                                     //
+  pa: PShortInt;                        //char* pa = data + a;
+  pb: PShortInt;                        //char* pb = data + b;
+  len: size_t;                          //size_t len = dlen - a;
+begin                                   //{
+  pa := @data[a];                       //  char* pa = data + a;
+  pb := @data[b];                       //  char* pb = data + b;
+  len := dlen - a;                      //  size_t len = dlen - a;
+  if dlen - b < len then                //  if(dlen - b < len)
+    len := dlen - b;                    //    len = dlen - b;
+  while (len <> 0) and (pa^ = pb^) do   //  while(len && *pa == *pb)
+  begin                                 //
+    Inc(pa); Inc(pb); Dec(len);         //    pa++, pb++, len--;
+  end;                                  //
+  if len = 0 then                       //  if(len == 0)
+  begin                                 //
+    Result := a - b; Exit;              //    return a - b;
+  end;                                  //
+  Result := pa^ - pb^;                  //  return *pa - *pb;
+end;                                    //}
+                                        //
+                                        //
+{ the `sink element' part of heapsort } //
+                                        //
+procedure block_sort_sink(le: size_t;   //void block_sort_sink(size_t le,
+  ri: size_t; block: PBlock;            //.. size_t ri, size_t* block,
+  data: PShortIntArray; dlen: size_t);  //.. char* data, size_t dlen)
+var                                     //
+  i, j, x: size_t;                      //size_t i, j, x;
+begin                                   //{
+                                        //  size_t i, j, x;
+  i := le;                              //  i = le;
+  x := block[i];                        //  x = block[i];
+  while True do                         //  while(1) {
+  begin                                 //
+    j := 2*i+1;                         //    j = 2*i+1;
+    if j >= ri then                     //    if(j >= ri)
+      Break;                            //      break;
+    if j < ri-1 then                    //    if(j < ri-1)
+      if block_sort_compare(block[j],   //      if(block_sort_compare(block[j],
+        block[j+1], data, dlen) < 0 then//..      block[j+1], data, dlen) < 0)
+        Inc(j);                         //        j++;
+    if block_sort_compare(x, block[j],  //      if(block_sort_compare(x,
+      data, dlen) > 0 then              //..      block[j], data, dlen) > 0)
+      Break;                            //        break;
+    block[i] := block[j];               //    block[i] = block[j];
+    i := j;                             //    i = j;
+  end;                                  //  }
+  block[i] := x;                        //  block[i] = x;
+end;                                    //}
+                                        //
+                                        //
+{ returns array of offsets into data,   //
+  sorted by position }                  //
+{ returns 0 on error (out of memory) }  //
+                                        //
+function block_sort(                    //size_t* block_sort(char* data,
+  data: PShortIntArray;                 //.. size_t dlen)
+  dlen: size_t): PBlock;                //
+var                                     //
+  block: PBlock;                        //size_t* block = malloc(sizeof(size_t)
+                                        //.. * dlen);
+  i, le, ri: size_t;                    //size_t i, le, ri;
+  x: size_t;                            //size_t x = block[le];
+begin                                   //{
+  block := malloc(sizeof(size_t)        //  size_t* block = malloc(
+    * dlen);                            //..  sizeof(size_t) * dlen);
+                                        //  size_t i, le, ri;
+  if not Assigned(block)                //  if(!block || !dlen)
+    or (dlen = 0) then                  //
+  begin                                 //
+    Result := nil; Exit;                //    return 0;
+  end;                                  //
+                                        //
+  { initialize unsorted data }          //
+  for i := 0 to Pred(dlen) do           //  for(i = 0; i < dlen; i++)
+    block[i] := i;                      //    block[i] = i;
+                                        //
+  { heapsort }                          //
+  le := dlen div 2;                     //  le = dlen/2;
+  ri := dlen;                           //  ri = dlen;
+  while le > 0 do                       //  while(le > 0) {
+  begin                                 //
+    Dec(le);                            //    le--;
+    block_sort_sink(le, ri, block,      //    block_sort_sink(le, ri, block,
+      data, dlen);                      //..    data, dlen);
+  end;                                  //  }
+  while ri > 0 do                       //  while(ri > 0) {
+  begin                                 //
+    x := block[le];                     //    size_t x = block[le];
+    block[le] := block[ri-1];           //    block[le] = block[ri-1];
+    block[ri-1] := x;                   //    block[ri-1] = x;
+    Dec(ri);                            //    ri--;
+    block_sort_sink(le, ri, block,      //    block_sort_sink(le, ri, block,
+      data, dlen);                      //..    data, dlen);
+  end;                                  //  }
+  Result := block;                      //  return block;
+end;                                    // }
+                                        //
+                                        //
+{ compute common stem of the data       //
+  blocks:                               //
+    return[i]==N  <=>  the first N bytes//
+    of data[block[i]] and               //
+    data[block[i-1]] are equal }        //
+                                        //size_t* compute_common_stem(char*
+                                        //..data, size_t* block, size_t len)
+                                        //{
+  ////////////////////////////////      //  size_t* p = malloc(sizeof(size_t) *
+  // This function has not been //      //..  len);
+  // translated as it is unused //      //  size_t i;
+  ////////////////////////////////      //  char* a, *b;
+                                        //  if(!p || !len)
+                                        //    return 0;
+                                        //  p[0] = 0;
+                                        //  for(i = 1; i < len; i++) {
+                                        //    /* max nr of data bytes */
+                                        //    size_t n = len - block[i-1];
+                                        //    size_t n1 = len - block[i];
+                                        //    if(n1 < n)
+                                        //      n = n1;
+                                        //    n1 = n;
+                                        //    a = &data[block[i-1]];
+                                        //    b = &data[block[i]];
+                                        //    while(n && *a==*b)
+                                        //      n--, a++, b++;
+                                        //    p[i] = n1-n;
+                                        //  }
+                                        //  return p;
+                                        //}
+                                        //
+                                        //
+{ find maximum length substring         //
+   starting at sub, at most max bytes   //
+   data, block, len characterize source //
+   fill *index returns found location   //
+   return value is found length }       //
+                                        //
+function find_string(                   //size_t find_string(char* data,
+  data: PShortIntArray;                 //.. size_t* block, size_t len,
+  block: PBlock; len: size_t;           //.. char* sub, size_t max,
+  sub: PShortInt; max: size_t;          //.. size_t* index)
+  index: Psize_t): size_t;              //
+var                                     //
+  first, last: size_t;                  //size_t first = 0, last = len-1;
+  mid: size_t;                          //size_t mid = 0;
+  l0, l: size_t;                        //size_t l0 = 0, l = 0;
+  pm: PShortInt;                        //char* pm;
+  sm: PShortInt;                        //char* sm;
+  retval: size_t;                       //size_t retval = 0;
+begin                                   //{
+  first := 0; last := len - 1;          //  size_t first = 0, last = len-1;
+//mid := 0;                             //  size_t mid = 0;
+//l0 := 0; l := 0;                      //  size_t l0 = 0, l = 0;
+                                        //  char* pm;
+                                        //  char* sm;
+  retval := 0;                          //  size_t retval = 0;
+  index^ := 0;                          //  *index = 0;
+                                        //
+  while first <= last do                //  while(first <= last) {
+  begin                                 //
+    mid := (first + last) div 2;        //    mid = (first+last)/2;
+    pm := @data[block[mid]];            //    pm = &data[block[mid]];
+    sm := sub;                          //    sm = sub;
+    l := len - block[mid];              //    l = len - block[mid];
+    if l > max then                     //    if(l > max)
+      l := max;                         //      l = max;
+    l0 := l;                            //    l0 = l;
+    while (l <> 0) and (pm^ = sm^) do   //    while(l && *pm == *sm)
+    begin                               //
+      Dec(l); Inc(pm); Inc(sm);         //      l--, pm++, sm++;
+    end;                                //
+                                        //
+    { we found a `match' of length l0-l,//
+      position block[mid] }             //
+    if l0 - l > retval then             //    if(l0 - l > retval) {
+    begin                               //
+      retval := l0 - l;                 //      retval = l0 - l;
+      index^ := block[mid];             //      *index = block[mid];
+    end;                                //    }
+                                        //
+    if (l = 0) or (pm^ < sm^) then      //    if(l == 0 || *pm < *sm)
+      first := mid + 1                  //      first = mid + 1;
+      else                              //    else {
+      begin
+        last := mid;                    //      last = mid;
+        if last <> 0 then               //      if(last)
+          Dec(last)                     //        last--;
+        else                            //      else
+          Break;                        //        break;
+      end;                              //    }
+  end;                                  //  }
+  Result := retval;                     //  return retval;
+end;                                    //}
+
+end.

@@ -1,0 +1,36 @@
+v0.2.5 - released 14 Aug 2008
+BDiff.exe v0.2.5 (build 5) [v0.2.4 skipped]
+BPatch.exe v0.2.5 (build 5)
++ Renamed BPtch back to BPatch.
++ Added manifests to resources of both BPatch and BDiff to inform Windows Vista to run them as invoked. This prevents Vista from elevating BPatch because of the word "patch" in its name.
+
+v0.2.4 - released 07 Apr 2008
+BDiff.exe v0.2.3 (build 4)
+BPtch.exe v0.2.4 (build 4)
++ Renamed BPatch as BPtch to prevent Windows Vista from flagging the program as requiring elevation.
++ Also altered BPtch's version information to remove the word "patch" for same reason!
++ BDiff was not changed except for incrementing build number.
+
+v0.2.3 - released 18 Sep 2007
+BDiff.exe v0.2.3 (build 3)
+BPatch.exe v0.2.3 (build 3) [v0.2.2 skipped]
++ Fixed bug where BPatch could not overwrite existing files.
++ Fixed small bug in -h and -v switches in both programs.
++ Fixed memory leaks in BDiff.
++ Prevented compiler warnings in both programs.
++ Added batch files to build projects.
++ Updated help screens.
++ Made some minor refactorings.
++ Removed conditional compilation for non-Windows targets.
++ Added test batch file a sample files.
++ Changed to new binary and source license.
+
+v0.2.2(pas) - released 21 Dec 2003
+BDiff.exe v0.2.2 (build 2)
+BPatch.exe v0.2.1 (build 2)
++ Fixed bug in BDiff by translating revised C code provided by Stefan Reuther. BDiff.exe is affected by the change while BPatch.exe remains unchanged.
+
+v0.2.1(pas) - released 29 Nov 2003
+BDiff.exe v0.2.1 (build 1)
+BPatch.exe v0.2.1 (build 1)
++ First Pascal version. This is a direct translation of v0.2 of Stefan Reuther's C code published in 1999.
