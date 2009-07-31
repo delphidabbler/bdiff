@@ -69,7 +69,7 @@ with '@' inform you about the position of the next 'space' line in the source
 file (byte offset).
 
 Unlike in diff, there's no implicit line feed after each line of output.
-Non-printable characters (see isprint(3)) and the backslash character are
+Non-printable characters (see isprint(3)[1]) and the backslash character are
 represented by a \ followed by the octal three-digit character code.
 
 The filtered format is like the quoted format, but non-printable characters are
@@ -86,12 +86,12 @@ words are in little-endian format (low byte first). The format is:
 n bytes  - The patch itself, a sequence of the following records:
 
   literally added data:
-  1 byte   - ASCII 43 (`+');
+  1 byte   - ASCII 43 ('+');
   4 bytes  - number of bytes;
   n bytes  - data.
 
   common block:
-  1 byte   - ASCII 64 (`@');
+  1 byte   - ASCII 64 ('@');
   4 bytes  - file position in old file;
   4 bytes  - number of bytes;
   4 bytes  - checksum.
@@ -113,10 +113,15 @@ ADMINISTRATIVIA
 
 This manual page is for version 0.2.5 of bdiff.
 
-(c) copyright 1999 by Stefan Reuther <Streu@gmx.de> and (c) 2003-2008 by Peter
+(c) copyright 1999 by Stefan Reuther <Streu@gmx.de> and (c) 2003-2009 by Peter
 Johnson (www.delphidabbler.com). See the LICENSE file for details of permisable
 use.
 
 THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
 NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF
 THIS SOFTWARE.
+
+
+FOOTNOTES
+
+[1] http://www.openbsd.org/cgi-bin/man.cgi?query=isprint&sektion=3
