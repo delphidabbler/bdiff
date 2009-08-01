@@ -407,8 +407,7 @@ begin
       + 'or ''binary'')'#13#10
       + ' -m N  --min-equal=N  Minimum equal bytes to recognize an equal chunk'
       + #13#10
-      + ' -o FN --output=FN    Set output file name (instead of stdout)'
-      + 'output'#13#10
+      + ' -o FN --output=FN    Set output file name (instead of stdout)'#13#10
       + ' -V    --verbose      Show status messages'#13#10
       + ' -h    --help         Show this help screen'#13#10
       + ' -v    --version      Show version information'#13#10
