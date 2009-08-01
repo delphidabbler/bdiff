@@ -1,41 +1,8 @@
-{ ##
-  @FILE                     UBlkSort.pas
-  @COMMENTS                 Contains code that implements block sort mechanism
-                            of BDiff.
-  @PROJECT_NAME             BDiff
-  @PROJECT_DESC             Outputs difference of binary files (Pascal
-                            translation of original C code).
-  @AUTHOR                   Original C program: Stefan Reuther <Streu@gmx.de>\
-                            Pascal translation: Peter Johnson
-                            <peter@delphidabbler.com>
-  @WEBSITE                  Pascal versions: http://www.delphidabbler.com/
-  @COPYRIGHT                Original C program: copyright © 1999 by Stefan
-                            Reuther.\
-                            Pascal translation: copyright © 2003 by Peter
-                            Johnson.
-  @LEGAL_NOTICE             Copying this program is allowed, as long as you
-                            include original source code and Pascal translation
-                            and document changes you made in a user-visible way
-                            so people know they're using the new version, not
-                            the original C code or Pascal translation.
-  @HISTORY(
-    @REVISION(
-      @VERSION              1.0
-      @DATE                 28/11/2003
-      @COMMENTS             Original Pascal translation of original blksort.c.
-    )
-    @REVISION(
-      @VERSION              1.1
-      @DATE                 21/12/2003
-      @COMMENTS             Bug fix based on updated blksort.c provided by
-                            Stefan Reuther.
-    )
-  )
-}
-
-
-unit UBlkSort;
-
+// -----------------------------------------------------------------------------
+// NOTE: DO NOT COMPILE THIS CODE
+//       Provided to test BDiff and BPatch
+// -----------------------------------------------------------------------------
+unit PatchTestUnit;
 
 interface
 
@@ -58,46 +25,9 @@ function find_string(data: PShortIntArray; block: PBlock; len: size_t;
 implementation
 
 
-{
-  GENERAL IMPLEMENTATION NOTE (Stefan Reuther)
-
-    + Block-sort part of bdiff:
-
-      Taking the data area of length N, we generate N substrings:
-      - first substring is data area, length N
-      - 2nd is data area sans first character, length N-1
-      - ith is data area sans first i-1 characters, length N-i+1
-      - Nth is last character of data area, length 1
-
-      These strings are sorted to allow fast (i.e., binary) searching in data
-      area. Of course, we don't really generate these N*N/2 bytes of strings: we
-      use an array of N size_t's indexing the data.
-
-  PASCAL IMPLEMENTATION NOTES (Peter Johnson)
-
-    + The fact that C's Char type is signed and Pascal's is unsigned is relevant
-      to the string sorting and accessing code described above. Thefore we use
-      Pascal's signed byte type - ShortInt - here to maintain the data buffer to
-      ensure that the the Pascal performs in the same way as the C code.
-}
-
-
-
-
 uses
   // Project
   UBDiffUtils;
-
-
-{
-  ABOUT THIS IMPLEMENTATION
-
-  This version of the block sort code is a literal translation of Stefan
-  Reuther's blksort.c file from BDiff v0.2.
-
-  The Pascal translation is on the left in the following code, while the
-  equivalent original C code is displayed on the right.
-}
 
 
 // ++++++++++++++++++++++++++++++++++++ // ++++++++++++++++++++++++++++++++++ //
