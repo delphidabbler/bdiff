@@ -58,5 +58,5 @@ VIED = "VIEd.exe" -makerc
 # Version info files are compiled by VIEd. A temporary .rc file is left behind
 .vi.rc:
   @echo +++ Compiling Version Info file $< +++
-  @$(VIED) $<
+  @$(VIED) .\$<
 
