@@ -27,7 +27,8 @@ uses
   Windows,
   UBPatch in 'UBPatch.pas',
   UBPatchUtils in 'UBPatchUtils.pas',
-  UBPatchTypes in 'UBPatchTypes.pas';
+  UBPatchTypes in 'UBPatchTypes.pas',
+  UAppInfo in '..\Common\UAppInfo.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources
