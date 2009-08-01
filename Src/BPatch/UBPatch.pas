@@ -37,24 +37,22 @@ implementation
 uses
   // Delphi
   Windows, SysUtils,
-  // Project: special types & routines
-  UBPatchUtils, UBPatchTypes;
+  // Project
+  UAppInfo, UBPatchUtils, UBPatchTypes;
 
 const
-  VERSION_ = '0.2.3';     // this program's version number
   FORMAT_VERSION = '02';  // binary diff file format version
   BUFFER_SIZE = 4096;     // size of buffer used to read files
 
 var
   { Global variables }
-  progname: string;         // program name
   tempfile: string = '';    // name of temporary file
   tempfd: Integer = 0;      // handle to temp file
 
 { Exit program with error message }
 procedure error_exit(msg: string);
 begin
-  fprintf(stderr, '%s: %s'#13#10, [progname, msg]);
+  fprintf(stderr, '%s: %s'#13#10, [ProgramFileName, msg]);
   if tempfd > 0 then
     fclose(tempfd);
   if tempfile <> '' then
@@ -248,9 +246,9 @@ end;
 { Help & exit }
 procedure help;
 begin
-  fprintf(stdout, '%s: binary ''patch'' - apply binary patch'#13#10
+  fprintf(stdout, '%0:s: binary ''patch'' - apply binary patch'#13#10
     + #13#10
-    + 'Usage: %s [options] old-file [new-file] [<patch-file]'#13#10#13#10
+    + 'Usage: %0:s [options] old-file [new-file] [<patch-file]'#13#10#13#10
     + 'Creates new-file from old-file and patch-file'#13#10
     + 'If new-file is not provided old-file is updated in place'#13#10
     + #13#10
@@ -262,30 +260,19 @@ begin
     + #13#10
     + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
     + '(c) copyright 2003-2007 Peter Johnson (www.delphidabbler.com)'#13#10,
-    [progname, progname]);
+    [ProgramFileName]);
   Halt(0);
 end;
 
 { Version & exit }
 procedure version;
-  function ExeDate: string;
-  var
-    H: Integer;
-    DOSDate: Integer;
-  begin
-    H := FileOpen(ParamStr(0), fmOpenRead + fmShareDenyNone);
-    try
-      DOSDate := FileGetDate(H);
-    finally
-      FileClose(H);
-    end;
-    Result := FormatDateTime('dd mmm yyy', FileDateToDateTime(DOSDate));
-  end;
 begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
-  fprintf(stdout, 'bpatch-%s %s '#13#10, [VERSION_, ExeDate]);
+  fprintf(
+    stdout, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
+  );
   Halt(0);
 end;
 
@@ -303,8 +290,6 @@ begin
   oldfn := '';
   newfn := '';
   infn := '';
-
-  progname := ExtractFileName(ParamStr(0));
 
   i := 1;
   while i <= ParamCount do
@@ -327,7 +312,8 @@ begin
           if (argv^ = #0) then
           begin
             fprintf(
-              stderr, '%s: missing argument to ''--input'''#13#10, [progname]
+              stderr, '%s: missing argument to ''--input'''#13#10,
+              [ProgramFileName]
             );
             Halt(1);
           end
@@ -340,9 +326,9 @@ begin
         begin
           fprintf(
             stderr,
-            '%s: unknown option ''--%s'''#13#10
-              + '%s: try ''%s --help'' for more information'#13#10,
-            [progname, p, progname, progname]);
+            '%0:s: unknown option ''--%1:s'''#13#10
+              + '%0:s: try ''%0:s --help'' for more information'#13#10,
+            [ProgramFileName, p]);
           Halt(1);
         end;
       end
@@ -364,7 +350,8 @@ begin
               if argv^ = #0 then
               begin
                 fprintf(
-                  stderr, '%s: missing argument to ''-i'''#13#10, [progname]
+                  stderr, '%s: missing argument to ''-i'''#13#10,
+                  [ProgramFileName]
                 );
                 Halt(1);
               end
@@ -375,9 +362,9 @@ begin
             begin
               fprintf(
                 stderr,
-                '%s: unknown option ''-%s'''#13#10
-                  + '%s: try ''%s --help'' for more information'#13#10,
-                [progname, p^, progname, progname]
+                '%0:s: unknown option ''-%1:s'''#13#10
+                  + '%0:s: try ''%0:s --help'' for more information'#13#10,
+                [ProgramFileName, p^]
               );
               Halt(1);
             end;
@@ -402,9 +389,9 @@ begin
   begin
     fprintf(
       stderr,
-      '%s: File name argument missing'#13#10
-        + '%s: try ''%s --help'' for more information'#13#10,
-      [progname, progname, progname]);
+      '%0:s: File name argument missing'#13#10
+        + '%0:s: try ''%0:s --help'' for more information'#13#10,
+      [ProgramFileName]);
     Halt(1);
   end;
 

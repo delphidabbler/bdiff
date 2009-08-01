@@ -1,5 +1,5 @@
 {
- * UBDiff.dpr
+ * UBDiff.pas
  *
  * Main program logic for BDiff.
  *
@@ -37,13 +37,10 @@ implementation
 uses
   // Delphi
   SysUtils, Windows,
-  // Project: translation of blksort.c
-  UBlkSort,
-  // Project: special types & routines
-  UBDiffTypes, UBDiffUtils;
+  // Project
+  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort;
 
 const
-  VERSION_        = '0.2.3';    // this program's version number
   FORMAT_VERSION  = '02';       // binary diff file format version
   BUFFER_SIZE     = 4096;       // size of buffer used to read files
 
@@ -64,7 +61,6 @@ type
 
 { Global variables }
 var
-  progname: string;             // used in error messages, set in main()
   min_len: size_t = 24;         // default minimum match length
   format: TFormat = FMT_QUOTED; // default output format
   verbose: Integer = 0;         // verbose mode defaults to off / false
@@ -121,7 +117,7 @@ var
 { Exit program with error message }
 procedure error_exit(msg: string);
 begin
-  WriteStrFmt(stderr, '%s: %s'#13#10, [progname, msg]);
+  WriteStrFmt(stderr, '%s: %s'#13#10, [ProgramFileName, msg]);
   Halt(1);
 end;
 
@@ -155,7 +151,9 @@ begin
     ReallocMem(tmp, cur_len + len);
     if not Assigned(tmp) then
     begin
-      WriteStrFmt(stderr, '%s: Virtual memory exhausted' + #13#10, [progname]);
+      WriteStrFmt(
+        stderr, '%s: Virtual memory exhausted' + #13#10, [ProgramFileName]
+      );
       Halt(1);
     end;
     data := tmp;
@@ -342,7 +340,7 @@ end;
 procedure log_status(const p: string);
 begin
   if verbose <> 0 then
-    WriteStrFmt(stderr, '%s: %s'#13#10, [progname, p]);
+    WriteStrFmt(stderr, '%s: %s'#13#10, [ProgramFileName, p]);
 end;
 
 { Main routine: generate diff }
@@ -367,7 +365,9 @@ begin
     sort := block_sort(data, len);
     if not Assigned(sort) then
     begin
-      WriteStrFmt(stderr, '%s: virtual memory exhausted'#13#10, [progname]);
+      WriteStrFmt(
+        stderr, '%s: virtual memory exhausted'#13#10, [ProgramFileName]
+      );
       // Halt(1); -- Deleted since skips finally section below
       error_code := 1;  // replacement code causes Halt(1) after mem freed
       Exit;             // in finally section
@@ -418,8 +418,8 @@ procedure help;
 begin
   WriteStrFmt(
     stdout,
-    '%s: binary ''diff'' - compare two binary files'#13#10#13#10
-      + 'Usage: %s [options] old-file new-file [>patch-file]'#13#10#13#10
+    '%0:s: binary ''diff'' - compare two binary files'#13#10#13#10
+      + 'Usage: %0:s [options] old-file new-file [>patch-file]'#13#10#13#10
       + 'Difference between old-file and new-file written to standard output'
       + #13#10#13#10
       + 'Valid options:'#13#10
@@ -438,33 +438,20 @@ begin
       + #13#10
       + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
       + '(c) copyright 2003-2007 Peter Johnson (www.delphidabbler.com)'#13#10,
-    [progname, progname]
+    [ProgramFileName]
   );
   Halt(0);
 end;
 
 { Display version & exit }
 procedure version;
-
-  function ExeDate: string;
-  var
-    H: Integer;
-    DOSDate: Integer;
-  begin
-    H := FileOpen(ParamStr(0), fmOpenRead + fmShareDenyNone);
-    try
-      DOSDate := FileGetDate(H);
-    finally
-      FileClose(H);
-    end;
-    Result := FormatDateTime('dd mmm yyy', FileDateToDateTime(DOSDate));
-  end;
 begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
-  // todo: get _VERSION from resources
-  WriteStrFmt(stdout, 'bdiff-%s %s '#13#10, [VERSION_, ExeDate]);
+  WriteStrFmt(
+    stdout, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
+  );
   Halt(0);
 end;
 
@@ -514,8 +501,6 @@ begin
   newfn := '';
   outfn := '';
 
-  progname := ExtractFileName(ParamStr(0));
-
   { Parse command line }
   i := 1;
   while (i <= ParamCount) do
@@ -540,7 +525,8 @@ begin
           if (argv^ = #0) then
           begin
             WriteStrFmt(
-              stderr, '%s: missing argument to ''--output'''#13#10, [progname]
+              stderr,
+              '%s: missing argument to ''--output'''#13#10, [ProgramFileName]
             );
             Halt(1);
           end
@@ -569,9 +555,9 @@ begin
         begin
           WriteStrFmt(
             stderr,
-            '%s: unknown option ''--%s'''#13#10
-              + '%s: try ''%s --help'' for more information'#13#10,
-            [progname, p, progname, progname]
+            '%0:s: unknown option ''--%1:s'''#13#10
+              + '%0:s: try ''%0:s --help'' for more information'#13#10,
+            [ProgramFileName, p]
           );
           Halt(1);
         end;
@@ -608,7 +594,8 @@ begin
               if argv^ = #0 then
               begin
                 WriteStrFmt(
-                  stderr, '%s: missing argument to ''-o'''#13#10, [progname]
+                  stderr, '%s: missing argument to ''-o'''#13#10,
+                  [ProgramFileName]
                   );
                 Halt(1);
               end
@@ -618,9 +605,9 @@ begin
             else
               WriteStrFmt(
                 stderr,
-                '%s: unknown option ''-%s'''#13#10
-                  + '%s: try %s --help'' for more information'#13#10,
-                [progname, p^, progname, progname]);
+                '%0:s: unknown option ''-%1:s'''#13#10
+                  + '%0:s: try %0:s --help'' for more information'#13#10,
+                [ProgramFileName, p^]);
               Halt(1);
           end;
           Inc(p);
