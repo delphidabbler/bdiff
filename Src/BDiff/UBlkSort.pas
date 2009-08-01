@@ -41,10 +41,10 @@ uses
 
 { "exported" functions: used by main BDiff engine }
 
-function block_sort(data: PShortIntArray; dlen: size_t): PBlock;
+function block_sort(data: PSignedAnsiCharArray; dlen: size_t): PBlock;
 
-function find_string(data: PShortIntArray; block: PBlock; len: size_t;
-  sub: PShortInt; max: size_t; index: Psize_t): size_t;
+function find_string(data: PSignedAnsiCharArray; block: PBlock; len: size_t;
+  sub: PSignedAnsiChar; max: size_t; index: Psize_t): size_t;
 
 
 implementation
@@ -65,11 +65,11 @@ implementation
       area. Of course, we don't really generate these N*N/2 bytes of strings: we
       use an array of N size_t's indexing the data.
 
-  PASCAL IMPLEMENTATION NOTES (Peter Johnson)
+  PASCAL IMPLEMENTATION NOTE (Peter Johnson)
 
-    The fact that C's Char type is signed and Pascal's is unsigned is relevant
-    to the string sorting and accessing code described above. Thefore we use
-    Pascal's signed byte type - ShortInt - here to maintain the data buffer to
+    The fact that C's (ansi) Char type is signed and Pascal's is unsigned is
+    relevant to the string sorting and accessing code described above. Thefore
+    we use a specially defined SignedAnsiChar to maintain the data buffer to
     ensure that the the Pascal performs in the same way as the C code.
 }
 
@@ -87,18 +87,18 @@ uses
 
   v1.1 was a literal translation of Stefan's bug fix to blksort.c.
 
-  v1.2 of this file has been updated and is no longer a direct translation of
+  From v1.2 of this file has been updated and is no longer a direct translation of
   Stefan's code, although it is functionally very similar. The C code has now
   been stripped from the file.
 }
 
 
 { Compare positions a and b in data area, consider maximum length dlen }
-function block_sort_compare(a: size_t; b: size_t; data: PShortIntArray;
+function block_sort_compare(a: size_t; b: size_t; data: PSignedAnsiCharArray;
   dlen: size_t): Integer;
 var
-  pa: PShortInt;
-  pb: PShortInt;
+  pa: PSignedAnsiChar;
+  pb: PSignedAnsiChar;
   len: size_t;
 begin
   pa := @data[a];
@@ -122,7 +122,7 @@ end;
 
 { The 'sink element' part of heapsort }
 procedure block_sort_sink(le: size_t; ri: size_t; block: PBlock;
-  data: PShortIntArray; dlen: size_t);
+  data: PSignedAnsiCharArray; dlen: size_t);
 var
   i, j, x: size_t;
 begin
@@ -147,7 +147,7 @@ end;
 { Returns array of offsets into data, sorted by position }
 { Raises EOutOfMemory if can't allocate block }
 { Returns reference to allocated block or nil if dlen = 0 }
-function block_sort(data: PShortIntArray; dlen: size_t): PBlock;
+function block_sort(data: PSignedAnsiCharArray; dlen: size_t): PBlock;
 var
   block: PBlock;
   i, le, ri: size_t;
@@ -187,14 +187,14 @@ end;
 { Find maximum length substring starting at sub, at most max bytes data, block,
   len characterize source fill *index returns found location return value is
   found length }
-function find_string(data: PShortIntArray; block: PBlock; len: size_t;
-  sub: PShortInt; max: size_t; index: Psize_t): size_t;
+function find_string(data: PSignedAnsiCharArray; block: PBlock; len: size_t;
+  sub: PSignedAnsiChar; max: size_t; index: Psize_t): size_t;
 var
   first, last: size_t;
   mid: size_t;
   l0, l: size_t;
-  pm: PShortInt;
-  sm: PShortInt;
+  pm: PSignedAnsiChar;
+  sm: PSignedAnsiChar;
   retval: size_t;
 begin
   first := 0;

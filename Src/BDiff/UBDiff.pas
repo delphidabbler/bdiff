@@ -114,27 +114,27 @@ type
     header:
       procedure(oldfn, newfn: string; olds, news: size_t);
     add:
-      procedure(data: PShortInt; len: size_t);
+      procedure(data: PSignedAnsiChar; len: size_t);
     copy:
-      procedure(nbase: PShortIntArray; npos: size_t; obase: PShortIntArray;
-        opos: size_t; len: size_t);
+      procedure(nbase: PSignedAnsiCharArray; npos: size_t;
+        obase: PSignedAnsiCharArray; opos: size_t; len: size_t);
   end;
 
 procedure print_binary_header(oldfn, newfn: string; oldl, newl: size_t);
   forward;
 procedure print_text_header(oldfn, newfn: string; olds, news: size_t);
   forward;
-procedure print_binary_add(data: PShortInt; len: size_t);
+procedure print_binary_add(data: PSignedAnsiChar; len: size_t);
   forward;
-procedure print_filtered_add(data: PShortInt; len: size_t);
+procedure print_filtered_add(data: PSignedAnsiChar; len: size_t);
   forward;
-procedure print_quoted_add(data: PShortInt; len: size_t);
+procedure print_quoted_add(data: PSignedAnsiChar; len: size_t);
   forward;
-procedure print_text_copy(nbase: PShortIntArray; npos: size_t;
-  obase: PShortIntArray; opos: size_t; len: size_t);
+procedure print_text_copy(nbase: PSignedAnsiCharArray; npos: size_t;
+  obase: PSignedAnsiCharArray; opos: size_t; len: size_t);
   forward;
-procedure print_binary_copy(nbase: PShortIntArray; npos: size_t;
-  obase: PShortIntArray; opos: size_t; len: size_t);
+procedure print_binary_copy(nbase: PSignedAnsiCharArray; npos: size_t;
+  obase: PSignedAnsiCharArray; opos: size_t; len: size_t);
   forward;
 
 var
@@ -166,14 +166,14 @@ end;
 
 { Load file, returning pointer to file data, exits with error message if out of
   memory or not found }
-function load_file(file_name: string; size_ret: Psize_t): PShortIntArray;
+function load_file(file_name: string; size_ret: Psize_t): PSignedAnsiCharArray;
 var
   fp: File of Byte;                         // file pointer
-  data: PShortIntArray;
+  data: PSignedAnsiCharArray;
   buffer: array[0..BUFFER_SIZE-1] of Byte;  // buffer to read file
   len: size_t;
   cur_len: size_t;
-  tmp: PShortIntArray;
+  tmp: PSignedAnsiCharArray;
 begin
   { open file }
   AssignFile(fp, file_name);
@@ -217,7 +217,7 @@ begin
 end;
 
 { Pack long in little-endian format minto p }
-procedure pack_long(p: PShortInt; l: Longint);
+procedure pack_long(p: PSignedAnsiChar; l: Longint);
 begin
   p^ := l and $FF;
   Inc(p);
@@ -229,7 +229,7 @@ begin
 end;
 
 { Compute simple checksum }
-function checksum(data: PShortInt; len: size_t): Longint;
+function checksum(data: PSignedAnsiChar; len: size_t): Longint;
 var
   l: Longint;
 begin
@@ -247,7 +247,7 @@ end;
 { Print header for 'BINARY' format }
 procedure print_binary_header(oldfn, newfn: string; oldl, newl: size_t);
 var
-  head: array[0..15] of ShortInt;
+  head: array[0..15] of SignedAnsiChar;
 begin
   Move('bdiff' + FORMAT_VERSION + #$1A, head[0], 8); {8 bytes}
   pack_long(@head[8], oldl);
@@ -266,7 +266,7 @@ begin
 end;
 
 { Print data as C-escaped string }
-procedure print_quoted_data(data: PShortInt; len: size_t);
+procedure print_quoted_data(data: PSignedAnsiChar; len: size_t);
 begin
   while (len <> 0) do
   begin
@@ -280,7 +280,7 @@ begin
 end;
 
 { Print data with non-printing characters filtered }
-procedure print_filtered_data(data: PShortInt; len: size_t);
+procedure print_filtered_data(data: PSignedAnsiChar; len: size_t);
 begin
   while len <> 0  do
   begin
@@ -294,9 +294,9 @@ begin
 end;
 
 { Print information for binary diff chunk }
-procedure print_binary_add(data: PShortInt; len: size_t);
+procedure print_binary_add(data: PSignedAnsiChar; len: size_t);
 var
-  buf: array[0..3] of ShortInt;
+  buf: array[0..3] of SignedAnsiChar;
 begin
   WriteStr(stdout, '+');
   pack_long(@buf[0], len);
@@ -305,7 +305,7 @@ begin
 end;
 
 { Print information for filtered diff chunk }
-procedure print_filtered_add(data: PShortInt; len: size_t);
+procedure print_filtered_add(data: PSignedAnsiChar; len: size_t);
 begin
   WriteStr(stdout, '+');
   print_filtered_data(data, len);
@@ -313,7 +313,7 @@ begin
 end;
 
 { Print information for quoted diff chunk }
-procedure print_quoted_add(data: PShortInt; len: size_t);
+procedure print_quoted_add(data: PSignedAnsiChar; len: size_t);
 begin
   WriteStr(stdout, '+');
   print_quoted_data(data, len);
@@ -321,8 +321,8 @@ begin
 end;
 
 { Print information for copied data in text mode }
-procedure print_text_copy(nbase: PShortIntArray; npos: size_t;
-  obase: PShortIntArray; opos: size_t; len: size_t);
+procedure print_text_copy(nbase: PSignedAnsiCharArray; npos: size_t;
+  obase: PSignedAnsiCharArray; opos: size_t; len: size_t);
 begin
   WriteStrFmt(
     stdout,
@@ -337,10 +337,10 @@ begin
 end;
 
 { Print information for copied data in binary mode }
-procedure print_binary_copy(nbase: PShortIntArray; npos: size_t;
-  obase: PShortIntArray; opos: size_t; len: size_t);
+procedure print_binary_copy(nbase: PSignedAnsiCharArray; npos: size_t;
+  obase: PSignedAnsiCharArray; opos: size_t; len: size_t);
 var
-  rec: array[0..11] of ShortInt;
+  rec: array[0..11] of SignedAnsiChar;
 begin
   WriteStr(stdout, '@');
   pack_long(@rec[0], opos);
@@ -352,9 +352,9 @@ end;
 { Find maximum-length match }
 procedure bs_find_max_match(
   m_ret: PMatch;                      { return }
-  data: PShortIntArray; sort: PBlock;
+  data: PSignedAnsiCharArray; sort: PBlock;
   len: size_t;                        { old file }
-  text: PShortInt; tlen: size_t);     { rest of new file }
+  text: PSignedAnsiChar; tlen: size_t);     { rest of new file }
 var
   found_pos: size_t;
   found_len: size_t;
@@ -387,8 +387,8 @@ end;
 { Main routine: generate diff }
 procedure bs_diff(fn, newfn: string);
 var
-  data: PShortIntArray;
-  data2: PShortIntArray;
+  data: PSignedAnsiCharArray;
+  data2: PSignedAnsiCharArray;
   len: size_t;
   len2, todo, nofs: size_t;
   sort: PBlock;

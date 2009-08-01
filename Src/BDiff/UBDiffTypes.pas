@@ -29,12 +29,12 @@ interface
 type
   { size_t type is used extensively in C and in original code for this program.
     We therefore define the size_t and "pointer to size_t" types }
-  size_t = Cardinal;
+  SizeT = Cardinal;
   Psize_t = ^size_t;
 
   { Some uses of *size_t in original C code actually reference an array of
     size_t and are referenced using array[] notation. The following types are
-    declared to use in these circumstances to enabled similar notation in
+    declared to use in these circumstances to enable similar notation in
     Pascal }
   TBlock = array[0..0] of size_t;
   PBlock = ^TBlock;
@@ -42,12 +42,15 @@ type
   { The original C code refers to the buffered file contents as an array of
     Char. The fact that Char is signed in C (-127..128) and unsigned in Pascal
     (0..255) means that the block sort algorithm and string lookup functions
-    operate differently in C and Pascal. We therefore refer to the buffered file
-    contents as an array of ShortInt in the Pascal code since ShortInt is
-    defined as (-127..128). We declare a short int array type and pointer to it
-    to enable us to asscess the buffer using array notation}
-  TShortIntArray = array[0..(MaxInt div SizeOf(ShortInt) - 1)] of ShortInt;
-  PShortIntArray = ^TShortIntArray;
+    operate differently in C and Pascal. We therefore define a signed *ansi*
+    char type - SignedAnsiChar - of the correct range and refer to the buffered
+    file contents as an array of this new type. Since ShortInt is defined as
+    (-127..128) we use this as the basis for SignedAnsiChar}
+  SignedAnsiChar = type ShortInt;
+  PSignedAnsiChar = ^SignedAnsiChar;
+  TSignedAnsiCharArray = array[0..(MaxInt div SizeOf(SignedAnsiChar) - 1)]
+    of SignedAnsiChar;
+  PSignedAnsiCharArray = ^TSignedAnsiCharArray;
 
 
 implementation
