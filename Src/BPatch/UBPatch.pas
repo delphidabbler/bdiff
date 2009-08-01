@@ -1,51 +1,26 @@
 {
-  ------------------------------------------------------------------------------
-  UBPatch.pas
-
-  Main program logic for BPatch.
-
-  Copyright (c) 2003-2007 Peter D Johnson (www.delphidabbler.com).
-
-  Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
-  <Streu@gmx.de>.
-
-  THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
-  NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
-  OF THIS SOFTWARE.
-
-  For conditions of distribution and use see the BDiff / BPatch license
-  available from http://www.delphidabbler.com/software/bdiff/license
-
-  Change log
-  v1.0 of 28 Nov 2003  -  Original Pascal translation of bpatch.c
-  v1.1 of 18 Sep 2007  -  Fixed bug preventing overwriting of existing output
-                          files.
-                       -  Removed "side-by-side" C code.
-                       -  Removed conditional Windows / DOS conditional code.
-                       -  Updated help screen copyright statement.
-                       -  Changed date format displayed by --version switch.
-                       -  Fixed small bug in -h and -v options.
-                       -  Moved code that redirects stdin to UBDiffUtils unit.
-                       -  Updated version constant to 0.2.3 (skipping 0.2.2).
-                       -  Changed copyright and license notice.
-  ------------------------------------------------------------------------------
+ * UBPatch.pas
+ *
+ * Main program logic for BPatch.
+ *
+ * Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
+ * <Streu@gmx.de>.
+ *
+ * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ *
+ * $Rev$
+ * $Date$
+ *
+ * THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY.
+ * IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE
+ * USE OF THIS SOFTWARE.
+ *
+ * For conditions of distribution and use see the LICENSE file of visit
+ * http://www.delphidabbler.com/software/bdiff/license
 }
 
 
 unit UBPatch;
-
-
-{
-  PASCAL IMPLEMENTATION NOTES:
-
-  The Pascal code is only suitable for use on Windows targets - it compiles to a
-  Win32 console application and uses the Windows API.
-
-  Patch files read via shell redirection in the Pascal translation are read in
-  pure binary mode, removing necessity to use --input command line switch to
-  read patch files that is required in C implementations on MS-DOS/Windows
-  systems. The --input command is still supported.
-}
 
 
 interface
@@ -56,18 +31,6 @@ procedure Main;
 
 
 implementation
-
-{
-  ABOUT THIS UNIT'S IMPLEMENTATION
-
-  v1.0 of this file was a literal translation into Object Pascal of Stefan
-  Reuther's bpatch.c file from BPatch v0.2. The original C code was included as
-  comments in the file.
-
-  v1.1 of this file has been updated to fix a few issues and is no longer a
-  simple translation of Stefan's code. The C code has been stripped from the
-  file as a result.
-}
 
 {$IOCHECKS OFF}
 

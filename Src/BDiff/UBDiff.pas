@@ -1,52 +1,26 @@
 {
-  ------------------------------------------------------------------------------
-  UBDiff.dpr
-
-  Main program logic for BDiff.
-
-  Copyright (c) 2003-2007 Peter D Johnson (www.delphidabbler.com).
-
-  Based on bdiff.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
-  <Streu@gmx.de>.
-
-  THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
-  NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
-  OF THIS SOFTWARE.
-
-  For conditions of distribution and use see the BDiff / BPatch license
-  available from http://www.delphidabbler.com/software/bdiff/license
-
-  Change log
-  v1.0 of 28 Nov 2003  -  Original Pascal translation of bdiff.c
-  v1.1 of 18 Sep 2007  -  Fixed memory leaks by freeing various memory buffers.
-                       -  Removed "side-by-side" C code.
-                       -  Updated help screen copyright statement and added
-                          information about -o / --output switch and various
-                          format options.
-                       -  Changed date format displayed by --version switch.
-                       -  Fixed small bug in -h and -v options.
-                       -  Fixed a buffer size in print_binary_add routine.
-                       -  Updated version constant to 0.2.3.
-                       -  Changed copyright and license notice.
-  -----------------------------------------------------------------------------
+ * UBDiff.dpr
+ *
+ * Main program logic for BDiff.
+ *
+ * Based on bdiff.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
+ * <Streu@gmx.de>.
+ *
+ * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ *
+ * $Rev$
+ * $Date$
+ *
+ * THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY.
+ * IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE
+ * USE OF THIS SOFTWARE.
+ *
+ * For conditions of distribution and use see the LICENSE file of visit
+ * http://www.delphidabbler.com/software/bdiff/license
 }
 
 
 unit UBDiff;
-
-{
-  PASCAL IMPLEMENTATION NOTES:
-
-  The Pascal translation is only suitable for use on Windows targets - it
-  compiles to a Win32 console application and uses the Windows API.
-
-  When shell redirection is used in the original C version running under
-  MS-DOS/Windows to create binary difference files, the shell can write CRLF
-  whenever LF appears in the output. This modification does not occur in the
-  Pascal version and therefore it a safe to output binary files using
-  redirection meaning it is not necessary to use the --output switch. The
-  --output switch is still supported.
-}
 
 
 interface
@@ -57,19 +31,6 @@ procedure Main;
 
 
 implementation
-
-
-{
-  ABOUT THIS UNIT'S IMPLEMENTATION
-
-  v1.0 of this file was a literal translation into Object Pascal of Stefan
-  Reuther's bdiff.c file from BDiff v0.2. The original C code was included as
-  comments in the file.
-
-  v1.1 of this file has been updated to fix a few issues and is no longer a
-  simple translation of Stefan's code. The C code has been stripped from the
-  file as a result.
-}
 
 {$IOCHECKS OFF}
 

@@ -1,29 +1,22 @@
 {
-  ------------------------------------------------------------------------------
-  UBlkSort.dpr
-
-  Implements block sort / search mechanism.
-
-  Copyright (c) 2003-2007 Peter D Johnson (www.delphidabbler.com).
-
-  Based on a blksort.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
-  <Streu@gmx.de>.
-
-  THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
-  NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
-  OF THIS SOFTWARE.
-
-  For conditions of distribution and use see the BDiff / BPatch license
-  available from http://www.delphidabbler.com/software/bdiff/license
-
-  Change log
-  v1.0 of 28 Nov 2003  -  Original Pascal translation of blksort.c
-  v1.1 of 21 Dec 2003  -  Bug fix based on updated blksort.c provided by Stefan
-                          Reuther.
-  v1.2 of 18 Sep 2007  -  Replaced call to C-style malloc() function with call
-                          to GetMem. Made a few minor related modifications.
-                       -  Changed copyright and license notice.
-  ------------------------------------------------------------------------------
+ * UBlkSort.dpr
+ *
+ * Implements block sort / search mechanism.
+ *
+ * Based on a blksort.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
+ * <Streu@gmx.de>.
+ *
+ * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ *
+ * $Rev$
+ * $Date$
+ *
+ * THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY.
+ * IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE
+ * USE OF THIS SOFTWARE.
+ *
+ * For conditions of distribution and use see the LICENSE file of visit
+ * http://www.delphidabbler.com/software/bdiff/license
 }
 
 
@@ -73,24 +66,10 @@ implementation
     ensure that the the Pascal performs in the same way as the C code.
 }
 
+
 uses
   // Project
   UBDiffUtils;
-
-
-{
-  ABOUT THIS UNIT'S IMPLEMENTATION
-
-  v1.0 of this file was a literal translation into Object Pascal of Stefan
-  Reuther's blksort.c file from BDiff v0.2. The original C code was included as
-  comments in the file.
-
-  v1.1 was a literal translation of Stefan's bug fix to blksort.c.
-
-  From v1.2 of this file has been updated and is no longer a direct translation of
-  Stefan's code, although it is functionally very similar. The C code has now
-  been stripped from the file.
-}
 
 
 { Compare positions a and b in data area, consider maximum length dlen }
