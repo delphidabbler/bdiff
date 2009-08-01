@@ -255,7 +255,7 @@ begin
     + ' -v    --version      Show version information'#13#10
     + #13#10
     + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-    + '(c) copyright 2003-2007 Peter Johnson (www.delphidabbler.com)'#13#10,
+    + '(c) copyright 2003-2009 Peter Johnson (www.delphidabbler.com)'#13#10,
     [ProgramFileName]);
 end;
 
