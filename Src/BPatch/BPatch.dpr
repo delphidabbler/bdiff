@@ -28,7 +28,8 @@ uses
   UBPatch in 'UBPatch.pas',
   UBPatchUtils in 'UBPatchUtils.pas',
   UBPatchTypes in 'UBPatchTypes.pas',
-  UAppInfo in '..\Common\UAppInfo.pas';
+  UAppInfo in '..\Common\UAppInfo.pas',
+  UErrors in '..\Common\UErrors.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources

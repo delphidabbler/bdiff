@@ -28,7 +28,8 @@ uses
   UBlkSort in 'UBlkSort.pas',
   UBDiffUtils in 'UBDiffUtils.pas',
   UBDiffTypes in 'UBDiffTypes.pas',
-  UAppInfo in '..\Common\UAppInfo.pas';
+  UAppInfo in '..\Common\UAppInfo.pas',
+  UErrors in '..\Common\UErrors.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
