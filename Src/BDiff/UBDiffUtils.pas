@@ -46,7 +46,7 @@ function stderr: Integer;
 procedure RedirectStdOut(const Handle: Integer);
 
 { emulates C std lib isprint function: does not support locales }
-function isprint(Ch: Char): Boolean;
+function isprint(Ch: AnsiChar): Boolean;  // todo: note changed to ansichar from char
 
 { emulates C std lib perror function: displays given message followed by
   description of last Windows error }
@@ -114,7 +114,7 @@ begin
 end;
 
 { emulates C std lib isprint function: does not support locales }
-function isprint(Ch: Char): Boolean;
+function isprint(Ch: AnsiChar): Boolean;
 begin
   Result := Ch in [#32..#126];
 end;

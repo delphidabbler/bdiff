@@ -105,13 +105,13 @@ end;
 { emulates C std lib fgetc function using Windows file handle}
 function fgetc(stream: Integer): Integer;
 var
-  Ch: Char;
+  Ch: AnsiChar; 
 begin
   if feof(stream) then
     Result := EOF
   else
   begin
-    fread(@Ch,1, 1, stream);
+    fread(@Ch, 1, 1, stream);
     Result := Integer(Ch);
   end;
 end;
@@ -152,7 +152,7 @@ var
 begin
   FormattedStr := Format(Fmt, Args);
   Result := Length(FormattedStr);
-  fwrite(PChar(FormattedStr), Result, 1, stream);
+  fwrite(PChar(FormattedStr), SizeOf(Char) * Result, 1, stream);
 end;
 
 { emulates C std lib perror function: displays given message followed by
