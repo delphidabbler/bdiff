@@ -38,7 +38,7 @@ uses
   // Delphi
   SysUtils, Windows,
   // Project
-  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort;
+  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -114,13 +114,6 @@ var
     )
   );
 
-{ Exit program with error message }
-procedure error_exit(msg: string);
-begin
-  WriteStrFmt(stderr, '%s: %s'#13#10, [ProgramFileName, msg]);
-  Halt(1);
-end;
-
 { Load file, returning pointer to file data, exits with error message if out of
   memory or not found }
 function load_file(file_name: string; size_ret: Psize_t): PSignedAnsiCharArray;
@@ -134,13 +127,11 @@ var
 begin
   { open file }
   AssignFile(fp, file_name);
+  if (IOResult <> 0) then
+    OSError;
   Reset(fp);
   if (IOResult <> 0) then
-  begin
-    perror(file_name);
-    Halt(1);
-  end;
-
+    OSError;
   { read file }
   cur_len := 0;
   data := nil;
@@ -150,12 +141,7 @@ begin
     tmp := data;
     ReallocMem(tmp, cur_len + len);
     if not Assigned(tmp) then
-    begin
-      WriteStrFmt(
-        stderr, '%s: Virtual memory exhausted' + #13#10, [ProgramFileName]
-      );
-      Halt(1);
-    end;
+      Error('Virtual memory exhausted');
     data := tmp;
     Move(buffer, data[cur_len], len);
     Inc(cur_len, len);
@@ -163,9 +149,8 @@ begin
   end;
   if not EOF(fp) then
   begin
-    perror(file_name);
     CloseFile(fp);
-    Halt(1);
+    OSError;
   end;
 
   { exit }
@@ -352,10 +337,11 @@ var
   len2, todo, nofs: size_t;
   sort: PBlock;
   match: TMatch;
-  error_code: Integer;  // added in UBDiff v1.1
 begin
-  error_code := 0;
   { initialize }
+  data := nil;
+  data2 := nil;
+  sort := nil;
   try
     log_status('loading old file');
     data := load_file(fn, @len);
@@ -364,14 +350,7 @@ begin
     log_status('block sorting old file');
     sort := block_sort(data, len);
     if not Assigned(sort) then
-    begin
-      WriteStrFmt(
-        stderr, '%s: virtual memory exhausted'#13#10, [ProgramFileName]
-      );
-      // Halt(1); -- Deleted since skips finally section below
-      error_code := 1;  // replacement code causes Halt(1) after mem freed
-      Exit;             // in finally section
-    end;
+      Error('virtual memory exhausted');
     log_status('generating patch');
     fmt_spec[format].header(fn, newfn, len, len2);
     { main loop }
@@ -408,8 +387,6 @@ begin
       FreeMem(data);
     if Assigned(data2) then
       FreeMem(data2);
-    if error_code = 1 then
-      Halt(1);    // error_code = 1 flags that program should halt
   end;
 end;
 
@@ -440,7 +417,6 @@ begin
       + '(c) copyright 2003-2007 Peter Johnson (www.delphidabbler.com)'#13#10,
     [ProgramFileName]
   );
-  Halt(0);
 end;
 
 { Display version & exit }
@@ -452,7 +428,6 @@ begin
   WriteStrFmt(
     stdout, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
   );
-  Halt(0);
 end;
 
 { Read argument of --min-equal }
@@ -462,20 +437,20 @@ var
   x: LongWord;
 begin
   if not Assigned(p) or (p^ = #0) then
-    error_exit('Missing argument to ''--min-equal'' / ''-m''');
+    Error('Missing argument to ''--min-equal'' / ''-m''');
   x := StrToULDec(p, q);
   if q^ <> #0 then
-    error_exit('Malformed number on command line');
+    Error('Malformed number on command line');
   if (x = 0) or (x > $7FFF) then
-    error_exit('Number out of range on command line');
+    Error('Number out of range on command line');
   min_len := x;
 end;
 
 { Read argument of --format }
-procedure set_format(p: PChar);   
+procedure set_format(p: PChar);
 begin
   if not Assigned(p) then
-    error_exit('Missing argument to ''--format''');
+    Error('Missing argument to ''--format''');
   if StrComp(p, 'quoted') = 0 then
     format := FMT_QUOTED
   else if (StrComp(p, 'filter') = 0) or (StrComp(p, 'filtered') = 0) then
@@ -483,7 +458,7 @@ begin
   else if StrComp(p, 'binary') = 0 then
     format := FMT_BINARY
   else
-    error_exit('Invalid format specification');
+    Error('Invalid format specification');
 end;
 
 { Main routine: parses arguments and calls creates diff using bs_diff() }
@@ -497,152 +472,147 @@ var
   p: PChar;       // scans parameter list
   argv: PChar;    // each command line paramter
 begin
+  ExitCode := 0;
+  
   oldfn := '';
   newfn := '';
   outfn := '';
 
-  { Parse command line }
-  i := 1;
-  while (i <= ParamCount) do
-  begin
-    argv := PChar(ParamStr(i) + #0#0#0);
-    if argv[0] = '-' then
+  try
+    { Parse command line }
+    i := 1;
+    while (i <= ParamCount) do
     begin
-      if argv[1] = '-' then
+      argv := PChar(ParamStr(i) + #0#0#0);
+      if argv[0] = '-' then
       begin
-        { long options }
-        p := argv + 2;
-        if StrComp(p, 'help') = 0 then
-          help
-        else if StrComp(p, 'version') = 0 then
-          version
-        else if StrComp(p, 'verbose') = 0 then
-          verbose := 1
-        else if StrComp(p, 'output') = 0 then
+        if argv[1] = '-' then
         begin
-          Inc(i);
-          argv := PChar(ParamStr(i));
-          if (argv^ = #0) then
+          { long options }
+          p := argv + 2;
+          if StrComp(p, 'help') = 0 then
           begin
-            WriteStrFmt(
-              stderr,
-              '%s: missing argument to ''--output'''#13#10, [ProgramFileName]
-            );
-            Halt(1);
+            help;
+            Exit;
           end
+          else if StrComp(p, 'version') = 0 then
+          begin
+            version;
+            Exit;
+          end
+          else if StrComp(p, 'verbose') = 0 then
+            verbose := 1
+          else if StrComp(p, 'output') = 0 then
+          begin
+            Inc(i);
+            argv := PChar(ParamStr(i));
+            if (argv^ = #0) then
+              Error('missing argument to ''--output''')
+            else
+              outfn := argv;
+          end
+          else if StrLComp(p, 'output=', 7) = 0 then
+            outfn := p + 7
+          else if StrComp(p, 'format') = 0 then
+          begin
+            Inc(i);
+            argv := PChar(ParamStr(i));
+            set_format(argv);
+          end
+          else if StrLComp(p, 'format=', 7) = 0 then
+            set_format(p + 7)
+          else if StrComp(p, 'min-equal') = 0 then
+          begin
+            Inc(i);
+            argv := PChar(ParamStr(i));
+            set_min_equal(argv);
+          end
+          else if StrLComp(p, 'min-equal=', 10) = 0 then
+            set_min_equal(p + 10)
           else
-            outfn := argv;
+            Error('unknown option ''--%s''', [p])
         end
-        else if StrLComp(p, 'output=', 7) = 0 then
-          outfn := p + 7
-        else if StrComp(p, 'format') = 0 then
-        begin
-          Inc(i);
-          argv := PChar(ParamStr(i));
-          set_format(argv);
-        end
-        else if StrLComp(p, 'format=', 7) = 0 then
-          set_format(p + 7)
-        else if StrComp(p, 'min-equal') = 0 then
-        begin
-          Inc(i);
-          argv := PChar(ParamStr(i));
-          set_min_equal(argv);
-        end
-        else if StrLComp(p, 'min-equal=', 10) = 0 then
-          set_min_equal(p + 10)
         else
         begin
-          WriteStrFmt(
-            stderr,
-            '%0:s: unknown option ''--%1:s'''#13#10
-              + '%0:s: try ''%0:s --help'' for more information'#13#10,
-            [ProgramFileName, p]
-          );
-          Halt(1);
+          { short options }
+          p := argv + 1;
+          while p^ <> #0 do
+          begin
+            case p^ of
+              'h':
+                if StrComp(p, 'h') = 0 then
+                begin
+                  help;
+                  Exit;
+                end;
+              'v':
+                if StrComp(p, 'v') = 0 then
+                begin
+                  version;
+                  Exit;
+                end;
+              'V':
+                verbose := 1;
+              'q':
+                format := FMT_QUOTED;
+              'f':
+                format := FMT_FILTERED;
+              'b':
+                format := FMT_BINARY;
+              'm':
+              begin
+                Inc(i);
+                argv := PChar(ParamStr(i));
+                set_min_equal(argv);
+              end;
+              'o':
+              begin
+                Inc(i);
+                argv := PChar(ParamStr(i));
+                if argv^ = #0 then
+                  Error('missing argument to ''-o''')
+                else
+                  outfn := argv;
+              end;
+              else
+                Error('unknown option ''-%:s''', [p^]);
+            end;
+            Inc(p);
+          end;
         end;
       end
       else
       begin
-        { short options }
-        p := argv + 1;
-        while p^ <> #0 do
-        begin
-          case p^ of
-            'h':
-              if StrComp(p, 'h') = 0 then help; // changed v1.1
-            'v':
-              if StrComp(p, 'v') = 0 then version;  // changed v1.1
-            'V':
-              verbose := 1;
-            'q':
-              format := FMT_QUOTED;
-            'f':
-              format := FMT_FILTERED;
-            'b':
-              format := FMT_BINARY;
-            'm':
-            begin
-              Inc(i);
-              argv := PChar(ParamStr(i));
-              set_min_equal(argv);
-            end;
-            'o':
-            begin
-              Inc(i);
-              argv := PChar(ParamStr(i));
-              if argv^ = #0 then
-              begin
-                WriteStrFmt(
-                  stderr, '%s: missing argument to ''-o'''#13#10,
-                  [ProgramFileName]
-                  );
-                Halt(1);
-              end
-              else
-                outfn := argv;
-            end;
-            else
-              WriteStrFmt(
-                stderr,
-                '%0:s: unknown option ''-%1:s'''#13#10
-                  + '%0:s: try %0:s --help'' for more information'#13#10,
-                [ProgramFileName, p^]);
-              Halt(1);
-          end;
-          Inc(p);
-        end;
+        { file names }
+        if oldfn = '' then
+          oldfn := ParamStr(i)
+        else if newfn = '' then
+          newfn := ParamStr(i)
+        else
+          Error('Too many file names on command line');
       end;
-    end
-    else
-    begin
-      { file names }
-      if oldfn = '' then
-        oldfn := ParamStr(i)
-      else if newfn = '' then
-        newfn := ParamStr(i)
-      else
-        error_exit('Too many file names on command line');
+      Inc(i);
     end;
-    Inc(i);
-  end;
-  if newfn = '' then
-    error_exit('Need two filenames');
-  if (outfn <> '') and (outfn <> '-') then
-  begin
-    { redirect stdout to patch file }
-    fp := FileCreate(outfn);
-    if fp <= 0 then
+    if newfn = '' then
+      Error('Need two filenames');
+    if (outfn <> '') and (outfn <> '-') then
     begin
-      perror(outfn);
-      Halt(1);
+      { redirect stdout to patch file }
+      fp := FileCreate(outfn);
+      if fp <= 0 then
+        OSError;
+      RedirectStdOut(fp);
     end;
-    RedirectStdOut(fp);
+
+    { create the diff }
+    bs_diff(oldfn, newfn);
+  except
+    on E: Exception do
+    begin
+      ExitCode := 1;
+      WriteStrFmt(StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
+    end;
   end;
-
-  { create the diff }
-  bs_diff(oldfn, newfn);
-
 end;
 
 end.
