@@ -130,14 +130,30 @@ begin
     error_exit('Source file does not  match patch');
 end;
 
+// todo: change this routine to raise exception if temp file name can't be found
+{ Creates a temporary file in user's temp directory and returns its name }
+function GetTempFileName: string;
+begin
+  // Get temporary folder
+  SetLength(Result, Windows.MAX_PATH);
+  Windows.GetTempPath(Windows.MAX_PATH, PChar(Result));
+  // Get unique temporary file name (it is created as side effect of this call)
+  if Windows.GetTempFileName(
+    PChar(Result), '', 0, PChar(Result)
+  ) <> 0 then
+    // Succeeded
+    Result := PChar(Result)
+  else
+    // Failed
+    Result := '';
+end;
+
 { Apply patch }
 procedure bpatch_(const src, dest: string);
 var
   sf: Integer; {source file}
   df: Integer; {destination file}
   header: array[0..15] of AnsiChar;
-  p: PChar;
-  q: PChar;
   srclen, destlen: Longint;
   size: Longint;
   ofs: Longint;
@@ -165,22 +181,7 @@ begin
   if dest = '' then
     error_exit('Empty destination file name');
 
-  // todo: find a simpler way of getting temp file name
-  { we use Pascal long string: no need to malloc space for it }
-  { hack source file name to get a suitable temp file name }
-  tempfile := Copy(dest, 1, Length(dest));  // forces real copy of string
-  p := StrRScan(PChar(tempfile), '/');
-  if not Assigned(p) then
-    p := PChar(tempfile)
-  else
-    Inc(p);
-  q := StrRScan(p, '\');
-  if Assigned(q) then
-    p := q + 1;
-  q := StrRScan(p, ':');
-  if Assigned(q) then
-    p := q + 1;
-  p^ := '$';
+  tempfile := GetTempFileName;
   df := FileCreate(tempfile);
   if df <= 0 then
     error_exit('Can''t create temporary file');
