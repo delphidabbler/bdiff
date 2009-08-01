@@ -89,7 +89,7 @@ var
   tempfd: Integer = 0;      // handle to temp file
 
 { Exit program with error message }
-procedure error_exit(msg: PChar);
+procedure error_exit(msg: string);
 begin
   fprintf(stderr, '%s: %s'#13#10, [progname, msg]);
   if tempfd > 0 then
@@ -100,7 +100,7 @@ begin
 end;
 
 { Compute simple checksum }
-function checksum(data: PChar; len: size_t; l: Longint): Longint;
+function checksum(data: PAnsiChar; len: size_t; l: Longint): Longint;
 begin
   while len <> 0 do
   begin
@@ -113,7 +113,7 @@ begin
 end;
 
 { Get 32-bit quantity from char array }
-function getlong(p: PChar): Longint;
+function getlong(p: PAnsiChar): Longint;
 var
   q: PByte;
   l: LongWord;
@@ -131,7 +131,7 @@ procedure copy_data(src, dest: Integer; amount, check: Longint;
   src_is_patch: Integer);
 var
   chk: Longint;
-  buffer: array[0..BUFFER_SIZE-1] of Char;
+  buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
   now: size_t;
 begin
   chk := 0;
@@ -170,11 +170,11 @@ begin
 end;
 
 { Apply patch }
-procedure bpatch_(const src, dest: PChar);
+procedure bpatch_(const src, dest: string);
 var
   sf: Integer; {source file}
   df: Integer; {destination file}
-  header: array[0..15] of Char;
+  header: array[0..15] of AnsiChar;
   p: PChar;
   q: PChar;
   srclen, destlen: Longint;
@@ -187,7 +187,7 @@ begin
   { read header }
   if fread(@header, 1, 16, stdin) <> 16 then
     error_exit('Patch not in BINARY format');
-  if StrLComp(header, PChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
+  if StrLComp(header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
     error_exit('Patch not in BINARY format');
   srclen := getlong(@header[8]);
   destlen := getlong(@header[12]);
@@ -201,12 +201,13 @@ begin
   end;
 
   { create temporary file }
-  if StrLen(dest) = 0 then
+  if dest = '' then
     error_exit('Empty destination file name');
 
+  // todo: find a simpler way of getting temp file name
   { we use Pascal long string: no need to malloc space for it }
   { hack source file name to get a suitable temp file name }
-  tempfile := dest;
+  tempfile := Copy(dest, 1, Length(dest));  // forces real copy of string
   p := StrRScan(PChar(tempfile), '/');
   if not Assigned(p) then
     p := PChar(tempfile)
@@ -332,9 +333,8 @@ var
   newfn: string;
   infn: string;
   i: Integer;
-  p: PChar;
-
-  argv: PChar;
+  p: PChar;       // scans parameter list
+  argv: PChar;    // each command line paramter
   fp: Integer;
 begin
   oldfn := '';
@@ -459,7 +459,7 @@ begin
     RedirectStdIn(fp);
   end;
 
-  bpatch_(PChar(oldfn), PChar(newfn));
+  bpatch_(oldfn, newfn);
 
 end;
 

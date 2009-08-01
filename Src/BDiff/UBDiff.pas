@@ -112,7 +112,7 @@ var
 type
   TFormatSpec = record
     header:
-      procedure(oldfn, newfn: PChar; olds, news: size_t);
+      procedure(oldfn, newfn: string; olds, news: size_t);
     add:
       procedure(data: PShortInt; len: size_t);
     copy:
@@ -120,9 +120,9 @@ type
         opos: size_t; len: size_t);
   end;
 
-procedure print_binary_header(oldfn, newfn: PChar; oldl, newl: size_t);
+procedure print_binary_header(oldfn, newfn: string; oldl, newl: size_t);
   forward;
-procedure print_text_header(oldfn, newfn: PChar; olds, news: size_t);
+procedure print_text_header(oldfn, newfn: string; olds, news: size_t);
   forward;
 procedure print_binary_add(data: PShortInt; len: size_t);
   forward;
@@ -158,7 +158,7 @@ var
   );
 
 { Exit program with error message }
-procedure error_exit(msg: PChar);
+procedure error_exit(msg: string);
 begin
   WriteStrFmt(stderr, '%s: %s'#13#10, [progname, msg]);
   Halt(1);
@@ -166,11 +166,11 @@ end;
 
 { Load file, returning pointer to file data, exits with error message if out of
   memory or not found }
-function load_file(file_name: PChar; size_ret: Psize_t): PShortIntArray;
+function load_file(file_name: string; size_ret: Psize_t): PShortIntArray;
 var
-  fp: File of Char;
+  fp: File of Byte;                         // file pointer
   data: PShortIntArray;
-  buffer: array[0..BUFFER_SIZE-1] of Char;
+  buffer: array[0..BUFFER_SIZE-1] of Byte;  // buffer to read file
   len: size_t;
   cur_len: size_t;
   tmp: PShortIntArray;
@@ -245,7 +245,7 @@ begin
 end;
 
 { Print header for 'BINARY' format }
-procedure print_binary_header(oldfn, newfn: PChar; oldl, newl: size_t);
+procedure print_binary_header(oldfn, newfn: string; oldl, newl: size_t);
 var
   head: array[0..15] of ShortInt;
 begin
@@ -256,7 +256,7 @@ begin
 end;
 
 { Print header for text formats }
-procedure print_text_header(oldfn, newfn: PChar; olds, news: size_t);
+procedure print_text_header(oldfn, newfn: string; olds, news: size_t);
 begin
   WriteStrFmt(
     stdout,
@@ -270,8 +270,8 @@ procedure print_quoted_data(data: PShortInt; len: size_t);
 begin
   while (len <> 0) do
   begin
-    if isprint(Char(data^)) and (Char(data^) <> '\') then
-      WriteStr(stdout, Char(data^))
+    if isprint(AnsiChar(data^)) and (AnsiChar(data^) <> '\') then
+      WriteStr(stdout, AnsiChar(data^))
     else
       WriteStr(stdout, '\' + ByteToOct(data^ and $FF));
     Inc(data);
@@ -284,8 +284,8 @@ procedure print_filtered_data(data: PShortInt; len: size_t);
 begin
   while len <> 0  do
   begin
-    if isprint(Char(data^)) then
-      WriteStr(stdout, Char(data^))
+    if isprint(AnsiChar(data^)) then
+      WriteStr(stdout, AnsiChar(data^))
     else
       WriteStr(stdout, '.');
     Inc(data);
@@ -378,14 +378,14 @@ end;
 
 { Print log message, if enabled. Log messages go to stderr because we may be
   writing patch file contents to stdout }
-procedure log_status(const p: PChar);
+procedure log_status(const p: string);
 begin
   if verbose <> 0 then
     WriteStrFmt(stderr, '%s: %s'#13#10, [progname, p]);
 end;
 
 { Main routine: generate diff }
-procedure bs_diff(fn, newfn: PChar);
+procedure bs_diff(fn, newfn: string);
 var
   data: PShortIntArray;
   data2: PShortIntArray;
@@ -502,6 +502,7 @@ begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
+  // todo: get _VERSION from resources
   WriteStrFmt(stdout, 'bdiff-%s %s '#13#10, [VERSION_, ExeDate]);
   Halt(0);
 end;
@@ -523,7 +524,7 @@ begin
 end;
 
 { Read argument of --format }
-procedure set_format(p: PChar);
+procedure set_format(p: PChar);   
 begin
   if not Assigned(p) then
     error_exit('Missing argument to ''--format''');
@@ -544,9 +545,9 @@ var
   newfn: string;
   outfn: string;
   i: Integer;
-  p: PChar;
   fp: Integer;
-  argv: PChar;
+  p: PChar;       // scans parameter list
+  argv: PChar;    // each command line paramter
 begin
   oldfn := '';
   newfn := '';
@@ -692,7 +693,7 @@ begin
   end;
 
   { create the diff }
-  bs_diff(PChar(oldfn), PChar(newfn));
+  bs_diff(oldfn, newfn);
 
 end;
 
