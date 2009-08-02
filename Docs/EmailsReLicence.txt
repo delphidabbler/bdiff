@@ -1,3 +1,11 @@
+--------------------------------------------------------------------------------
+
+This file contains copies of emails exchanged between Peter Johnson and Stefan
+Reuther that relate to licensing of Peter's Pascal translation of Stefan's
+original source code.
+
+--------------------------------------------------------------------------------
+
 From: peter@delphidabbler.com
 To:   Streu@gmx.de
 Date: 04/12/2003 01:59
@@ -70,7 +78,7 @@ right now), but it is simple and easy to handle.
 > > you have any problems with this.
 
 To be honest, I had almost forgotten that that file was on my
-web site  :) 
+web site  :)
 
 Oh well, this reminds me that the version on the website has a
 bug. And since I forgot that it's there, I forgot to update it.
@@ -79,3 +87,6 @@ crash on certain data. The problem is in 'find_string'.
 
 
 Stefan
+
+--------------------------------------------------------------------------------
+
