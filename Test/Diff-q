@@ -1,0 +1,156 @@
+% --- Test1 (12412 bytes)
+% +++ Test2 (3806 bytes)
+@ -[0] => +[0] 318 bytes
+ // -----------------------------------------------------------------------------\015\012// NOTE: DO NOT COMPILE THIS CODE\015\012//       Provided to test BDiff and BPatch\015\012// -----------------------------------------------------------------------------\015\012unit PatchTestUnit;\015\012\015\012interface\015\012\015\012uses\015\012  // Delphi\015\012  Windows, SysUtils,
+@ -[359] => +[318] 391 bytes
+ \015\012  // Project\015\012  UBDiffTypes;\015\012\015\012\015\012{ "exported" functions: used by main BDiff engine }\015\012\015\012function block_sort(data: PShortIntArray; dlen: size_t): PBlock;\015\012\015\012function find_string(data: PShortIntArray; block: PBlock; len: size_t;\015\012                    sub: PShortInt; max: size_t;\015\012                    index: Psize_t): size_t;\015\012\015\012\015\012implementation\015\012\015\012\015\012uses\015\012  // Project\015\012  UBDiffUtils;\015\012\015\012\015\012
++{\015\012 
+@ -[1085] => +[713] 35 bytes
+  compare positions a and b in data 
+@ -[1128] => +[748] 34 bytes
+ area, consider maximum length dlen
++\015\012}
+@ -[1214] => +[785] 41 bytes
+ \015\012function block_sort_compare(a: size_t; 
+@ -[1294] => +[826] 32 bytes
+ b: size_t; data: PShortIntArray;
+@ -[1371] => +[858] 27 bytes
+ \015\012  dlen: size_t): Integer;
++\015\012var\015\012  pa: PShortInt;\015\012  pb: PShortInt;\015\012  len: size_t;\015\012begin\015\012  pa := @data[a];\015\012  pb := @data[b];\015\012  len :
+@ -[1887] => +[996] 37 bytes
+ = dlen - a;\015\012  if dlen - b < len then
++\015\012    len :
+@ -[2014] => +[1044] 50 bytes
+ = dlen - b;\015\012  while (len <> 0) and (pa^ = pb^) do
++\015\012  begin
+@ -[2139] => +[1103] 33 bytes
+ \015\012    Inc(pa); Inc(pb); Dec(len);
++\015\012  end;\015\012  if len = 0 then\015\012  begin
+@ -[2351] => +[1172] 28 bytes
+ \015\012    Result := a - b; Exit;
++\015\012  end;
+@ -[2456] => +[1208] 24 bytes
+ \015\012  Result := pa^ - pb^;
++\015\012end;\015\012\015\012{\015\012  the "sink element" part of heapsort\015\012}
+@ -[2740] => +[1285] 40 bytes
+ \015\012procedure block_sort_sink(le: size_t; 
+@ -[2819] => +[1325] 26 bytes
+ ri: size_t; block: PBlock;
+@ -[2887] => +[1351] 40 bytes
+ \015\012  data: PShortIntArray; dlen: size_t);
++\015\012var\015\012  i, j, x: size_t;\015\012begin\015\012  i := le;\015\012  x :
+@ -[3268] => +[1442] 28 bytes
+ = block[i];\015\012  while True do
++\015\012  begin\015\012    j :
+@ -[3429] => +[1488] 29 bytes
+ = 2*i+1;\015\012    if j >= ri then
++\015\012      B
+@ -[3547] => +[1526] 27 bytes
+ reak;\015\012    if j < ri-1 then
+@ -[3612] => +[1553] 40 bytes
+ \015\012      if block_sort_compare(block[j], 
+@ -[3703] => +[1593] 32 bytes
+ block[j+1], data, dlen) < 0 then
++\015\012        Inc(j)
+@ -[3828] => +[1641] 42 bytes
+ ;\015\012    if block_sort_compare(x, block[j], 
++data, dlen) > 0 then\015\012      B
+@ -[4034] => +[1712] 32 bytes
+ reak;\015\012    block[i] := block[j];
++\015\012    i := j;\015\012  end;\015\012  block[i] := x;\015\012end;\015\012\015\012{\015\012 
+@ -[4403] => +[1797] 37 bytes
+  returns array of offsets into data, 
++sorted by position\015\012 
+@ -[4491] => +[1855] 35 bytes
+  returns 0 on error (out of memory)
++\015\012}
+@ -[448] => +[1893] 68 bytes
+ \015\012function block_sort(data: PShortIntArray; dlen: size_t): PBlock;\015\012
++var\015\012  block: PBlock;\015\012  i, le, ri: size_t;\015\012  x: size_t;\015\012begin
+@ -[5104] => +[2025] 35 bytes
+ \015\012  block := malloc(sizeof(size_t) 
++* dlen)
+@ -[5306] => +[2067] 28 bytes
+ ;\015\012  if not Assigned(block) 
++or (dlen = 0) then\015\012  begin\015\012    Result := nil;\015\012    Exit;\015\012  end;\015\012
+@ -[5605] => +[2163] 32 bytes
+ \015\012  { initialize unsorted data }
+@ -[5649] => +[2195] 31 bytes
+ \015\012  for i := 0 to Pred(dlen) do
++\015\012    block[i] := i;\015\012\015\012  { heapsort }\015\012  le := dlen div 2;\015\012  ri :
+@ -[5976] => +[2293] 26 bytes
+ = dlen;\015\012  while le > 0 do
++\015\012  begin\015\012    Dec(le)
+@ -[6690] => +[2341] 38 bytes
+ ;\015\012    block_sort_sink(le, ri, block, 
++data, dlen);\015\012  end;\015\012  while ri > 0 do\015\012  begin\015\012    x :
+@ -[6490] => +[2436] 43 bytes
+ = block[le];\015\012    block[le] := block[ri-1];
++\015\012    block[ri-1] := x;\015\012    Dec(ri)
+@ -[6690] => +[2515] 38 bytes
+ ;\015\012    block_sort_sink(le, ri, block, 
++data, dlen);\015\012  end;\015\012  Result := block;\015\012end;\015\012\015\012{\015\012 
+@ -[8943] => +[2607] 31 bytes
+  find maximum length substring 
+@ -[8989] => +[2638] 35 bytes
+ starting at sub, at most max bytes 
++data, block,\015\012 
+@ -[9045] => +[2688] 25 bytes
+  len characterize source 
+@ -[9077] => +[2713] 35 bytes
+ fill *index returns found location 
++return value is\015\012  found length\015\012}
+@ -[516] => +[2782] 76 bytes
+ \015\012function find_string(data: PShortIntArray; block: PBlock; len: size_t;\015\012  
+@ -[9424] => +[2858] 29 bytes
+ sub: PShortInt; max: size_t; 
+@ -[660] => +[2887] 26 bytes
+ index: Psize_t): size_t;\015\012
++var
+@ -[9569] => +[2916] 24 bytes
+ \015\012  first, last: size_t;
++\015\012  mid: size_t;\015\012  l0, l: size_t;\015\012  pm: PShortInt;\015\012  sm: PShortInt;\015\012  retval: size_t;\015\012begin
+@ -[9981] => +[3036] 32 bytes
+ \015\012  first := 0; last := len - 1;
++\015\012  retval := 0;\015\012  index^ := 0;\015\012
+@ -[10461] => +[3102] 26 bytes
+ \015\012  while first <= last do
++\015\012  begin
+@ -[10573] => +[3137] 34 bytes
+ \015\012    mid := (first + last) div 2;
+@ -[10642] => +[3171] 30 bytes
+ \015\012    pm := @data[block[mid]];
++\015\012    sm :
+@ -[10764] => +[3211] 34 bytes
+ = sub;\015\012    l := len - block[mid];
++\015\012    if l > max then\015\012      l := max;\015\012    l0 :
+@ -[11007] => +[3293] 43 bytes
+ = l;\015\012    while (l <> 0) and (pm^ = sm^) do
++\015\012    begin
+@ -[11125] => +[3347] 33 bytes
+ \015\012      Dec(l); Inc(pm); Inc(sm);
++\015\012    end;\015\012
+@ -[11279] => +[3392] 42 bytes
+ \015\012    { we found a `match' of length l0-l,
++ position block[mid] }
+@ -[11367] => +[3456] 29 bytes
+ \015\012    if l0 - l > retval then
++\015\012    begin
+@ -[11480] => +[3496] 25 bytes
+ \015\012      retval := l0 - l;
+@ -[11546] => +[3521] 29 bytes
+ \015\012      index^ := block[mid];
++\015\012    end;\015\012
+@ -[11709] => +[3562] 36 bytes
+ \015\012    if (l = 0) or (pm^ < sm^) then
+@ -[11780] => +[3598] 24 bytes
+ \015\012      first := mid + 1
++\015\012      else
+@ -[11900] => +[3634] 35 bytes
+ \015\012      begin\015\012        last := mid;
+@ -[11974] => +[3669] 27 bytes
+ \015\012        if last <> 0 then
++\015\012          Dec(last)\015\012  
+@ -[12135] => +[3721] 28 bytes
+       else\015\012          Break;
++\015\012      end;\015\012  end;\015\012  Result := retval;\015\012end;\015\012\015\012end.\015\012
