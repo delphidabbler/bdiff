@@ -41,31 +41,40 @@ echo --- Creating Patch with bdiff ---
 if errorlevel 1 set ErrorMsg=BDiff failed
 if not "%ErrorMsg%"=="" goto error
 echo.
+echo --- Testing Patch file against expected Diff-b fc ---
+fc /B Patch Diff-b
 echo --- Applying Patch with bpatch ---
 %BPatch% Test1 Test3 --input=Patch
 if errorlevel 1 set ErrorMsg=BPatch failed
 if not "%ErrorMsg%"=="" goto error
 echo.
 echo --- Testing patched file against original with fc ---
-rem fc %Test%\Test2 %Test%\Test3
 fc Test2 Test3
 echo.
 goto end
 
 rem Run quoted diff test
 :DoQuotedTest
+echo --- Creating quoted diff of Test1 and Test2 ---
 %BDiff% --format=quoted --verbose Test1 Test2 >Diff
 if errorlevel 1 set ErrorMsg=BDiff failed
 if not "%ErrorMsg%"=="" goto error
-Notepad Diff
+echo.
+echo --- Testing expected Diff file against expected Diff-q with fc ---
+fc Diff Diff-q
+if "%2" == "view" Notepad Diff
 goto end
 
 rem Run filtered diff test
 :DoFilteredTest
+echo --- Creating filtered diff of Test1 and Test2 ---
 %BDiff% --format=filtered --verbose Test1 Test2 >Diff
 if errorlevel 1 set ErrorMsg=BDiff failed
+echo.
+echo --- Testing expected Diff file against expected Diff-f with fc ---
 if not "%ErrorMsg%"=="" goto error
-Notepad Diff
+fc Diff Diff-f
+if "%2" == "view" Notepad Diff
 goto end
 
 rem Run version number test
@@ -88,11 +97,16 @@ goto end
 :usage
 if not "%ErrorMsg%" == "" echo *** ERROR: %ErrorMsg%
 echo Usage is:
-echo   test.bat patch - test binary patching
-echo   test.bat quoted - create quoted text diff and display it
-echo   test.bat filtered - create filtered text diff and display it
-echo   test.bat version - display version information for BDiff and BPatch
-echo   test.bat clean - remove all generated files
+echo   test.bat patch
+echo     test binary patching
+echo   test.bat quoted [view]
+echo     test quoted text diff (specify view to display diff in notepad)
+echo   test.bat filtered [view]
+echo     test filtered text diff (specify view to display diff in notepad)
+echo   test.bat version
+echo     display version information for BDiff and BPatch
+echo   test.bat clean
+echo     remove all generated files
 echo For more information see ReadMe.txt
 goto end
 
