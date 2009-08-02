@@ -23,8 +23,8 @@
 
 
 [Fixed File Info]
-File Version #=0, 2, 5, 5
-Product Version #=0, 2, 5, 0
+File Version #=0, 2, 6, 6
+Product Version #=0, 2, 6, 0
 File OS=4
 File Type=1
 File Sub-Type=0
@@ -41,7 +41,7 @@ Company Name=
 File Description=Windows console application recreates a binary file from another file and a binary diff.
 File Version=v<#F1>.<#F2>.<#F3> Build <#F4>
 Internal Name=<SHORTFNAME>
-Legal Copyright=Original code copyright © 1999 by Stefan Reuther <Streu@gmx.de>. Portions copyright © 2003-2007 by Peter Johnson (www.delphidabbler.com).
+Legal Copyright=Original code copyright © 1999 by Stefan Reuther <Streu@gmx.de>. Portions copyright © 2003-<YEAR> by Peter Johnson (www.delphidabbler.com).
 Legal Trademark=
 Original File Name=BPatch.exe
 Private Build=
