@@ -5,43 +5,44 @@ bdiff - difference of binary files
 
 SYNOPSIS
 
-bdiff [options] old-file new-file >patch-file
+bdiff [options] old-file new-file [>patch-file]
 
 
 DESCRIPTION
 
 bdiff computes differences between two binary files. Output can be either a
-somewhat human-readable protocol, or a binary file readable by bpatch.
+somewhat human-readable protocol, or a binary file readable by bpatch. Output is
+sent to standard output unless the --output option is used to specify an output
+file.
 
 bdiff handles insertion and deletion of data as well as changed bytes.
 
 
 OPTIONS
 
--q                - Use QUOTED format (default);
+-q                   - Use QUOTED format (default);
 
--f                - Use FILTERED format;
+-f                   - Use FILTERED format;
 
--b                - Use BINARY format;
+-b                   - Use BINARY format;
 
---format=FMT      - Select format by name: (binary, filtered, quoted)
+--format=FMT         - Select format by name: (binary, filtered, quoted)
 
--m N, 
---min-equal=N     - Two chunks of data are recognized as being identical if they
-                    are at least N bytes long, the default is 24;
+-m N,                - Two chunks of data are recognized as being identical if
+--min-equal=N          they are at least N bytes long, the default is 24.
 
--o FILENAME, 
---output=FILENAME - Specify output file name. Specifying --output=- does
-                    nothing. Can be used as an alternative to shell redirection.
+-o FILENAME,         - Write diff to specified file instead of standard output.
+--output=FILENAME      Specifying --output=- does nothing. Use as an alternative
+                       to shell redirection.
 
--V, 
---verbose          - Print status messages while processing input;
+-V,                  - Print status messages while processing input;
+--verbose
 
--h,
---help             - Show help screen and exit;
+-h,                  - Show help screen and exit;
+--help
 
--v,
---version          - Show version number and exit.
+-v,                  - Show version number and exit.
+--version
 
 
 ALGORITHM
@@ -61,8 +62,6 @@ very often.
 
 OUTPUT FORMATS
 
-Output always goes to standard output.
-
 The quoted format (default) is similar to diff output in unified format: '+'
 means added data, and a space means data kept from the old file. Lines prefixed
 with '@' inform you about the position of the next 'space' line in the source
@@ -73,7 +72,7 @@ Non-printable characters (see isprint(3)[1]) and the backslash character are
 represented by a \ followed by the octal three-digit character code.
 
 The filtered format is like the quoted format, but non-printable characters are
-replaced by dots (.) here.
+replaced by dots (.).
 
 The binary format is machine-readable, and omits details for common blocks. All
 words are in little-endian format (low byte first). The format is:
@@ -111,11 +110,11 @@ n bytes  - The patch itself, a sequence of the following records:
     
 ADMINISTRATIVIA
 
-This manual page is for version 0.2.5 of bdiff.
+This manual page is for version 0.2.6 or later of bdiff.
 
-(c) copyright 1999 by Stefan Reuther <Streu@gmx.de> and (c) 2003-2009 by Peter
-Johnson (www.delphidabbler.com). See the LICENSE file for details of permisable
-use.
+bdiff is (c) copyright 1999 Stefan Reuther <Streu@gmx.de> and (c) 2003-2009
+Peter Johnson (www.delphidabbler.com). See the LICENSE file for details of
+permisable use.
 
 THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
 NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF
