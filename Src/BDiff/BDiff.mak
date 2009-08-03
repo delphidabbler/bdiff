@@ -10,6 +10,8 @@
 #
 # Usage:
 #   Run one of the following commands on the same directory as this file:
+#     Make -f BDiff.mak config
+#       Configure source folder
 #     Make -f BDiff.mak exe
 #     Make -f BDiff.mak
 #       Builds the executable file: builds resources and pascal.
@@ -46,3 +48,9 @@ res : BDiff.res VBDiff.res
 # Build pascal source and link in resources
 pascal: BDiff.exe
 
+# Configure source folder
+config:
+  -@del BDiff.cfg
+  -@del BDiff.dof
+  -@copy BDiff.cfg.tplt BDiff.cfg
+  -@copy BDiff.dof.tplt BDiff.dof

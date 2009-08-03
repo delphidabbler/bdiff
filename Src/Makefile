@@ -10,6 +10,8 @@
 #
 # Usage:
 #   Run one of the following commands on the same directory as this file:
+#     Make config
+#       Configure source folders
 #     Make
 #     Make exe
 #     Make all
@@ -57,7 +59,7 @@ res:
   @cd ..
 
 # Build pascal code and link in resources
-pascal:
+pascal: config
   @echo.
   @echo Build Pascal
   @echo ------------
@@ -102,3 +104,13 @@ release: clean
   @zip -r -9 $(OUTFILE) Test
   -@cd Src
 
+# Configure source code ready for compilation
+config:
+  @echo.
+  @echo Conifguring
+  @echo -----------
+  @cd BDiff
+  $(MAKE) -f BDiff.mak config
+  @cd ..\BPatch
+  $(MAKE) -f BPatch.mak config
+  @cd ..
