@@ -59,7 +59,7 @@ res:
   @cd ..
 
 # Build pascal code and link in resources
-pascal: config
+pascal:
   @echo.
   @echo Build Pascal
   @echo ------------
@@ -107,10 +107,20 @@ release: clean
 # Configure source code ready for compilation
 config:
   @echo.
-  @echo Conifguring
+  @echo Configuring
   @echo -----------
+  @echo Creating empty output directories
+  -@if not exist ..\Exe md ..\Exe
+  @del ..\Exe\*.* /Q /S /F
+  -@if not exist ..\Release md ..\Release
+  @del ..\Release\*.* /Q /S /F
+  -@if not exist ..\Bin md ..\Bin
+  @del ..\Bin\*.* /Q /S /F
+  -@if not exist ..\Bin\BDiff md ..\Bin\BDiff
+  -@if not exist ..\Bin\BPatch md ..\Bin\BPatch
+  @echo Creating .cfg and .dof files
   @cd BDiff
-  $(MAKE) -f BDiff.mak config
+  @$(MAKE) -f BDiff.mak config >nul
   @cd ..\BPatch
-  $(MAKE) -f BPatch.mak config
+  @$(MAKE) -f BPatch.mak config >nul
   @cd ..
