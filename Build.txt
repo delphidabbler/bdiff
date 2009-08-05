@@ -1,0 +1,286 @@
+================================================================================
+
+BDiff / BPatch Build Instructions
+
+================================================================================
+
+
+Introduction
+--------------------------------------------------------------------------------
+
+BDiff / BPatch is written in Object Pascal and is targeted at Delphi 7. The
+Delphi IDE can be used to modify the source and to perform test builds. Final
+builds should be built using the provided makefile, but you can get away with
+using the IDE if you don't change any resources.
+
+These instructions only apply to building BDiff / BPatch v0.2.6a and later. For
+earlier versions please see any instructions that came with the source code.
+
+
+Requirements
+--------------------------------------------------------------------------------
+
+You need the following tools to perform a full build and release of BDiff /
+BPatch:
+
+Delphi Command Line compiler (DCC32)
+------------------------------------
+
+The preferred version is Delphi 7. If you have this compiler please use it. If
+you set the DELPHI7 environment variable to Delphi 7's install directory, the
+makefile will use it. If DELPHI7 is not set you should set DELPHIROOT to the
+install root of the Delphi you are using. If DELPHIROOT is not set then the
+makefile will assume Delphi is on the path and will use the first version it
+finds.
+  
+Alternatives:
+
+  + Earlier version of Delphi may work, but haven't been tested.
+
+  + The Win32 personalities of Delphi 2005, 2006 and 2007 should work OK.
+
+  + The Turbo versions may work, but I'm not sure if they ship with the DCC32
+    command line compiler, so you may need to compile only from the IDE.
+
+  + Be very careful with Delphi 2009 and any later Unicode enabled versions: In
+    places the code requires single byte characters. I hope that the relevant
+    code uses explicit single-byte type, but this hasn't been tested. 
+
+  + As noted above you can compile Pascal code from the Delphi IDE instead of
+    running DCC32.
+
+BRCC32 resource compiler (BRCC32)
+---------------------------------
+
+BRCC32 is distributed with Delphi. It is needed to compile resource files. The
+Makefile expects to find BRCC32 in the same directory as DCC32.
+  
+Borland MAKE
+------------
+
+This is the make tool that ships with Delphi. You can use any version that
+works. I've tested the versions that ship with Delphi 7 and Delphi 2006. The
+makefile calls Make recursively: it uses the same command line that you used so
+there are no requirements as to the location of Make.
+  
+DelphiDabbler Version Information Editor (VIEd)
+-----------------------------------------------
+
+This program is required to convert the .vi files that specify version
+information into an intermediate .rc file that is compiled by BRCC32. VIEd is
+expected to be on the system path unless the VIEDROOT environment variable is
+set to indicate VIEd's installation directory. You can get VIEd here:
+http://www.delphidabbler.com/software/vied
+  
+Zip.exe 
+-------
+
+This program is required to create the release exe file. Again it is assumed to
+be on the path unless the ZIPROOT environment variable is set to its install
+directory. You can get a Windows version at:
+http://stahlforce.com/dev/index.php?tool=zipunzip
+
+  
+Dependencies
+--------------------------------------------------------------------------------
+
+The source depends only on the Delphi VCL, so provided you have Delphi
+installed, the source should compile without building any other libraries.
+
+
+Preparations
+--------------------------------------------------------------------------------
+
+Get the source code
+-------------------
+  
+You have two options for getting the source code:
+  
+  1) If you have Subversion client you can use it to checkout a copy of the
+     source code. The BDiff / BPatch repository URL is at:
+     http://my-svn.assembla.com/svn/bdiff
+     
+     You can checkout either the current development branch (may not be stable),
+     or you can select one of the release versions.
+     The development branch is in the trunk branch of the repository.
+     The release versions are in sub-directories of the tags branch of the
+     repository.
+     
+     To checkout the main development branch do
+     
+       > svn checkout http://my-svn.assembla.com/svn/bdiff/trunk MY-PATH
+     
+     where MY-PATH is the local directory where you want to store the code.
+     
+     To check out a release first check what releases are available with:
+     svn list http://my-svn.assembla.com/svn/bdiff/tags
+     Now checkout the selected version (where 9.9.9 is the version number) with:
+     
+       > svn checkout http://my-svn.assembla.com/svn/bdiff/tags/version-9.9.9
+           MY-PATH
+         [all on one line].
+     
+     Please ignore version-0.2.5 - these instructions won't work for that
+     release.
+     
+  2) You can view code repository on assembla.com using their code browser to
+     navigate to the branch you are interested in. Once you've found it you can
+     download that code tree by clicking the Download button on the code browser
+     page.
+     
+     You will find the repository root at
+     http://code.assembla.com/bdiff/subversion/nodes.
+     From there you can navigate to the trunk or find a suitable release under
+     the tags branch. Once you have found the one you want download a zip file
+     containing that source tree by clicking the Download button.
+     
+     Then copy the content of zip file to a suitable folder on your local
+     computer.
+     
+     Shortcuts:
+       The current development branch (which may not be stable) is at:
+       http://code.assembla.com/bdiff/subversion/nodes/trunk
+       The releases are listed at
+       http://code.assembla.com/bdiff/subversion/nodes/tags.
+       Just click on the one you want. But please ignore version-0.2.5 - these
+       instructions won't work.
+
+Whichever method you used, you should end up with a folder structure like this:
+  
+  +--+
+     |
+     +-- Docs         { documentation file }
+     |
+     +-- OrigC        { original C source - not used }
+     |
+     +-- Src          { project group and master make files }
+     |   |
+     |   +-- BDiff    { source and makefile for BDiff }
+     |   |
+     |   +-- BPatch   { source and makefile for BPatch }
+     |   |
+     |   +-- Common   { code common to both programs }
+     |
+     +-- Test         { test scripts }
+     
+If, by chance you also have a Bin, Exe and Release directory don't worry.
+Subversion users will also see the usual .svn hidden directories.
+  
+Configure the source tree
+-------------------------
+
+Before you can get hacking, you need to prepare the code. Open a command console
+and navigate into the Src sub-folder and do:
+  
+  > Make config
+  
+You may need to replace "Make" above with the full path to Make if it isn't on
+the path, or if the Make that runs isn't the Borland / CodeGear version.
+  
+Once "Make config" has completed your folder structure should have changed to:
+  
+  +--+
+     |
+     +-- Bin           { parent of binary folders }
+     |   |
+     |   +-- BDiff     { receives binary files for BDiff (.dcu and .res) }
+     |   |
+     |   +-- BPatch    { receives binary files for BPatch (.dcu and .res) }
+     |
+     +-- Docs
+     |
+     +-- Exe           { receives executable files }
+     |
+     +-- OrigC
+     |
+     +-- Release       { receives release zip file }
+     |
+     +-- Src
+     |   |
+     |   +-- BDiff
+     |   |
+     |   +-- BPatch
+     |
+     +-- Test
+
+If the Bin, Exe and Release folders already existed they will have been emptied.
+Subversion has been configured to ignore these folders. In addition, Make will
+have created .cfg and .dof files from templates. .cfg files are needed for DCC32
+to run correctly and .dof files enable use of the Delphi IDE. These files will
+be ignored by Subversion.
+  
+If you are intending to use the Delphi IDE to compile code, you should also do:
+  
+  > Make res
+  
+This compiles the resource files that the IDE needs to link into compiled
+executables.
+  
+Modify the source
+-----------------
+
+If you plan to modify the source, you can do it now.
+  
+If you are using the Delphi IDE you should load the BDiff.bpg project group file
+in from the Src folder into the IDE - this contains both the BDiff and BPatch
+targets.
+  
+Versions of Delphi after Delphi 7 will emit additional project files. Subversion
+users will have to decide which files to add to the repository and which to
+ignore.
+
+Compile
+-------
+
+Compile the code by doing
+  
+  > Make exe
+  
+This builds the resources then builds the whole of the Pascal source using the
+DCC32 command line compiler.
+  
+Even if you have built the code in the IDE you advised to run "Make exe".
+  
+At any time you can rebuild the resources using "Make res" or rebuild the pascal
+code without also building resources by using "Make pascal".
+  
+Testing
+-------
+
+Some simple tests can be run to check that BDiff and BPatch are working
+correctly. For details see ReadMe.txt in the Test folder.
+
+Prepare the executable release file
+-----------------------------------
+
+If you want to create a zip file containing the executable programs and required
+documentation do:
+  
+  > Make release
+  
+This deletes any temporary files then creates the required zip file. You can
+change the default name of the zip file by defining the RELEASEFILENAME
+environment variable as the required name (excluding extension). For example, to
+generate a release file named my-file.zip define RELEASEFILENAME as 'my-file' or
+do:
+  
+  > Make -DRELEASEFILENAME=myfile release
+  
+If you issue a Make with no target it will re-run config, build the executable
+code and create the release.
+  
+Tidy up
+-------
+
+At any time you can tidy up temporary files by doing:
+  
+  > Make clean
+  
+If you are using a Delphi IDE that maintain a history you will need to modify
+the makefile to delete the various hidden __history directories. Subversion
+users will need to get subversion to ignore these directories.
+
+--------------------------------------------------------------------------------
+$Rev$
+$Date$
+--------------------------------------------------------------------------------
