@@ -21,26 +21,42 @@
 # Requires that the BIN macro is defined to point to directory that is to
 # receive .res and .dcu output.
 
-# DELPHIROOT must point to the install directory for Delphi 7. The preferred
-# option is for user to define this in the DELPHI7 environment variable or to
-# directly define DELPHIROOT. If neither DELPHIROOT nor DELPHI2006 is defined
-# the directory is calculated from Make's directory. In this latter case it is
-# important to ensure it is the Delphi 7 version of Make that is used.
-!ifndef DELPHIROOT
+# The preferred compiler is Delphi 7. If the DELPHI7 evironment variable is set,
+# it will be used and expected to Delphi 7 install directory.
+# If DELPHI7 is not set then the DELPHIROOT environment variable is examined.
+# This can be set to any Delphi compiler (should compile if later than Delphi
+# 7). If neither DELPHI7 nor DELPHIROOT is set then a Delphi compiler is
+# expected to be present on the system path.
 !ifdef DELPHI7
 DELPHIROOT = $(DELPHI7)
-!else
-DELPHIROOT = $(MAKEDIR)\..
-!endif
 !endif
 
 # Define macros that access required build tools
-# MAKE, DCC32 and BRCC32 should be in same sub-directory of Delphi 7
-MAKE = "$(DELPHIROOT)\Bin\Make.exe" -$(MAKEFLAGS)
+# We use same version of MAKE as that used to build this file
+MAKE = "$(MAKEDIR)\Make.exe" -$(MAKEFLAGS)
+# If DELPHIROOT set assume DCC32 and BRCC32 are in the Bin sub-directory of root
+# directory, otherwise assume the tools are on the path
+!ifdef DELPHIROOT
 DCC32 = "$(DELPHIROOT)\Bin\DCC32.exe"
 BRCC32 = "$(DELPHIROOT)\Bin\BRCC32.exe"
-# VIED is expected to be on the path
-VIED = "VIEd.exe" -makerc
+!else
+DCC32 = DCC32.exe
+BRCC32 = BRCC32.exe
+!endif
+# If VIEDROOT is set then use that directory for VIEd, otherwise assume VIEd is
+# on the path
+!ifdef VIEDROOT
+VIED = "$(VIEDROOT)\VIEd.exe" -makerc
+!else
+VIED = VIEd.exe -makerc
+!endif
+# If ZIPROOT is set then use that directory for Zip, otherwise assume Zip is on
+# the path
+!ifdef ZIPROOT
+ZIP = $(ZIPROOT)\Zip.exe
+!else
+ZIP = Zip.exe
+!endif
 
 # Implicit rules
 # Delphi projects are assumed to contain required output and search path
