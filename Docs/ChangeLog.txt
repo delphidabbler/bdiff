@@ -1,3 +1,10 @@
+v0.2.6a - released 05 Aug 2009
+BDiff.exe v0.2.6 (build 7)
+BPatch.exe v0.2.6 (build 7)
++ Removed source code from distribution. (Source code now available from assembla.com code repository).
++ Documentation updated re changes.
++ No changes to executable code other than to update build numbers.
+
 v0.2.6 - released 02 Aug 2009
 BDiff.exe v0.2.6 (build 6)
 BPatch.exe v0.2.6 (build 6)
