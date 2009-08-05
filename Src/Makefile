@@ -10,9 +10,12 @@
 #
 # Usage:
 #   Run one of the following commands on the same directory as this file:
-#     Make config
-#       Configure source folders
 #     Make
+#     Make everything
+#       Configures ready for building, builds executable (resource and pascal)
+#       Cleans up and creates release files
+#     Make config
+#       Configure source directories and creates binary output directories
 #     Make exe
 #     Make all
 #       Builds both executables: same as Make res followed by Make pascal
@@ -25,8 +28,7 @@
 #     Make tidy
 #       Cleans up temporary files.
 #     Make release
-#       Creates a zip file containing all files of a release. Cleans temporary
-#       files before creating zip.
+#       Creates binary release file.
 #
 # THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
 # NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
@@ -74,35 +76,33 @@ clean:
   @echo.
   @echo Clean Unwanted Files
   @echo --------------------
-  -@cd ..
+  @cd ..
   -@del *.~* /S 2>nul
-  -@cd Src
+  @cd Src
   @echo Done.
 
 # Build release files (.zip)
-OUTFILE = Release\dd-bdiff.zip
+!ifndef RELEASEFILENAME
+RELEASEFILENAME = dd-bdiff
+!endif
+OUTFILE = Release\$(RELEASEFILENAME).zip
 release: clean
   @echo.
   @echo Creating Release File
   @echo ---------------------
-  -@cd ..
+  @cd ..
   -@if exist $(OUTFILE) del $(OUTFILE)
   # Store exe files in zip file root
-  @zip -j -9 $(OUTFILE) Exe\*.exe
-  # Copy all current source files except .dsk files to Src sub directory
-  @zip -r -9 $(OUTFILE) Src
-  @zip -d $(OUTFILE) *.dsk
-  # Copy .res files to Bin directory
-  @zip -r -9 $(OUTFILE) Bin\BDiff\*.res
-  @zip -r -9 $(OUTFILE) Bin\BPatch\*.res
+  @$(ZIP) -j -9 $(OUTFILE) Exe\*.exe
   # Copy license and readme files to root
-  @zip -j -9 $(OUTFILE) Docs\README Docs\LICENSE
+  @$(ZIP) -j -9 $(OUTFILE) Docs\README Docs\LICENSE
   # Copy other docs to docs sub-directory
-  @zip -r -9 $(OUTFILE) Docs\BDiff.txt Docs\BPatch.txt
-  @zip -r -9 $(OUTFILE) Docs\PasTrans.txt Docs\ChangeLog.txt
+  @$(ZIP) -r -9 $(OUTFILE) Docs\BDiff.txt
+  @$(ZIP) -r -9 $(OUTFILE) Docs\BPatch.txt
+  @$(ZIP) -r -9 $(OUTFILE) Docs\ChangeLog.txt
   # Copy test code
-  @zip -r -9 $(OUTFILE) Test
-  -@cd Src
+  @$(ZIP) -r -9 $(OUTFILE) Test
+  @cd Src
 
 # Configure source code ready for compilation
 config:
