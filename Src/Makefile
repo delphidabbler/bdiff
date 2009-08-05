@@ -41,13 +41,16 @@
 
 !include "Common.mak"
 
-# Default is to build executables
-exe: res pascal
+# Default is to config, create executable and create release file
+everything: config exe release
 
 # Synonyms
 tidy: clean
 pas: pascal
 all: exe
+
+# Build executables
+exe: res pascal
 
 # Build resources
 res:
