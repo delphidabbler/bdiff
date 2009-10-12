@@ -1,7 +1,6 @@
-
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+================================================================================
 License for original BDiff / BPatch releases 0.1 and 0.2 (C source code)
-________________________________________________________________________________
+================================================================================
 
 (c) copyright 1999 by Stefan Reuther <Streu@gmx.de>. Copying this program is
 allowed, as long as you include source code and document changes you made in a
@@ -11,9 +10,9 @@ This program is distributed in the hope that it will be useful, but without
 warranties of any kind, be they explicit or implicit.
 
 
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+================================================================================
 License used for BDiff / BPatch v0.2.1 and v0.2.2
-________________________________________________________________________________
+================================================================================
 
 The copyright statement and terms of use and distribution granted by the
 original author are:
@@ -38,4 +37,8 @@ Many thanks to Stefan for creating this software.
 * Stefan's email address is included in the original document but has not been
 included here for obvious reasons - please see the file bdiff.1 that is included
 in the download for details. 
-________________________________________________________________________________
+
+================================================================================
+$Rev$
+$Date$
+================================================================================
