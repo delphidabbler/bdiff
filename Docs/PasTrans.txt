@@ -1,11 +1,12 @@
+================================================================================
 
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
 NOTES ON THE PASCAL TRANSLATION OF BDIFF / BPATCH
-________________________________________________________________________________
 
+================================================================================
 
 Release 0.2.1 (pas)
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-------------------
+
 This version is a fairly literal, line by line, translation of Stefan Reuther's
 BDiff v0.2 and BPatch v0.2. The differences are:
 
@@ -34,19 +35,20 @@ BDiff v0.2 and BPatch v0.2. The differences are:
   
 
 Release 0.2.2 (pas)
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+------------------
+
 This version is again a fairly literal translation. The only change (except for
 updated version information) is that BDiff contains a Pascal translation of a
 bug fix in the block sort code for which Stefan provided updated C source code.
 
 
 Release 0.2.3 and later
-¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯¯
+-----------------------
+
 From this release BDiff and BPatch broke the link with the original C source and
 began to develop separately, so further translation notes are not provided.
 
-________________________________________________________________________________
-
+--------------------------------------------------------------------------------
 $Rev$
 $Date$
-________________________________________________________________________________
+--------------------------------------------------------------------------------
