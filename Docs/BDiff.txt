@@ -107,7 +107,7 @@ n bytes  - The patch itself, a sequence of the following records:
     }
     (rotate current checksum left by two and xor in the current byte)
 
-    
+
 ADMINISTRATIVIA
 
 This manual page is for version 0.2.6 or later of bdiff.

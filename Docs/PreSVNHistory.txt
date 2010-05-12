@@ -471,7 +471,7 @@ to release 0.2.5. For each release the following is noted:
   + Version and build number of BDiff and BPatch.
   + Brief notes of changes to each utility.
   + List of new and added source files.
-  
+
 The Development tools, .bpg and .cfg files, test files and documentation are not
 included in this information.
 
@@ -521,7 +521,7 @@ BDiff.exe v0.2.3 build 3
   Notes:
     + Fixed some memory leaks.
     + Fixed small bug in -h and -v switches.
-    + Updated copyright statements on help screen and description of missing 
+    + Updated copyright statements on help screen and description of missing
       options.
     + Updated version to v0.2.3.
     + Added batch file that can build the project.
