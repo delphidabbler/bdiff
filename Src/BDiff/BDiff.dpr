@@ -29,7 +29,8 @@ uses
   UBDiffUtils in 'UBDiffUtils.pas',
   UBDiffTypes in 'UBDiffTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',
-  UErrors in '..\Common\UErrors.pas';
+  UErrors in '..\Common\UErrors.pas',
+  UFileData in 'UFileData.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
