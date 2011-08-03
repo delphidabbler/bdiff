@@ -6,7 +6,7 @@
  * Based on a blksort.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
  * <Streu@gmx.de>.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -32,12 +32,26 @@ uses
   UBDiffTypes;
 
 
-{ "exported" functions: used by main BDiff engine }
+{ Returns array of offsets into data, sorted by position.
+  @param Data [in] Data to be sorted. Must not be nil.
+  @param DataSize [in] Size of data to be sorted, must be > 0.
+  @return Pointer to block of sorted indices into Data. Caller must free.
+  @except raises EOutOfMemory if can't allocate sorted data block.
+}
+function BlockSort(Data: PSignedAnsiCharArray; DataSize: size_t): PBlock;
 
-function block_sort(data: PSignedAnsiCharArray; dlen: size_t): PBlock;
-
-function find_string(data: PSignedAnsiCharArray; block: PBlock; len: size_t;
-  sub: PSignedAnsiChar; max: size_t; index: Psize_t): size_t;
+{ Finds maximum length "sub-string" of CompareData that is in Data.
+  @param Data [in] Data to be searched for "sub-string".
+  @param Block [in] Block of indexes into Data that sort sub-strings of Data.
+  @param DataSize [in] Size of Data.
+  @param CompareData [in] Pointer to data to be compared to Data.
+  @param CompareDataSize [in] Size of data pointed to by CompareData.
+  @param FoundPos [out] Position in Data where "sub-string" was found.
+  @return Length of found "sub-string".
+}
+function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
+  DataSize: size_t; CompareData: PSignedAnsiChar; CompareDataSize: size_t;
+  out FoundPos: size_t): size_t;
 
 
 implementation
@@ -72,150 +86,151 @@ uses
   UBDiffUtils;
 
 
-{ Compare positions a and b in data area, consider maximum length dlen }
-function block_sort_compare(a: size_t; b: size_t; data: PSignedAnsiCharArray;
-  dlen: size_t): Integer;
+function BlockSortCompare(A: size_t; B: size_t; Data: PSignedAnsiCharArray;
+  DataSize: size_t): Integer;
 var
-  pa: PSignedAnsiChar;
-  pb: PSignedAnsiChar;
-  len: size_t;
+  PA: PSignedAnsiChar;
+  PB: PSignedAnsiChar;
+  Len: size_t;
 begin
-  pa := @data[a];
-  pb := @data[b];
-  len := dlen - a;
-  if dlen - b < len then
-    len := dlen - b;
-  while (len <> 0) and (pa^ = pb^) do
+  PA := @Data[A];
+  PB := @Data[B];
+  Len := DataSize - A;
+  if DataSize - B < Len then
+    Len := DataSize - B;
+  while (Len <> 0) and (PA^ = PB^) do
   begin
-    Inc(pa);
-    Inc(pb);
-    Dec(len);
+    Inc(PA);
+    Inc(PB);
+    Dec(Len);
   end;
-  if len = 0 then
+  if Len = 0 then
   begin
-    Result := a - b;
+    Result := A - B;
     Exit;
   end;
-  Result := pa^ - pb^;
+  Result := PA^ - PB^;
 end;
 
 { The 'sink element' part of heapsort }
-procedure block_sort_sink(le: size_t; ri: size_t; block: PBlock;
-  data: PSignedAnsiCharArray; dlen: size_t);
+procedure BlockSortSink(Left: size_t; Right: size_t; Block: PBlock;
+  Data: PSignedAnsiCharArray; DataSize: size_t);
 var
-  i, j, x: size_t;
+  I, J, X: size_t;
 begin
-  i := le;
-  x := block[i];
+  I := Left;
+  X := Block[I];
   while True do
   begin
-    j := 2*i+1;
-    if j >= ri then
+    J := 2 * I + 1;
+    if J >= Right then
       Break;
-    if j < ri-1 then
-      if block_sort_compare(block[j], block[j+1], data, dlen) < 0 then
-        Inc(j);
-    if block_sort_compare(x, block[j], data, dlen) > 0 then
+    if J < Right - 1 then
+      if BlockSortCompare(Block[J], Block[J+1], Data, DataSize) < 0 then
+        Inc(J);
+    if BlockSortCompare(X, Block[J], Data, DataSize) > 0 then
       Break;
-    block[i] := block[j];
-    i := j;
+    Block[I] := Block[J];
+    I := J;
   end;
-  block[i] := x;
+  Block[I] := X;
 end;
 
-{ Returns array of offsets into data, sorted by position }
-{ Raises EOutOfMemory if can't allocate block }
-{ Returns reference to allocated block or nil if dlen = 0 }
-function block_sort(data: PSignedAnsiCharArray; dlen: size_t): PBlock;
+function BlockSort(Data: PSignedAnsiCharArray; DataSize: size_t): PBlock;
 var
-  block: PBlock;
-  i, le, ri: size_t;
-  x: size_t;
+  I, Temp, Left, Right: size_t;
 begin
-  if dlen = 0 then
+  if DataSize = 0 then
   begin
     Result := nil;
     Exit;
   end;
 
-  GetMem(block, sizeof(size_t) * dlen);   // replaces call to malloc()
+  GetMem(Result, SizeOf(size_t) * DataSize);
 
-  { initialize unsorted data }
-  for i := 0 to Pred(dlen) do
-    block[i] := i;
+  // initialize unsorted data
+  for I := 0 to Pred(DataSize) do
+    Result[I] := I;
 
-  { heapsort }
-  le := dlen div 2;
-  ri := dlen;
-  while le > 0 do
+  // heapsort
+  Left := DataSize div 2;
+  Right := DataSize;
+  while Left > 0 do
   begin
-    Dec(le);
-    block_sort_sink(le, ri, block, data, dlen);
+    Dec(Left);
+    BlockSortSink(Left, Right, Result, Data, DataSize);
   end;
-  while ri > 0 do
+  while Right > 0 do
   begin
-    x := block[le];
-    block[le] := block[ri-1];
-    block[ri-1] := x;
-    Dec(ri);
-    block_sort_sink(le, ri, block, data, dlen);
+    Temp := Result[Left];
+    Result[Left] := Result[Right-1];
+    Result[Right-1] := Temp;
+    Dec(Right);
+    BlockSortSink(Left, Right, Result, Data, DataSize);
   end;
-  Result := block;
 end;
 
-{ Find maximum length substring starting at sub, at most max bytes data, block,
-  len characterize source fill *index returns found location return value is
-  found length }
-function find_string(data: PSignedAnsiCharArray; block: PBlock; len: size_t;
-  sub: PSignedAnsiChar; max: size_t; index: Psize_t): size_t;
+function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
+  DataSize: size_t; CompareData: PSignedAnsiChar; CompareDataSize: size_t;
+  out FoundPos: size_t): size_t;
 var
-  first, last: size_t;
-  mid: size_t;
-  l0, l: size_t;
-  pm: PSignedAnsiChar;
-  sm: PSignedAnsiChar;
-  retval: size_t;
+  First: size_t;                  // first position in Data to search
+  Last: size_t;                   // last position in Data to search
+  Mid: size_t;                    // mid point of Data to search
+  FoundSize: size_t;              // size of matching "sub-string"
+  FoundMax: size_t;               // maximum size of matching "sub-string"
+  PData: PSignedAnsiChar;         // ptr to char in Data to be compared
+  PCompareData: PSignedAnsiChar;  // ptr to char in CompareData to be compared
 begin
-  first := 0;
-  last := len - 1;
-  retval := 0;
-  index^ := 0;
+  First := 0;
+  Last := DataSize - 1;
+  Result := 0;
+  FoundPos := 0;
 
-  while first <= last do
+  // Do binary search of Data
+  while First <= Last do
   begin
-    mid := (first + last) div 2;
-    pm := @data[block[mid]];
-    sm := sub;
-    l := len - block[mid];
-    if l > max then
-      l := max;
-    l0 := l;
-    while (l <> 0) and (pm^ = sm^) do
+    // Get mid point of (sorted) Data to search
+    Mid := (First + Last) div 2;
+    // Set pointer to start of Data search string
+    PData := @Data[Block[Mid]];
+    // Set pointer to start of CompareData
+    PCompareData := CompareData;
+    // Calculate maximum possible size of matching substring
+    FoundMax := DataSize - Block[Mid];
+    if FoundMax > CompareDataSize then
+      FoundMax := CompareDataSize;
+    // Find and count match chars from Data and CompareData
+    FoundSize := 0;
+    while (FoundSize < FoundMax) and (PData^ = PCompareData^) do
     begin
-      Dec(l);
-      Inc(pm);
-      Inc(sm);
+      Inc(FoundSize);
+      Inc(PData);
+      Inc(PCompareData);
     end;
 
-    { we found a `match' of length l0-l, position block[mid] }
-    if l0 - l > retval then
+    // We found a "match" of length FoundSize, position Block[Mid]
+    if FoundSize > Result then
     begin
-      retval := l0 - l;
-      index^ := block[mid];
+      Result := FoundSize;
+      FoundPos := Block[Mid];
     end;
 
-    if (l = 0) or (pm^ < sm^) then
-      first := mid + 1
-      else
+    // Determine next search area
+    // Note: FoundSize = FoundMatch => substrings match
+    if (FoundSize = FoundMax) or (PData^ < PCompareData^) then
+      // substring <= current data string: search above
+      First := Mid + 1
+    else
+      // substring < current data string: search below
       begin
-        last := mid;
-        if last <> 0 then
-          Dec(last)
+        Last := Mid;
+        if Last <> 0 then
+          Dec(Last)
         else
           Break;
       end;
   end;
-  Result := retval;
 end;
 
 end.

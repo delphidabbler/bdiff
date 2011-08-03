@@ -84,13 +84,13 @@ begin
   Result.NewOffset := 0;
   while (SearchTextLength <> 0) do
   begin
-    FoundLen := find_string(
+    FoundLen := FindString(
       OldFile.Data,
       SortedOldData,
       OldFile.Size,
       SearchText,
       SearchTextLength,
-      @FoundPos
+      FoundPos
     );
     if FoundLen >= gMinMatchLength then
     begin
@@ -134,7 +134,7 @@ begin
     LogStatus('loading new file');
     NewFile := TFileData.Create(NewFileName);
     LogStatus('block sorting old file');
-    SortedOldData := block_sort(OldFile.Data, OldFile.Size);
+    SortedOldData := BlockSort(OldFile.Data, OldFile.Size);
     if not Assigned(SortedOldData) then
       Error('virtual memory exhausted');
     LogStatus('generating patch');
