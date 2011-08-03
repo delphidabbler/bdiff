@@ -3,7 +3,7 @@
  *
  * Main project file for BPatch.exe.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2001 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -30,7 +30,8 @@ uses
   UBPatchTypes in 'UBPatchTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
-  UBPatchParams in 'UBPatchParams.pas';
+  UBPatchParams in 'UBPatchParams.pas',
+  UUtils in '..\Common\UUtils.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources

@@ -32,7 +32,8 @@ uses
   UErrors in '..\Common\UErrors.pas',
   UFileData in 'UFileData.pas',
   UBDiffParams in 'UBDiffParams.pas',
-  UPatchWriters in 'UPatchWriters.pas';
+  UPatchWriters in 'UPatchWriters.pas',
+  UUtils in '..\Common\UUtils.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
