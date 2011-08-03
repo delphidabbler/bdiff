@@ -92,12 +92,12 @@ begin
   end;
 end;
 
-{ Print log message, if enabled. Log messages go to stderr because we may be
-  writing patch file contents to stdout }
+{ Print log message, if enabled. Log messages go to standard error because we
+  may be writing patch file contents to standard output }
 procedure LogStatus(const Msg: string);
 begin
   if gVerbose then
-    WriteStrFmt(stderr, '%s: %s'#13#10, [ProgramFileName, Msg]);
+    WriteStrFmt(StdErr, '%s: %s'#13#10, [ProgramFileName, Msg]);
 end;
 
 { Main routine: generate diff }
@@ -171,7 +171,7 @@ end;
 procedure DisplayHelp;
 begin
   WriteStrFmt(
-    stdout,
+    StdOut,
     '%0:s: binary ''diff'' - compare two binary files'#13#10#13#10
       + 'Usage: %0:s [options] old-file new-file [>patch-file]'#13#10#13#10
       + 'Difference between old-file and new-file written to standard output'
@@ -202,7 +202,7 @@ begin
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
   WriteStrFmt(
-    stdout, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
+    StdOut, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
   );
 end;
 
@@ -237,7 +237,7 @@ begin
 
       if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
       begin
-        // redirect StdOut to patch file
+        // redirect standard output to patch file
         PatchFileHandle := FileCreate(Params.PatchFileName);
         if PatchFileHandle <= 0 then
           OSError;
