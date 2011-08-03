@@ -48,17 +48,6 @@ function StrToULDec(const s: PChar; var endp: PChar): LongWord;
   string: note that the value has no leading '\', just the digits }
 function ByteToOct(V: Byte): string;
 
-{ writes binary data to a file: this is a C fwrite replacement }
-procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
-
-{ writes a single character or string to a file: used in place of C's string or
-  char output functions where string does not need formatting }
-procedure WriteStr(Handle: THandle; const S: string);
-
-{ writes a string built from format string and arguments to file: used in place
-  of C's fprintf and printf functions (but doesn't handle \n etc }
-procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
-
 
 implementation
 
@@ -118,28 +107,6 @@ begin
     Result := 10 * Result + LongWord((Ord(endp^) - Ord('0')));
     inc(endp);
   end;
-end;
-
-{ writes binary data to a file: this is a C fwrite replacement }
-procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
-var
-  Dummy: DWORD;
-begin
-  Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
-end;
-
-{ writes a single character or string to a file: used in place of C's string or
-  char output functions where string does not need formatting }
-procedure WriteStr(Handle: THandle; const S: string);
-begin
-  WriteBin(Handle, PChar(S), Length(S));
-end;
-
-{ writes a string built from format string and arguments to file: used in place
-  of C's fprintf and printf functions (but doesn't handle \n etc }
-procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
-begin
-  WriteStr(Handle, Format(Fmt, Args));
 end;
 
 end.

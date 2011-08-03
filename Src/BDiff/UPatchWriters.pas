@@ -51,7 +51,7 @@ uses
   // Delphi
   SysUtils,
   // Project
-  UBDiffUtils;
+  UBDiffUtils, UUtils;
 
 type
   TBinaryPatchWriter = class(TPatchWriter)
