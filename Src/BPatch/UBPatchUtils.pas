@@ -31,14 +31,6 @@ uses
   UBPatchTypes;
 
 
-{ emulates C std lib fread function using Windows file handle }
-function fread(ptr: Pointer; size: size_t; nobj: size_t;
-  stream: Integer): size_t;
-
-{ emulates C std lib fwrite function using Windows file handle }
-function fwrite(ptr: Pointer; size: size_t; nobj: size_t;
-  stream: Integer): size_t;
-
 { emulates C std lib fgetc function using Windows file handle }
 function fgetc(stream: Integer): Integer;
 
@@ -48,18 +40,11 @@ function feof(stream: Integer): Boolean;
 { emulates C std lib fseek function using Windows file handle }
 function fseek(stream: Integer; offset: Longint; origin: Integer): Integer;
 
-{ emulates C std lib fclose function using Windows file handle }
-procedure fclose(stream: Integer);
-
 { emulates C std lib fprintf function using Windows file handle: \n etc not
   supported and parameters and string format specifiers are in Object Pascal
   format }
 function fprintf(stream: Integer; const Fmt: string;
   Args: array of const): Integer;
-
-{ emulates C std lib perror function: displays given message followed by
-  description of last Windows error }
-procedure perror(const Msg: string);
 
 { emulates C std lib stdin value by returning Windows standard input handle }
 function stdin: Integer;
@@ -130,12 +115,6 @@ begin
     Result := 0;
 end;
 
-{ emulates C std lib fclose function using Windows file handle}
-procedure fclose(stream: Integer);
-begin
-  SysUtils.FileClose(stream);
-end;
-
 { emulates C std lib fprintf function using Windows file handle: \n etc not
   supported and parameters and string format specifiers are in Object Pascal
   format }
@@ -147,14 +126,6 @@ begin
   FormattedStr := Format(Fmt, Args);
   Result := Length(FormattedStr);
   fwrite(PChar(FormattedStr), SizeOf(Char) * Result, 1, stream);
-end;
-
-{ emulates C std lib perror function: displays given message followed by
-  description of last Windows error }
-procedure perror(const Msg: string);
-begin
-  fprintf(stderr, '%s: %s'#13#10,
-    [Msg, SysUtils.SysErrorMessage(Windows.GetLastError)]);
 end;
 
 { emulates C std lib stdin value by returning Windows standard input handle }
