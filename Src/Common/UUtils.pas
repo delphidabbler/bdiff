@@ -24,6 +24,8 @@ interface
 const
   // Value representing end of file (as returned from TIO.GetCh).
   EOF: Integer = -1;
+  // seek flag used by TIO.Seek (other possible values not used in program).
+  SEEK_SET = 0;
 
 type
   TIO = class(TObject)

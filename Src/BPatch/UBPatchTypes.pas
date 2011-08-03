@@ -3,7 +3,7 @@
  *
  * Contains type and global constant declarations for BPatch.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -26,12 +26,6 @@ interface
 type
   { size_t type is used extensively in C and in original code for this program }
   size_t = Cardinal;
-
-const
-  { end of file value returned by fgetc() }
-  EOF = -1;
-  { seek flag used by fseek() (other possible values not used in program) }
-  SEEK_SET = 0;
 
 
 implementation
