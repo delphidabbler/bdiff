@@ -21,73 +21,75 @@ unit UUtils;
 
 interface
 
-{ Returns Windows standard input handle }
-function StdIn: Integer;
-
-{ Returns Windows standard output handle }
-function StdOut: Integer;
-
-{ Returns Windows standard error handle }
-function StdErr: Integer;
-
-{ Redirects standard input from a given file handle }
-procedure RedirectStdIn(const Handle: Integer);
-
-{ Redirects standard output to a given file handle }
-procedure RedirectStdOut(const Handle: Integer);
-
-{ Writes binary data to a file }
-procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
-
-{ Writes a string to a file  }
-procedure WriteStr(Handle: THandle; const S: string);
-
-{ Writes a string built from format string and arguments to file }
-procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
+type
+  TIO = class(TObject)
+  public
+    { Returns Windows standard input handle }
+    class function StdIn: Integer;
+    { Returns Windows standard output handle }
+    class function StdOut: Integer;
+    { Returns Windows standard error handle }
+    class function StdErr: Integer;
+    { Redirects standard input from a given file handle }
+    class procedure RedirectStdIn(const Handle: Integer);
+    { Redirects standard output to a given file handle }
+    class procedure RedirectStdOut(const Handle: Integer);
+    { Writes binary data to a file }
+    class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
+    { Writes a string to a file }
+    class procedure WriteStr(Handle: THandle; const S: string);
+    { Writes a string built from format string and arguments to file }
+    class procedure WriteStrFmt(Handle: THandle; const Fmt: string;
+      Args: array of const);
+  end;
 
 implementation
 
 uses
   SysUtils, Windows;
 
-function StdIn: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_INPUT_HANDLE));
-end;
+{ TIO }
 
-function StdOut: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_OUTPUT_HANDLE));
-end;
-
-function StdErr: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_ERROR_HANDLE));
-end;
-
-procedure RedirectStdIn(const Handle: Integer);
+class procedure TIO.RedirectStdIn(const Handle: Integer);
 begin
   Windows.SetStdHandle(STD_INPUT_HANDLE, Cardinal(Handle));
 end;
 
-procedure RedirectStdOut(const Handle: Integer);
+class procedure TIO.RedirectStdOut(const Handle: Integer);
 begin
   Windows.SetStdHandle(STD_OUTPUT_HANDLE, Cardinal(Handle));
 end;
 
-procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
+class function TIO.StdErr: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_ERROR_HANDLE));
+end;
+
+class function TIO.StdIn: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_INPUT_HANDLE));
+end;
+
+class function TIO.StdOut: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_OUTPUT_HANDLE));
+end;
+
+class procedure TIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
+  Size: Integer);
 var
   Dummy: DWORD;
 begin
   Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
-procedure WriteStr(Handle: THandle; const S: string);
+class procedure TIO.WriteStr(Handle: THandle; const S: string);
 begin
-  WriteBin(Handle, PChar(S), Length(S));
+  WriteRaw(Handle, PChar(S), Length(S));
 end;
 
-procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
+class procedure TIO.WriteStrFmt(Handle: THandle; const Fmt: string;
+  Args: array of const);
 begin
   WriteStr(Handle, Format(Fmt, Args));
 end;

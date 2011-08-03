@@ -159,7 +159,7 @@ const
 begin
   try
     // read header from patch file
-    if FileRead(StdIn, Header, 16) <> 16 then
+    if FileRead(TIO.StdIn, Header, 16) <> 16 then
       Error('Patch not in BINARY format');
     if StrLComp(Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
       Error('Patch not in BINARY format');
@@ -187,14 +187,14 @@ begin
       { apply patch }
       while True do
       begin
-        Ch := fgetc(StdIn);
+        Ch := fgetc(TIO.StdIn);
         if Ch = EOF then
           Break;
         case Ch of
           Integer('@'):
           begin
             // common block: copy from source
-            if FileRead(StdIn, Header, 12) <> 12 then
+            if FileRead(TIO.StdIn, Header, 12) <> 12 then
               Error('Patch garbled - unexpected end of data');
             DataSize := GetLong(@Header[4]);
             SourceFilePos := GetLong(@Header[0]);
@@ -216,10 +216,10 @@ begin
           Integer('+'):
           begin
             // add data from patch file
-            if FileRead(StdIn, Header, 4) <> 4 then
+            if FileRead(TIO.StdIn, Header, 4) <> 4 then
               Error('Patch garbled - unexpected end of data');
             DataSize := GetLong(@Header[0]);
-            CopyData(StdIn, DestFileHandle, DataSize, 0, True);
+            CopyData(TIO.StdIn, DestFileHandle, DataSize, 0, True);
             Dec(DestLen, DataSize);
           end;
           else
@@ -252,7 +252,9 @@ end;
 
 procedure DisplayHelp;
 begin
-  WriteStrFmt(StdOut, '%0:s: binary ''patch'' - apply binary patch'#13#10
+  TIO.WriteStrFmt(
+    TIO.StdOut,
+    '%0:s: binary ''patch'' - apply binary patch'#13#10
     + #13#10
     + 'Usage: %0:s [options] old-file [new-file] [<patch-file]'#13#10#13#10
     + 'Creates new-file from old-file and patch-file'#13#10
@@ -274,8 +276,10 @@ begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
-  WriteStrFmt(
-    StdOut, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
+  TIO.WriteStrFmt(
+    TIO.StdOut,
+    '%s-%s %s '#13#10,
+    [ProgramBaseName, ProgramVersion, ProgramExeDate]
   );
 end;
 
@@ -311,7 +315,7 @@ begin
         );
         if PatchFileHandle <= 0 then
           OSError;
-        RedirectStdIn(PatchFileHandle);
+        TIO.RedirectStdIn(PatchFileHandle);
       end;
 
       ApplyPatch(Params.OldFileName, Params.NewFileName);
@@ -323,7 +327,9 @@ begin
     on E: Exception do
     begin
       ExitCode := 1;
-      WriteStrFmt(StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
+      TIO.WriteStrFmt(
+        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
+      );
     end;
   end;
 

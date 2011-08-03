@@ -97,7 +97,7 @@ end;
 procedure LogStatus(const Msg: string);
 begin
   if gVerbose then
-    WriteStrFmt(StdErr, '%s: %s'#13#10, [ProgramFileName, Msg]);
+    TIO.WriteStrFmt(TIO.StdErr, '%s: %s'#13#10, [ProgramFileName, Msg]);
 end;
 
 { Main routine: generate diff }
@@ -170,8 +170,8 @@ end;
 { Display help screen  }
 procedure DisplayHelp;
 begin
-  WriteStrFmt(
-    StdOut,
+  TIO.WriteStrFmt(
+    TIO.StdOut,
     '%0:s: binary ''diff'' - compare two binary files'#13#10#13#10
       + 'Usage: %0:s [options] old-file new-file [>patch-file]'#13#10#13#10
       + 'Difference between old-file and new-file written to standard output'
@@ -201,8 +201,10 @@ begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
-  WriteStrFmt(
-    StdOut, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
+  TIO.WriteStrFmt(
+    TIO.StdOut,
+    '%s-%s %s '#13#10,
+    [ProgramBaseName, ProgramVersion, ProgramExeDate]
   );
 end;
 
@@ -241,7 +243,7 @@ begin
         PatchFileHandle := FileCreate(Params.PatchFileName);
         if PatchFileHandle <= 0 then
           OSError;
-        RedirectStdOut(PatchFileHandle);
+        TIO.RedirectStdOut(PatchFileHandle);
       end;
 
       // create the diff
@@ -254,7 +256,9 @@ begin
     on E: Exception do
     begin
       ExitCode := 1;
-      WriteStrFmt(StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
+      TIO.WriteStrFmt(
+        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
+      );
     end;
   end;
 end;

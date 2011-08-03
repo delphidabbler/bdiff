@@ -114,10 +114,10 @@ var
 const
   cPlusSign: AnsiChar = '+';                // flags added data
 begin
-  WriteStr(StdOut, cPlusSign);
+  TIO.WriteStr(TIO.StdOut, cPlusSign);
   PackLong(@Rec.DataLength, Length);
-  WriteBin(StdOut, @Rec, SizeOf(Rec));
-  WriteBin(StdOut, Data, Length);           // data added
+  TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
+  TIO.WriteRaw(TIO.StdOut, Data, Length);           // data added
 end;
 
 { Compute simple checksum }
@@ -145,11 +145,11 @@ var
 const
   cAtSign: AnsiChar = '@';                  // flags command data in both file
 begin
-  WriteStr(StdOut, cAtSign);
+  TIO.WriteStr(TIO.StdOut, cAtSign);
   PackLong(@Rec.CopyStart, OldPos);
   PackLong(@Rec.CopyLength, Length);
-  PackLong( @Rec.CheckSum, CheckSum(@NewBuf[NewPos], Length));
-  WriteBin(StdOut, @Rec, SizeOf(Rec));
+  PackLong(@Rec.CheckSum, CheckSum(@NewBuf[NewPos], Length));
+  TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
 end;
 
 procedure TBinaryPatchWriter.Header(const OldFileName, NewFileName: string;
@@ -170,7 +170,7 @@ begin
   Move(cFileSignature, Head.Signature[0], Length(cFileSignature));
   PackLong(@Head.OldDataSize, OldFileSize);
   PackLong(@Head.NewDataSize, NewFileSize);
-  WriteBin(StdOut, @Head, SizeOf(Head));
+  TIO.WriteRaw(TIO.StdOut, @Head, SizeOf(Head));
 end;
 
 { Pack long in little-endian format to P }
@@ -190,8 +190,8 @@ end;
 
 procedure TTextPatchWriter.CopyHeader(NewPos, OldPos, Length: size_t);
 begin
-  WriteStrFmt(
-    StdOut,
+  TIO.WriteStrFmt(
+    TIO.StdOut,
     '@ -[%d] => +[%d] %d bytes'#13#10' ',
     [OldPos, NewPos, Length]
   );
@@ -200,8 +200,8 @@ end;
 procedure TTextPatchWriter.Header(const OldFileName, NewFileName: string;
   const OldFileSize, NewFileSize: size_t);
 begin
-  WriteStrFmt(
-    StdOut,
+  TIO.WriteStrFmt(
+    TIO.StdOut,
     '%% --- %s (%d bytes)'#13#10'%% +++ %s (%d bytes)'#13#10,
     [OldFileName, OldFileSize, NewFileName, NewFileSize]
   );
@@ -211,9 +211,9 @@ end;
 
 procedure TQuotedPatchWriter.Add(Data: PSignedAnsiChar; Length: size_t);
 begin
-  WriteStr(StdOut, '+');
+  TIO.WriteStr(TIO.StdOut, '+');
   QuotedData(Data, Length);
-  WriteStr(StdOut, #13#10);
+  TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
 procedure TQuotedPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos, OldPos,
@@ -221,7 +221,7 @@ procedure TQuotedPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos, OldPos,
 begin
   CopyHeader(NewPos, OldPos, Length);
   QuotedData(@NewBuf[NewPos], Length);
-  WriteStr(StdOut, #13#10);
+  TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
 procedure TQuotedPatchWriter.QuotedData(Data: PSignedAnsiChar; Length: size_t);
@@ -229,9 +229,9 @@ begin
   while (Length <> 0) do
   begin
     if IsPrint(Char(Data^)) and (Char(Data^) <> '\') then
-      WriteStr(StdOut, Char(Data^))
+      TIO.WriteStr(TIO.StdOut, Char(Data^))
     else
-      WriteStr(StdOut, '\' + ByteToOct(Data^ and $FF));
+      TIO.WriteStr(TIO.StdOut, '\' + ByteToOct(Data^ and $FF));
     Inc(Data);
     Dec(Length);
   end;
@@ -241,9 +241,9 @@ end;
 
 procedure TFilteredPatchWriter.Add(Data: PSignedAnsiChar; Length: size_t);
 begin
-  WriteStr(StdOut, '+');
+  TIO.WriteStr(TIO.StdOut, '+');
   FilteredData(Data, Length);
-  WriteStr(StdOut, #13#10);
+  TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
 procedure TFilteredPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos,
@@ -251,7 +251,7 @@ procedure TFilteredPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos,
 begin
   CopyHeader(NewPos, OldPos, Length);
   FilteredData(@NewBuf[NewPos], Length);
-  WriteStr(StdOut, #13#10);
+  TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
 procedure TFilteredPatchWriter.FilteredData(Data: PSignedAnsiChar;
@@ -260,9 +260,9 @@ begin
   while Length <> 0  do
   begin
     if IsPrint(Char(Data^)) then
-      WriteStr(StdOut, Char(Data^))
+      TIO.WriteStr(TIO.StdOut, Char(Data^))
     else
-      WriteStr(StdOut, '.');
+      TIO.WriteStr(TIO.StdOut, '.');
     Inc(Data);
     Dec(Length);
   end;
