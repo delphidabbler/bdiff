@@ -29,15 +29,6 @@ uses
   Windows;
 
 
-{ emulates C std lib stdin value by returning Windows standard output handle }
-function stdout: Integer;
-
-{ emulates C std lib stdin value by returning Windows standard error handle }
-function stderr: Integer;
-
-{ redirects stdout to a given file handle }
-procedure RedirectStdOut(const Handle: Integer);
-
 { emulates C std lib isprint function: does not support locales }
 function isprint(Ch: AnsiChar): Boolean;  // todo: note changed to ansichar from char
 
@@ -71,24 +62,6 @@ begin
     V := V div 8;
     Result := Chr(M + Ord('0')) + Result;
   end;
-end;
-
-{ emulates C std lib stdin value by returning Windows standard output handle }
-function stdout: Integer;
-begin
-  Result := Integer(GetStdHandle(STD_OUTPUT_HANDLE));
-end;
-
-{ emulates C std lib stdin value by returning Windows standard error handle }
-function stderr: Integer;
-begin
-  Result := Integer(GetStdHandle(STD_ERROR_HANDLE));
-end;
-
-{ redirects stdout to a given file handle }
-procedure RedirectStdOut(const Handle: Integer);
-begin
-  SetStdHandle(STD_OUTPUT_HANDLE, Cardinal(Handle));
 end;
 
 { emulates C std lib isprint function: does not support locales }

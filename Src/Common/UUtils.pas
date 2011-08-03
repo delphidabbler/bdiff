@@ -21,13 +21,28 @@ unit UUtils;
 
 interface
 
-{ writes binary data to a file }
+{ Returns Windows standard input handle }
+function StdIn: Integer;
+
+{ Returns Windows standard output handle }
+function StdOut: Integer;
+
+{ Returns Windows standard error handle }
+function StdErr: Integer;
+
+{ Redirects standard input from a given file handle }
+procedure RedirectStdIn(const Handle: Integer);
+
+{ Redirects standard output to a given file handle }
+procedure RedirectStdOut(const Handle: Integer);
+
+{ Writes binary data to a file }
 procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
 
-{ writes a string to a file  }
+{ Writes a string to a file  }
 procedure WriteStr(Handle: THandle; const S: string);
 
-{ writes a string built from format string and arguments to file }
+{ Writes a string built from format string and arguments to file }
 procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
 
 implementation
@@ -35,7 +50,31 @@ implementation
 uses
   SysUtils, Windows;
 
-{ writes binary data to a file }
+function StdIn: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_INPUT_HANDLE));
+end;
+
+function StdOut: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_OUTPUT_HANDLE));
+end;
+
+function StdErr: Integer;
+begin
+  Result := Integer(Windows.GetStdHandle(STD_ERROR_HANDLE));
+end;
+
+procedure RedirectStdIn(const Handle: Integer);
+begin
+  Windows.SetStdHandle(STD_INPUT_HANDLE, Cardinal(Handle));
+end;
+
+procedure RedirectStdOut(const Handle: Integer);
+begin
+  Windows.SetStdHandle(STD_OUTPUT_HANDLE, Cardinal(Handle));
+end;
+
 procedure WriteBin(Handle: THandle; BufPtr: Pointer; Size: Integer);
 var
   Dummy: DWORD;
@@ -43,16 +82,15 @@ begin
   Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
-{ writes a string to a file  }
 procedure WriteStr(Handle: THandle; const S: string);
 begin
   WriteBin(Handle, PChar(S), Length(S));
 end;
 
-{ writes a string built from format string and arguments to file }
 procedure WriteStrFmt(Handle: THandle; const Fmt: string; Args: array of const);
 begin
   WriteStr(Handle, Format(Fmt, Args));
 end;
 
 end.
+

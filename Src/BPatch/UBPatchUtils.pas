@@ -4,7 +4,7 @@
  * Contains utility functions used for BPatch. Includes Pascal implementations
  * of some standard C library code.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2001 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -39,18 +39,6 @@ function feof(stream: Integer): Boolean;
 
 { emulates C std lib fseek function using Windows file handle }
 function fseek(stream: Integer; offset: Longint; origin: Integer): Integer;
-
-{ emulates C std lib stdin value by returning Windows standard input handle }
-function stdin: Integer;
-
-{ emulates C std lib stdin value by returning Windows standard output handle }
-function stdout: Integer;
-
-{ emulates C std lib stdin value by returning Windows standard error handle }
-function stderr: Integer;
-
-{ redirects a given file handle to stdin }
-procedure RedirectStdIn(const Handle: Integer);
 
 
 implementation
@@ -107,30 +95,6 @@ begin
     Result := -1
   else
     Result := 0;
-end;
-
-{ emulates C std lib stdin value by returning Windows standard input handle }
-function stdin: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_INPUT_HANDLE));
-end;
-
-{ emulates C std lib stdin value by returning Windows standard output handle }
-function stdout: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_OUTPUT_HANDLE));
-end;
-
-{ emulates C std lib stdin value by returning Windows standard error handle }
-function stderr: Integer;
-begin
-  Result := Integer(Windows.GetStdHandle(STD_ERROR_HANDLE));
-end;
-
-{ redirects stdout to a given file handle }
-procedure RedirectStdIn(const Handle: Integer);
-begin
-  Windows.SetStdHandle(STD_INPUT_HANDLE, Cardinal(Handle));
 end;
 
 end.
