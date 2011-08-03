@@ -74,28 +74,32 @@ begin
 end;
 
 { Find maximum-length match }
-procedure FindMaxMatch(RetVal: PMatch; Data: PSignedAnsiCharArray;
-  SortedData: PBlock; DataSize: size_t; SearchText: PSignedAnsiChar;
-  SearchTextLength: size_t);
+function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
+  SearchText: PSignedAnsiChar; SearchTextLength: size_t): TMatch;
 var
   FoundPos: size_t;
   FoundLen: size_t;
 begin
-  RetVal^.BlockLength := 0;  {no match}
-  RetVal^.NewOffset := 0;
+  Result.BlockLength := 0;  {no match}
+  Result.NewOffset := 0;
   while (SearchTextLength <> 0) do
   begin
     FoundLen := find_string(
-      Data, SortedData, DataSize, SearchText, SearchTextLength, @FoundPos
+      OldFile.Data,
+      SortedOldData,
+      OldFile.Size,
+      SearchText,
+      SearchTextLength,
+      @FoundPos
     );
     if FoundLen >= gMinMatchLength then
     begin
-      RetVal^.OldOffset := FoundPos;
-      RetVal^.BlockLength := FoundLen;
+      Result.OldOffset := FoundPos;
+      Result.BlockLength := FoundLen;
       Exit;
     end;
     Inc(SearchText);
-    Inc(RetVal^.NewOffset);
+    Inc(Result.NewOffset);
     Dec(SearchTextLength);
   end;
 end;
@@ -141,9 +145,8 @@ begin
     while (ToDo <> 0) do
     begin
       { invariant: nofs + todo = len2 }
-      FindMaxMatch(
-        @Match, OldFile.Data, SortedOldData, OldFile.Size,
-        @NewFile.Data[NewOffset], ToDo
+      Match := FindMaxMatch(
+        OldFile, SortedOldData, @NewFile.Data[NewOffset], ToDo
       );
       if Match.BlockLength <> 0 then
       begin
