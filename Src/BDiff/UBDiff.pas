@@ -39,7 +39,7 @@ uses
   SysUtils, Windows,
   // Project
   UAppInfo, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors,
-  UFileData;
+  UFileData, UPatchWriters;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -60,194 +60,6 @@ var
   gMinMatchLength: size_t = 24;   // default minimum match length
   gFormat: TFormat = FMT_QUOTED;  // default output format
   gVerbose: Boolean;              // verbose mode defaults to off / false
-
-{ Record used to reference output generation routines for a format }
-type
-  TFormatSpec = record
-    Header:
-      procedure(OldFileName, NewFileName: string;
-        OldFileSize, NewFileSize: size_t);
-    Add:
-      procedure(Data: PSignedAnsiChar; Length: size_t);
-    Copy:
-      // todo: remove unused OldBuf param
-      procedure(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-        OldPos: size_t; Length: size_t);
-  end;
-
-procedure PrintBinaryHeader(OldFileName, NewFileName: string;
-  OldFileSize, NewFileSize: size_t);
-  forward;
-procedure PrintTextHeader(OldFileName, NewFileName: string;
-  OldFileSize, NewFileSize: size_t);
-  forward;
-procedure PrintBinaryAdd(Data: PSignedAnsiChar; Length: size_t);
-  forward;
-procedure PrintFilteredAdd(Data: PSignedAnsiChar; Length: size_t);
-  forward;
-procedure PrintQuotedAdd(Data: PSignedAnsiChar; Length: size_t);
-  forward;
-procedure PrintTextCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldPos: size_t; Length: size_t);
-  forward;
-procedure PrintBinaryCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldPos: size_t; Length: size_t);
-  forward;
-
-var
-  { References procs used to generate output for different formats }
-  FmtSpec: array[TFormat] of TFormatSpec = (
-    (
-      Header: PrintBinaryHeader;
-      Add: PrintBinaryAdd;
-      Copy: PrintBinaryCopy;
-    ),
-    (
-      Header: PrintTextHeader;
-      Add: PrintFilteredAdd;
-      Copy: PrintTextCopy;
-    ),
-    (
-      Header: PrintTextHeader;
-      Add: PrintQuotedAdd;
-      Copy: PrintTextCopy;
-    )
-  );
-
-{ Pack long in little-endian format into p }
-procedure PackLong(p: PSignedAnsiChar; l: Longint);
-begin
-  p^ := l and $FF;
-  Inc(p);
-  p^ := (l shr 8) and $FF;
-  Inc(p);
-  p^ := (l shr 16) and $FF;
-  Inc(p);
-  p^ := (l shr 24) and $FF;
-end;
-
-{ Compute simple checksum }
-function CheckSum(Data: PSignedAnsiChar; Length: size_t): Longint;
-var
-  l: Longint;
-begin
-  l := 0;
-  while Length <> 0 do
-  begin
-    Dec(Length);
-    l := ((l shr 30) and 3) or (l shl 2);
-    l := l xor Ord(Data^);
-    Inc(Data);
-  end;
-  Result := l;
-end;
-
-{ Print header for 'BINARY' format }
-procedure PrintBinaryHeader(OldFileName, NewFileName: string;
-  OldFileSize, NewFileSize: size_t);
-var
-  head: array[0..15] of SignedAnsiChar;
-begin
-  Move('bdiff' + FORMAT_VERSION + #$1A, head[0], 8); {8 bytes}
-  PackLong(@head[8], OldFileSize);
-  PackLong(@head[12], NewFileSize);
-  WriteBin(stdout, @head, 16);
-end;
-
-{ Print header for text formats }
-procedure PrintTextHeader(OldFileName, NewFileName: string;
-  OldFileSize, NewFileSize: size_t);
-begin
-  WriteStrFmt(
-    stdout,
-    '%% --- %s (%d bytes)'#13#10'%% +++ %s (%d bytes)'#13#10,
-    [OldFileName, OldFileSize, NewFileName, NewFileSize]
-  );
-end;
-
-{ Print data as C-escaped string }
-procedure PrintQuotedData(data: PSignedAnsiChar; len: size_t);
-begin
-  while (len <> 0) do
-  begin
-    if isprint(AnsiChar(data^)) and (AnsiChar(data^) <> '\') then
-      WriteStr(stdout, AnsiChar(data^))
-    else
-      WriteStr(stdout, '\' + ByteToOct(data^ and $FF));
-    Inc(data);
-    Dec(len);
-  end;
-end;
-
-{ Print data with non-printing characters filtered }
-procedure PrintFilteredData(Data: PSignedAnsiChar; Length: size_t);
-begin
-  while Length <> 0  do
-  begin
-    if isprint(AnsiChar(Data^)) then
-      WriteStr(stdout, AnsiChar(Data^))
-    else
-      WriteStr(stdout, '.');
-    Inc(Data);
-    Dec(Length);
-  end;
-end;
-
-{ Print information for binary diff chunk }
-procedure PrintBinaryAdd(Data: PSignedAnsiChar; Length: size_t);
-var
-  buf: array[0..3] of SignedAnsiChar;
-begin
-  WriteStr(stdout, '+');
-  PackLong(@buf[0], Length);
-  WriteBin(stdout, @buf, 4);
-  WriteBin(stdout, Data, Length);
-end;
-
-{ Print information for filtered diff chunk }
-procedure PrintFilteredAdd(Data: PSignedAnsiChar; Length: size_t);
-begin
-  WriteStr(stdout, '+');
-  PrintFilteredData(Data, Length);
-  WriteStr(stdout, #13#10);
-end;
-
-{ Print information for quoted diff chunk }
-procedure PrintQuotedAdd(Data: PSignedAnsiChar; Length: size_t);
-begin
-  WriteStr(stdout, '+');
-  PrintQuotedData(Data, Length);
-  WriteStr(stdout, #13#10);
-end;
-
-{ Print information for copied data in text mode }
-procedure PrintTextCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldPos: size_t; Length: size_t);
-begin
-  WriteStrFmt(
-    stdout,
-    '@ -[%d] => +[%d] %d bytes'#13#10' ',
-    [OldPos, NewPos, Length]
-  );
-  if gFormat = FMT_FILTERED then
-    PrintFilteredData(@NewBuf[NewPos], Length)
-  else
-    PrintQuotedData(@NewBuf[NewPos], Length);
-  WriteStr(stdout, #13#10);
-end;
-
-{ Print information for copied data in binary mode }
-procedure PrintBinaryCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldPos: size_t; Length: size_t);
-var
-  rec: array[0..11] of SignedAnsiChar;
-begin
-  WriteStr(stdout, '@');
-  PackLong(@rec[0], OldPos);
-  PackLong(@rec[4], Length);
-  PackLong(@rec[8], CheckSum(@NewBuf[NewPos], Length));
-  WriteBin(stdout, @rec, 12);
-end;
 
 function LastOSError: EOSError;
 var
@@ -305,11 +117,13 @@ var
   ToDo: size_t;
   SortedOldData: PBlock;
   Match: TMatch;
+  PatchWriter: TPatchWriter;
 begin
   { initialize }
   OldFile := nil;
   NewFile := nil;
   SortedOldData := nil;
+  PatchWriter := TPatchWriterFactory.Instance(gFormat);
   try
     LogStatus('loading old file');
     OldFile := TFileData.Create(OldFileName);
@@ -320,9 +134,7 @@ begin
     if not Assigned(SortedOldData) then
       Error('virtual memory exhausted');
     LogStatus('generating patch');
-    FmtSpec[gFormat].Header(
-      OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size
-    );
+    PatchWriter.Header(OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size);
     { main loop }
     ToDo := NewFile.Size;
     NewOffset := 0;
@@ -338,10 +150,10 @@ begin
         { found a match }
         if Match.NewOffset <> 0 then
           { preceded by a "copy" block }
-          FmtSpec[gFormat].Add(@NewFile.Data[NewOffset], Match.NewOffset);
+          PatchWriter.Add(@NewFile.Data[NewOffset], Match.NewOffset);
         Inc(NewOffset, Match.NewOffset);
         Dec(ToDo, Match.NewOffset);
-        FmtSpec[gFormat].Copy(
+        PatchWriter.Copy(
           NewFile.Data, NewOffset, Match.OldOffset, Match.BlockLength
         );
         Inc(NewOffset, Match.BlockLength);
@@ -349,7 +161,7 @@ begin
       end
       else
       begin
-        FmtSpec[gFormat].Add(@NewFile.Data[NewOffset], ToDo);
+        PatchWriter.Add(@NewFile.Data[NewOffset], ToDo);
         Break;
       end;
     end;
@@ -360,6 +172,7 @@ begin
       FreeMem(SortedOldData);
     OldFile.Free;
     NewFile.Free;
+    PatchWriter.Free;
   end;
 end;
 

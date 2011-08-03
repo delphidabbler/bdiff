@@ -3,7 +3,7 @@
  *
  * Main project file for BDiff.exe.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -31,7 +31,8 @@ uses
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
   UFileData in 'UFileData.pas',
-  UBDiffParams in 'UBDiffParams.pas';
+  UBDiffParams in 'UBDiffParams.pas',
+  UPatchWriters in 'UPatchWriters.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
