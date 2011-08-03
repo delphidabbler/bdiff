@@ -6,7 +6,7 @@
  * Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
  * <Streu@gmx.de>.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -47,72 +47,83 @@ const
 
 
 { Compute simple checksum }
-function checksum(data: PAnsiChar; len: size_t; l: Longint): Longint;
+function CheckSum(Data: PAnsiChar; DataSize: size_t;
+  BFCheckSum: Longint): Longint;
 begin
-  while len <> 0 do
+  while DataSize <> 0 do
   begin
-    Dec(len);
-    l := ((l shr 30) and 3) or (l shl 2);
-    l := l xor PShortInt(data)^;
-    Inc(data);
+    Dec(DataSize);
+    BFCheckSum := ((BFCheckSum shr 30) and 3) or (BFCheckSum shl 2);
+    BFCheckSum := BFCheckSum xor PShortInt(Data)^;
+    Inc(Data);
   end;
-  Result := l;
+  Result := BFCheckSum;
 end;
 
 { Get 32-bit quantity from char array }
-function getlong(p: PAnsiChar): Longint;
+function GetLong(PCh: PAnsiChar): Longint;
 var
-  q: PByte;
-  l: LongWord;
+  PB: PByte;
+  LW: LongWord;
 begin
-  q := PByte(p);
-  l := q^;  Inc(q);
-  l := l + 256 * q^;  Inc(q);
-  l := l + 65536 * q^;  Inc(q);
-  l := l + 16777216 * q^;
-  Result := l;
+  PB := PByte(PCh);
+  LW := PB^;
+  Inc(PB);
+  LW := LW + 256 * PB^;
+  Inc(PB);
+  LW := LW + 65536 * PB^;
+  Inc(PB);
+  LW := LW + 16777216 * PB^;
+  Result := LW;
 end;
 
-{ Copy data from one stream to another, computing checksums (allows dest = 0) }
-procedure copy_data(src, dest: Integer; amount, check: Longint;
-  src_is_patch: Integer);
+{ Copy data from one stream to another, computing checksums (allows dest = 0)
+  @param SourceFileHandle [in] Handle to file containing data to be copied.
+  @param DestFileHandle [in] Handle to file to receive copied data.
+  @param Count [in] Number of bytes to copy.
+  @param SourceCheckSum [in] Checksum for data to be copied
+  @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
+    False when SourceFileHandle is source file.
+}
+procedure CopyData(SourceFileHandle, DestFileHandle: Integer;
+  Count, SourceCheckSum: Longint; SourceIsPatch: Integer);
 var
-  chk: Longint;
-  buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
-  now: size_t;
+  DestCheckSum: Longint;
+  Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
+  BytesToCopy: size_t;
 begin
-  chk := 0;
+  DestCheckSum := 0;
 
-  while amount <> 0 do
+  while Count <> 0 do
   begin
-    if amount > BUFFER_SIZE then
-      now := BUFFER_SIZE
+    if Count > BUFFER_SIZE then
+      BytesToCopy := BUFFER_SIZE
     else
-      now := amount;
-    if fread(@buffer, 1, now, src) <> now then
+      BytesToCopy := Count;
+    if fread(@Buffer, 1, BytesToCopy, SourceFileHandle) <> BytesToCopy then
     begin
-      if feof(src) then
+      if feof(SourceFileHandle) then
       begin
-        if src_is_patch <> 0 then
+        if SourceIsPatch <> 0 then
           Error('Patch garbled - unexpected end of data')
         else
           Error('Source file does not match patch');
       end
       else
       begin
-        if src_is_patch <> 0 then
+        if SourceIsPatch <> 0 then
           Error('Error reading patch file')
         else
           Error('Error reading source file');
       end;
     end;
-    if dest <> 0 then
-      if fwrite(@buffer, 1, now, dest) <> now then
+    if DestFileHandle <> 0 then
+      if fwrite(@Buffer, 1, BytesToCopy, DestFileHandle) <> BytesToCopy then
         Error('Error writing temporary file');
-    chk := checksum(buffer, now, chk);
-    Dec(amount, now);
+    DestCheckSum := CheckSum(Buffer, BytesToCopy, DestCheckSum);
+    Dec(Count, BytesToCopy);
   end;
-  if (src_is_patch = 0) and (chk <> check) then
+  if (SourceIsPatch = 0) and (DestCheckSum <> SourceCheckSum) then
     Error('Source file does not  match patch');
 end;
 
@@ -130,117 +141,119 @@ begin
   Result := PChar(Result)
 end;
 
-{ Apply patch }
-procedure bpatch_(const src, dest: string);
+procedure ApplyPatch(const SourceFileName, DestFileName: string);
 var
-  sf: Integer; {source file}
-  df: Integer; {destination file}
-  header: array[0..15] of AnsiChar;
-  srclen, destlen: Longint;
-  size: Longint;
-  ofs: Longint;
-  c: Integer;
-  tempfile: string;
-  tempfd: Integer;
+  SourceFileHandle: Integer;        // source file handle
+  DestFileHandle: Integer;          // destination file handle
+  TempFileHandle: Integer;          // temporary file handle
+  TempFileName: string;             // temporary file name
+  Header: array[0..15] of AnsiChar; // patch file header
+  SourceLen: Longint;               // expected length of source file
+  DestLen: Longint;                 // expected length of destination file
+  DataSize: Longint;                // size of data to be copied to destination
+  SourceFilePos: Longint;           // position in source file
+  Ch: Integer;                      // next character from patch, or EOF
 const
-  error_msg = 'Patch garbled - invalid section ''%''';
+  ErrorMsg = 'Patch garbled - invalid section ''%''';
 begin
-  tempfd := 0;
-  tempfile := '';
+  TempFileHandle := 0;
+  TempFileName := '';
   try
     { read header }
-    if fread(@header, 1, 16, stdin) <> 16 then
+    if fread(@Header, 1, 16, stdin) <> 16 then
       Error('Patch not in BINARY format');
-    if StrLComp(header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
+    if StrLComp(Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
       Error('Patch not in BINARY format');
-    srclen := getlong(@header[8]);
-    destlen := getlong(@header[12]);
+    SourceLen := GetLong(@Header[8]);
+    DestLen := GetLong(@Header[12]);
 
     { open source file }
-    sf := FileOpen(src, fmOpenRead + fmShareDenyNone);
-    if sf <= 0 then
+    SourceFileHandle := FileOpen(SourceFileName, fmOpenRead + fmShareDenyNone);
+    if SourceFileHandle <= 0 then
       OSError;
     { create temporary file }
-    if dest = '' then
+    if DestFileName = '' then
       Error('Empty destination file name');
 
-    tempfile := GetTempFileName;
-    df := FileCreate(tempfile);
-    if df <= 0 then
+    TempFileName := GetTempFileName;
+    DestFileHandle := FileCreate(TempFileName);
+    if DestFileHandle <= 0 then
       Error('Can''t create temporary file');
-    tempfd := df;
+    TempFileHandle := DestFileHandle;
 
     { apply patch }
     while True do
     begin
-      c := fgetc(stdin);
-      if c = EOF then
+      Ch := fgetc(stdin);
+      if Ch = EOF then
         Break;
-      case c of
+      case Ch of
         Integer('@'):
         begin
           { copy from source }
-          if fread(@header, 1, 12, stdin) <> 12 then
+          if fread(@Header, 1, 12, stdin) <> 12 then
             Error('Patch garbled - unexpected end of data');
-          size := getlong(@header[4]);
-          ofs := getlong(@header[0]);
-          if (ofs < 0) or (size <= 0) or (ofs > srclen) or (size > srclen)
-            or (size+ofs > srclen) then
+          DataSize := GetLong(@Header[4]);
+          SourceFilePos := GetLong(@Header[0]);
+          if (SourceFilePos < 0) or (DataSize <= 0)
+            or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
+            or (DataSize + SourceFilePos > SourceLen) then
             Error('Patch garbled - invalid change request');
-          if fseek(sf, ofs, SEEK_SET) <> 0 then
+          if fseek(SourceFileHandle, SourceFilePos, SEEK_SET) <> 0 then
             Error('''fseek'' on source file failed');
-          copy_data(sf, df, size, getlong(@header[8]), 0);
-          Dec(destlen, size);
+          CopyData(
+            SourceFileHandle, DestFileHandle, DataSize, GetLong(@Header[8]), 0
+          );
+          Dec(DestLen, DataSize);
         end;
         Integer('+'):
         begin
           { copy N bytes from patch }
-          if fread(@header, 1, 4, stdin) <> 4 then
+          if fread(@Header, 1, 4, stdin) <> 4 then
             Error('Patch garbled - unexpected end of data');
-          size := getlong(@header[0]);
-          copy_data(stdin, df, size, 0, 1);
-          Dec(destlen, size);
+          DataSize := GetLong(@Header[0]);
+          CopyData(stdin, DestFileHandle, DataSize, 0, 1);
+          Dec(DestLen, DataSize);
         end;
         else
         begin
-          fclose(sf);
-          fclose(df);
-          StrRScan(error_msg, '%')^ := Char(c);
-          Error(error_msg);
+          fclose(SourceFileHandle);
+          fclose(DestFileHandle);
+          StrRScan(ErrorMsg, '%')^ := Char(Ch);
+          Error(ErrorMsg);
         end;
       end;
-      if destlen < 0 then
+      if DestLen < 0 then
         Error(
           'Patch garbled - patch file longer than announced in header'
         );
     end;
-    if destlen <> 0 then
+    if DestLen <> 0 then
       Error(
         'Patch garbled - destination file shorter than announced in header'
       );
 
-    fclose(sf);
-    fclose(df);
-    tempfd := 0;
+    fclose(SourceFileHandle);
+    fclose(DestFileHandle);
+    TempFileHandle := 0;
 
-    SysUtils.DeleteFile(dest);    // Added in v1.1: bug fix
-    if not RenameFile(tempfile, dest) then
+    SysUtils.DeleteFile(DestFileName);
+    if not RenameFile(TempFileName, DestFileName) then
       Error('Can''t rename temporary file');
-    tempfile := '';
+    TempFileName := '';
   except
     on E: Exception do
     begin
-      if tempfd > 0 then
-        fclose(tempfd);
-      if tempfile <> '' then
-        SysUtils.DeleteFile(tempfile);
+      if TempFileHandle > 0 then
+        fclose(TempFileHandle);
+      if TempFileName <> '' then
+        SysUtils.DeleteFile(TempFileName);
       raise;
     end;
   end;
 end;
 
-{ Help & exit }
-procedure help;
+procedure DisplayHelp;
 begin
   fprintf(stdout, '%0:s: binary ''patch'' - apply binary patch'#13#10
     + #13#10
@@ -259,8 +272,7 @@ begin
     [ProgramFileName]);
 end;
 
-{ Version & exit }
-procedure version;
+procedure DisplayVersion;
 begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
@@ -273,116 +285,116 @@ end;
 { Control }
 procedure Main;
 var
-  oldfn: string;
-  newfn: string;
-  infn: string;
-  i: Integer;
-  p: PChar;       // scans parameter list
-  argv: PChar;    // each command line paramter
-  fp: Integer;
+  OldFileName: string;
+  NewFileName: string;
+  PatchFileName: string;
+  PatchFileHandle: Integer;
+  ParamIdx: Integer;        // index of param in parameter list
+  PCh: PChar;               // scans parameter list
+  Param: PChar;             // each command line paramter
 begin
   ExitCode := 0;
 
-  oldfn := '';
-  newfn := '';
-  infn := '';
+  OldFileName := '';
+  NewFileName := '';
+  PatchFileName := '';
 
   try
-    i := 1;
-    while i <= ParamCount do
+    ParamIdx := 1;
+    while ParamIdx <= ParamCount do
     begin
-      argv := PChar(ParamStr(i) + #0#0#0);
-      if argv[0] = '-' then
+      Param := PChar(ParamStr(ParamIdx) + #0#0#0);
+      if Param[0] = '-' then
       begin
-        if argv[1] = '-' then
+        if Param[1] = '-' then
         begin
           { long option }
-          p := argv + 2;
-          if StrComp(p, 'help') = 0 then
+          PCh := Param + 2;
+          if StrComp(PCh, 'help') = 0 then
           begin
-            help;
+            DisplayHelp;
             Exit;
           end
-          else if StrComp(p, 'version') = 0 then
+          else if StrComp(PCh, 'version') = 0 then
           begin
-            version;
+            DisplayVersion;
             Exit;
           end
-          else if StrComp(p, 'input') = 0 then
+          else if StrComp(PCh, 'input') = 0 then
           begin
-            Inc(i);
-            argv := PChar(ParamStr(i));
-            if (argv^ = #0) then
+            Inc(ParamIdx);
+            Param := PChar(ParamStr(ParamIdx));
+            if (Param^ = #0) then
               Error('missing argument to ''--input''')
             else
-              infn := argv;
+              PatchFileName := Param;
           end
-          else if StrLComp(p, 'input=', 6) = 0 then
-            infn := p + 6
+          else if StrLComp(PCh, 'input=', 6) = 0 then
+            PatchFileName := PCh + 6
           else
-            Error('unknown option ''--%s''', [p])
+            Error('unknown option ''--%s''', [PCh])
         end
         else
         begin
           { short option }
-          p := argv + 1;
-          while p^ <> #0 do
+          PCh := Param + 1;
+          while PCh^ <> #0 do
           begin
-            case p^ of
+            case PCh^ of
               'h':
-                if StrComp(p, 'h') = 0 then
+                if StrComp(PCh, 'h') = 0 then
                 begin
-                  help;
+                  DisplayHelp;
                   Exit;
                 end;
               'v':
-                if StrComp(p, 'v') = 0 then
+                if StrComp(PCh, 'v') = 0 then
                 begin
-                  version;
+                  DisplayVersion;
                   Exit;
                 end;
               'i':
               begin
-                Inc(i);
-                argv := PChar(ParamStr(i));
-                if argv^ = #0 then
+                Inc(ParamIdx);
+                Param := PChar(ParamStr(ParamIdx));
+                if Param^ = #0 then
                   Error('missing argument to ''-i''')
                 else
-                  infn := argv;
+                  PatchFileName := Param;
               end
               else
-                Error('unknown option ''-%s''', [p^])
+                Error('unknown option ''-%s''', [PCh^])
             end;
-            Inc(p);
+            Inc(PCh);
           end;
         end;
       end
       else
       begin
-        if oldfn = '' then
-          oldfn := ParamStr(i)
-        else if newfn = '' then
-          newfn := ParamStr(i)
+        if OldFileName = '' then
+          OldFileName := ParamStr(ParamIdx)
+        else if NewFileName = '' then
+          NewFileName := ParamStr(ParamIdx)
         else
           Error('Too many file names on command line');
       end;
-      Inc(i);
+      Inc(ParamIdx);
     end;
 
-    if oldfn = '' then
+    if OldFileName = '' then
       Error('File name argument missing');
-    if newfn = '' then
-      newfn := oldfn;
+    if NewFileName = '' then
+      NewFileName := OldFileName;
 
-    if (infn <> '') and (infn <> '-') then
+    if (PatchFileName <> '') and (PatchFileName <> '-') then
     begin
-      fp := FileOpen(infn, fmOpenRead or fmShareDenyNone);
-      if fp <= 0 then
+      PatchFileHandle := FileOpen(PatchFileName, fmOpenRead or fmShareDenyNone);
+      if PatchFileHandle <= 0 then
         OSError;
-      RedirectStdIn(fp);
+      RedirectStdIn(PatchFileHandle);
     end;
 
-    bpatch_(oldfn, newfn);
+    ApplyPatch(OldFileName, NewFileName);
   except
     on E: Exception do
     begin
