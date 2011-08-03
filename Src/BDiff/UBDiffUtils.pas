@@ -4,7 +4,7 @@
  * Contains utility functions used for BDiff. Includes Pascal implementations
  * of, or alternatives for, some standard C library code.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -40,10 +40,6 @@ procedure RedirectStdOut(const Handle: Integer);
 
 { emulates C std lib isprint function: does not support locales }
 function isprint(Ch: AnsiChar): Boolean;  // todo: note changed to ansichar from char
-
-{ emulates C std lib perror function: displays given message followed by
-  description of last Windows error }
-procedure perror(const Msg: string);
 
 { cut down version of C std lib strtoul function that only supports base 10 }
 function StrToULDec(const s: PChar; var endp: PChar): LongWord;
@@ -110,14 +106,6 @@ end;
 function isprint(Ch: AnsiChar): Boolean;
 begin
   Result := Ch in [#32..#126];
-end;
-
-{ emulates C std lib perror function: displays given message followed by
-  description of last Windows error }
-procedure perror(const Msg: string);
-begin
-  WriteStrFmt(stderr, '%s: %s'#13#10,
-    [Msg, SysUtils.SysErrorMessage(Windows.GetLastError)]);
 end;
 
 { cut down version of C std lib strtoul function that only supports base 10 }
