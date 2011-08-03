@@ -3,7 +3,7 @@
  *
  * Main project file for BPatch.exe.
  *
- * Copyright (c) 2003-2001 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
