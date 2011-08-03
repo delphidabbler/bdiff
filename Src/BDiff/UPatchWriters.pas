@@ -4,6 +4,9 @@
  * Heirachy of classes used to write various types of patch, along with factory
  * class.
  *
+ * Patch generation code based portions of bdiff.c by Stefan Reuther, copyright
+ * (c) 1999 Stefan Reuther <Streu@gmx.de>.
+ *
  * Copyright (c) 2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
