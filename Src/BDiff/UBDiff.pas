@@ -6,7 +6,7 @@
  * Based on bdiff.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
  * <Streu@gmx.de>.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -43,11 +43,6 @@ uses
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
   BUFFER_SIZE     = 4096;       // size of buffer used to read files
-
-
-{ Output format to use }
-type
-  TFormat = (FMT_BINARY, FMT_FILTERED, FMT_QUOTED);
 
 
 { Structure for a matching block }

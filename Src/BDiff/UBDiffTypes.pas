@@ -3,7 +3,7 @@
  *
  * Contains type declarations for BDiff.
  *
- * Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
+ * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
  * $Rev$
  * $Date$
@@ -49,6 +49,8 @@ type
     of SignedAnsiChar;
   PSignedAnsiCharArray = ^TSignedAnsiCharArray;
 
+  { Output format to use }
+  TFormat = (FMT_BINARY, FMT_FILTERED, FMT_QUOTED);
 
 implementation
 
