@@ -30,7 +30,8 @@ uses
   UBDiffTypes in 'UBDiffTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
-  UFileData in 'UFileData.pas';
+  UFileData in 'UFileData.pas',
+  UBDiffParams in 'UBDiffParams.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources

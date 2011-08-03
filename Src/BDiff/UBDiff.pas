@@ -38,7 +38,8 @@ uses
   // Delphi
   SysUtils, Windows,
   // Project
-  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors, UFileData;
+  UAppInfo, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors,
+  UFileData;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -56,9 +57,9 @@ type
 
 { Global variables }
 var
-  gMinMatchLength: size_t = 24;  // default minimum match length
-  gFormat: TFormat = FMT_QUOTED; // default output format
-  gVerbose: Integer = 0;         // verbose mode defaults to off / false
+  gMinMatchLength: size_t = 24;   // default minimum match length
+  gFormat: TFormat = FMT_QUOTED;  // default output format
+  gVerbose: Boolean;              // verbose mode defaults to off / false
 
 { Record used to reference output generation routines for a format }
 type
@@ -248,10 +249,22 @@ begin
   WriteBin(stdout, @rec, 12);
 end;
 
+function LastOSError: EOSError;
+var
+  LastError: Integer;
+begin
+  LastError := GetLastError;
+  if LastError <> 0 then
+    Result := EOSError.Create(SysErrorMessage(LastError))
+  else
+    Result := EOSError.Create('Unknown operating system error');
+  Result.ErrorCode := LastError;
+end;
+
 { Find maximum-length match }
 procedure FindMaxMatch(RetVal: PMatch; Data: PSignedAnsiCharArray;
   SortedData: PBlock; DataSize: size_t; SearchText: PSignedAnsiChar;
-  SearchTextLength: size_t);   
+  SearchTextLength: size_t);
 var
   FoundPos: size_t;
   FoundLen: size_t;
@@ -279,7 +292,7 @@ end;
   writing patch file contents to stdout }
 procedure LogStatus(const Msg: string);
 begin
-  if gVerbose <> 0 then
+  if gVerbose then
     WriteStrFmt(stderr, '%s: %s'#13#10, [ProgramFileName, Msg]);
 end;
 
@@ -389,182 +402,50 @@ begin
   );
 end;
 
-{ Read argument of --min-equal }
-procedure SetMinEqual(p: PChar);
-var
-  q: PChar;
-  x: LongWord;
-begin
-  if not Assigned(p) or (p^ = #0) then
-    Error('Missing argument to ''--min-equal'' / ''-m''');
-  x := StrToULDec(p, q);
-  if q^ <> #0 then
-    Error('Malformed number on command line');
-  if (x = 0) or (x > $7FFF) then
-    Error('Number out of range on command line');
-  gMinMatchLength := x;
-end;
-
-{ Read argument of --format }
-procedure SetFormat(p: PChar);
-begin
-  if not Assigned(p) then
-    Error('Missing argument to ''--format''');
-  if StrComp(p, 'quoted') = 0 then
-    gFormat := FMT_QUOTED
-  else if (StrComp(p, 'filter') = 0) or (StrComp(p, 'filtered') = 0) then
-    gFormat := FMT_FILTERED
-  else if StrComp(p, 'binary') = 0 then
-    gFormat := FMT_BINARY
-  else
-    Error('Invalid format specification');
-end;
-
-{ Main routine: parses arguments and calls creates diff using CreateDiff() }
+{ Main routine: parses arguments and creates diff using CreateDiff() }
 procedure Main;
 var
-  OldFileName: string;
-  NewFileName: string;
-  PatchFileName: string;
-  i: Integer;
-  fp: Integer;
-  p: PChar;       // scans parameter list
-  argv: PChar;    // each command line paramter
+  PatchFileHandle: Integer;
+  Params: TParams;
 begin
   ExitCode := 0;
-  
-  OldFileName := '';
-  NewFileName := '';
-  PatchFileName := '';
 
+  Params := TParams.Create;
   try
-    { Parse command line }
-    i := 1;
-    while (i <= ParamCount) do
-    begin
-      argv := PChar(ParamStr(i) + #0#0#0);
-      if argv[0] = '-' then
-      begin
-        if argv[1] = '-' then
-        begin
-          { long options }
-          p := argv + 2;
-          if StrComp(p, 'help') = 0 then
-          begin
-            DisplayHelp;
-            Exit;
-          end
-          else if StrComp(p, 'version') = 0 then
-          begin
-            DisplayVersion;
-            Exit;
-          end
-          else if StrComp(p, 'verbose') = 0 then
-            gVerbose := 1
-          else if StrComp(p, 'output') = 0 then
-          begin
-            Inc(i);
-            argv := PChar(ParamStr(i));
-            if (argv^ = #0) then
-              Error('missing argument to ''--output''')
-            else
-              PatchFileName := argv;
-          end
-          else if StrLComp(p, 'output=', 7) = 0 then
-            PatchFileName := p + 7
-          else if StrComp(p, 'format') = 0 then
-          begin
-            Inc(i);
-            argv := PChar(ParamStr(i));
-            SetFormat(argv);
-          end
-          else if StrLComp(p, 'format=', 7) = 0 then
-            SetFormat(p + 7)
-          else if StrComp(p, 'min-equal') = 0 then
-          begin
-            Inc(i);
-            argv := PChar(ParamStr(i));
-            SetMinEqual(argv);
-          end
-          else if StrLComp(p, 'min-equal=', 10) = 0 then
-            SetMinEqual(p + 10)
-          else
-            Error('unknown option ''--%s''', [p])
-        end
-        else
-        begin
-          { short options }
-          p := argv + 1;
-          while p^ <> #0 do
-          begin
-            case p^ of
-              'h':
-                if StrComp(p, 'h') = 0 then
-                begin
-                  DisplayHelp;
-                  Exit;
-                end;
-              'v':
-                if StrComp(p, 'v') = 0 then
-                begin
-                  DisplayVersion;
-                  Exit;
-                end;
-              'V':
-                gVerbose := 1;
-              'q':
-                gFormat := FMT_QUOTED;
-              'f':
-                gFormat := FMT_FILTERED;
-              'b':
-                gFormat := FMT_BINARY;
-              'm':
-              begin
-                Inc(i);
-                argv := PChar(ParamStr(i));
-                SetMinEqual(argv);
-              end;
-              'o':
-              begin
-                Inc(i);
-                argv := PChar(ParamStr(i));
-                if argv^ = #0 then
-                  Error('missing argument to ''-o''')
-                else
-                  PatchFileName := argv;
-              end;
-              else
-                Error('unknown option ''-%:s''', [p^]);
-            end;
-            Inc(p);
-          end;
-        end;
-      end
-      else
-      begin
-        { file names }
-        if OldFileName = '' then
-          OldFileName := ParamStr(i)
-        else if NewFileName = '' then
-          NewFileName := ParamStr(i)
-        else
-          Error('Too many file names on command line');
-      end;
-      Inc(i);
-    end;
-    if NewFileName = '' then
-      Error('Need two filenames');
-    if (PatchFileName <> '') and (PatchFileName <> '-') then
-    begin
-      { redirect stdout to patch file }
-      fp := FileCreate(PatchFileName);
-      if fp <= 0 then
-        OSError;
-      RedirectStdOut(fp);
-    end;
+    try
+      Params.Parse;
 
-    { create the diff }
-    CreateDiff(OldFileName, NewFileName);
+      if Params.Help then
+      begin
+        DisplayHelp;
+        Exit;
+      end;
+
+      if Params.Version then
+      begin
+        DisplayVersion;
+        Exit;
+      end;
+
+      gMinMatchLength := Params.MinEqual;
+      gFormat := Params.Format;
+      gVerbose := Params.Verbose;
+
+      if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
+      begin
+        // redirect StdOut to patch file
+        PatchFileHandle := FileCreate(Params.PatchFileName);
+        if PatchFileHandle <= 0 then
+          raise LastOSError;
+        RedirectStdOut(PatchFileHandle);
+      end;
+
+      // create the diff
+      CreateDiff(Params.OldFileName, Params.NewFileName);
+
+    finally
+      Params.Free;
+    end;
   except
     on E: Exception do
     begin
