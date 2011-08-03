@@ -38,7 +38,7 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors;
+  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors, UUtils;
 
 
 const
@@ -252,7 +252,7 @@ end;
 
 procedure DisplayHelp;
 begin
-  fprintf(stdout, '%0:s: binary ''patch'' - apply binary patch'#13#10
+  WriteStrFmt(stdout, '%0:s: binary ''patch'' - apply binary patch'#13#10
     + #13#10
     + 'Usage: %0:s [options] old-file [new-file] [<patch-file]'#13#10#13#10
     + 'Creates new-file from old-file and patch-file'#13#10
@@ -274,7 +274,7 @@ begin
   // NOTE: original code displayed compile date using C's __DATE__ macro. Since
   // there is no Pascal equivalent of __DATE__ we display update date of program
   // file instead
-  fprintf(
+  WriteStrFmt(
     stdout, '%s-%s %s '#13#10, [ProgramBaseName, ProgramVersion, ProgramExeDate]
   );
 end;
@@ -323,7 +323,7 @@ begin
     on E: Exception do
     begin
       ExitCode := 1;
-      fprintf(stderr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
+      WriteStrFmt(stderr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
     end;
   end;
 

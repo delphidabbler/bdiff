@@ -40,12 +40,6 @@ function feof(stream: Integer): Boolean;
 { emulates C std lib fseek function using Windows file handle }
 function fseek(stream: Integer; offset: Longint; origin: Integer): Integer;
 
-{ emulates C std lib fprintf function using Windows file handle: \n etc not
-  supported and parameters and string format specifiers are in Object Pascal
-  format }
-function fprintf(stream: Integer; const Fmt: string;
-  Args: array of const): Integer;
-
 { emulates C std lib stdin value by returning Windows standard input handle }
 function stdin: Integer;
 
@@ -113,19 +107,6 @@ begin
     Result := -1
   else
     Result := 0;
-end;
-
-{ emulates C std lib fprintf function using Windows file handle: \n etc not
-  supported and parameters and string format specifiers are in Object Pascal
-  format }
-function fprintf(stream: Integer; const Fmt: string;
-  Args: array of const): Integer;
-var
-  FormattedStr: string;
-begin
-  FormattedStr := Format(Fmt, Args);
-  Result := Length(FormattedStr);
-  fwrite(PChar(FormattedStr), SizeOf(Char) * Result, 1, stream);
 end;
 
 { emulates C std lib stdin value by returning Windows standard input handle }
