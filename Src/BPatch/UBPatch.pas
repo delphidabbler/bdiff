@@ -103,7 +103,7 @@ begin
     if FileRead(SourceFileHandle, Buffer, BytesToCopy)
       <> Integer(BytesToCopy) then
     begin
-      if feof(SourceFileHandle) then
+      if TIO.AtEOF(SourceFileHandle) then
       begin
         if SourceIsPatch then
           Error('Patch garbled - unexpected end of data')
@@ -187,7 +187,7 @@ begin
       { apply patch }
       while True do
       begin
-        Ch := fgetc(TIO.StdIn);
+        Ch := TIO.GetCh(TIO.StdIn);
         if Ch = EOF then
           Break;
         case Ch of
@@ -202,8 +202,8 @@ begin
               or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
               or (DataSize + SourceFilePos > SourceLen) then
               Error('Patch garbled - invalid change request');
-            if fseek(SourceFileHandle, SourceFilePos, SEEK_SET) <> 0 then
-              Error('''fseek'' on source file failed');
+            if not TIO.Seek(SourceFileHandle, SourceFilePos, SEEK_SET) then
+              Error('Seek on source file failed');
             CopyData(
               SourceFileHandle,
               DestFileHandle,
