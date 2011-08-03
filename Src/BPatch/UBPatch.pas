@@ -48,16 +48,16 @@ const
 
 { Compute simple checksum }
 function CheckSum(Data: PAnsiChar; DataSize: size_t;
-  BFCheckSum: Longint): Longint;
+  const BFCheckSum: Longint): Longint;
 begin
+  Result := BFCheckSum;
   while DataSize <> 0 do
   begin
     Dec(DataSize);
-    BFCheckSum := ((BFCheckSum shr 30) and 3) or (BFCheckSum shl 2);
-    BFCheckSum := BFCheckSum xor PShortInt(Data)^;
+    Result := ((Result shr 30) and 3) or (Result shl 2);
+    Result := Result xor PShortInt(Data)^;
     Inc(Data);
   end;
-  Result := BFCheckSum;
 end;
 
 { Get 32-bit quantity from char array }
@@ -77,7 +77,7 @@ begin
   Result := LW;
 end;
 
-{ Copy data from one stream to another, computing checksums (allows dest = 0)
+{ Copy data from one stream to another, computing checksums
   @param SourceFileHandle [in] Handle to file containing data to be copied.
   @param DestFileHandle [in] Handle to file to receive copied data.
   @param Count [in] Number of bytes to copy.
@@ -85,8 +85,8 @@ end;
   @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
     False when SourceFileHandle is source file.
 }
-procedure CopyData(SourceFileHandle, DestFileHandle: Integer;
-  Count, SourceCheckSum: Longint; SourceIsPatch: Integer);
+procedure CopyData(const SourceFileHandle, DestFileHandle: Integer;
+  Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
 var
   DestCheckSum: Longint;
   Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
@@ -100,31 +100,33 @@ begin
       BytesToCopy := BUFFER_SIZE
     else
       BytesToCopy := Count;
-    if fread(@Buffer, 1, BytesToCopy, SourceFileHandle) <> BytesToCopy then
+    if FileRead(SourceFileHandle, Buffer, BytesToCopy)
+      <> Integer(BytesToCopy) then
     begin
       if feof(SourceFileHandle) then
       begin
-        if SourceIsPatch <> 0 then
+        if SourceIsPatch then
           Error('Patch garbled - unexpected end of data')
         else
           Error('Source file does not match patch');
       end
       else
       begin
-        if SourceIsPatch <> 0 then
+        if SourceIsPatch then
           Error('Error reading patch file')
         else
           Error('Error reading source file');
       end;
     end;
     if DestFileHandle <> 0 then
-      if fwrite(@Buffer, 1, BytesToCopy, DestFileHandle) <> BytesToCopy then
+      if FileWrite(DestFileHandle, Buffer, BytesToCopy)
+        <> Integer(BytesToCopy) then
         Error('Error writing temporary file');
     DestCheckSum := CheckSum(Buffer, BytesToCopy, DestCheckSum);
     Dec(Count, BytesToCopy);
   end;
-  if (SourceIsPatch = 0) and (DestCheckSum <> SourceCheckSum) then
-    Error('Source file does not  match patch');
+  if not SourceIsPatch and (DestCheckSum <> SourceCheckSum) then
+    Error('Source file does not match patch');
 end;
 
 { Creates a temporary file in user's temp directory and returns its name }
@@ -145,7 +147,6 @@ procedure ApplyPatch(const SourceFileName, DestFileName: string);
 var
   SourceFileHandle: Integer;        // source file handle
   DestFileHandle: Integer;          // destination file handle
-  TempFileHandle: Integer;          // temporary file handle
   TempFileName: string;             // temporary file name
   Header: array[0..15] of AnsiChar; // patch file header
   SourceLen: Longint;               // expected length of source file
@@ -156,98 +157,94 @@ var
 const
   ErrorMsg = 'Patch garbled - invalid section ''%''';
 begin
-  TempFileHandle := 0;
-  TempFileName := '';
   try
-    { read header }
-    if fread(@Header, 1, 16, stdin) <> 16 then
+    // read header from patch file
+    if FileRead(stdin, Header, 16) <> 16 then
       Error('Patch not in BINARY format');
     if StrLComp(Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
       Error('Patch not in BINARY format');
+    // get length of source and destination files from header
     SourceLen := GetLong(@Header[8]);
     DestLen := GetLong(@Header[12]);
 
-    { open source file }
+    DestFileHandle := 0;
+    // open source file
     SourceFileHandle := FileOpen(SourceFileName, fmOpenRead + fmShareDenyNone);
-    if SourceFileHandle <= 0 then
-      OSError;
-    { create temporary file }
-    if DestFileName = '' then
-      Error('Empty destination file name');
+    try
+      if SourceFileHandle <= 0 then
+        OSError;
 
-    TempFileName := GetTempFileName;
-    DestFileHandle := FileCreate(TempFileName);
-    if DestFileHandle <= 0 then
-      Error('Can''t create temporary file');
-    TempFileHandle := DestFileHandle;
+      // check destination file name
+      if Length(DestFileName) = 0 then
+        Error('Empty destination file name');
 
-    { apply patch }
-    while True do
-    begin
-      Ch := fgetc(stdin);
-      if Ch = EOF then
-        Break;
-      case Ch of
-        Integer('@'):
-        begin
-          { copy from source }
-          if fread(@Header, 1, 12, stdin) <> 12 then
-            Error('Patch garbled - unexpected end of data');
-          DataSize := GetLong(@Header[4]);
-          SourceFilePos := GetLong(@Header[0]);
-          if (SourceFilePos < 0) or (DataSize <= 0)
-            or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
-            or (DataSize + SourceFilePos > SourceLen) then
-            Error('Patch garbled - invalid change request');
-          if fseek(SourceFileHandle, SourceFilePos, SEEK_SET) <> 0 then
-            Error('''fseek'' on source file failed');
-          CopyData(
-            SourceFileHandle, DestFileHandle, DataSize, GetLong(@Header[8]), 0
-          );
-          Dec(DestLen, DataSize);
+      // create temporary file
+      TempFileName := GetTempFileName;
+      DestFileHandle := FileCreate(TempFileName);
+      if DestFileHandle <= 0 then
+        Error('Can''t create temporary file');
+
+      { apply patch }
+      while True do
+      begin
+        Ch := fgetc(stdin);
+        if Ch = EOF then
+          Break;
+        case Ch of
+          Integer('@'):
+          begin
+            // common block: copy from source
+            if FileRead(stdin, Header, 12) <> 12 then
+              Error('Patch garbled - unexpected end of data');
+            DataSize := GetLong(@Header[4]);
+            SourceFilePos := GetLong(@Header[0]);
+            if (SourceFilePos < 0) or (DataSize <= 0)
+              or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
+              or (DataSize + SourceFilePos > SourceLen) then
+              Error('Patch garbled - invalid change request');
+            if fseek(SourceFileHandle, SourceFilePos, SEEK_SET) <> 0 then
+              Error('''fseek'' on source file failed');
+            CopyData(
+              SourceFileHandle,
+              DestFileHandle,
+              DataSize,
+              GetLong(@Header[8]),
+              False
+            );
+            Dec(DestLen, DataSize);
+          end;
+          Integer('+'):
+          begin
+            // add data from patch file
+            if FileRead(stdin, Header, 4) <> 4 then
+              Error('Patch garbled - unexpected end of data');
+            DataSize := GetLong(@Header[0]);
+            CopyData(stdin, DestFileHandle, DataSize, 0, True);
+            Dec(DestLen, DataSize);
+          end;
+          else
+            Error('Patch garbled - invalid section ''%s''', [Char(Ch)]);
         end;
-        Integer('+'):
-        begin
-          { copy N bytes from patch }
-          if fread(@Header, 1, 4, stdin) <> 4 then
-            Error('Patch garbled - unexpected end of data');
-          DataSize := GetLong(@Header[0]);
-          CopyData(stdin, DestFileHandle, DataSize, 0, 1);
-          Dec(DestLen, DataSize);
-        end;
-        else
-        begin
-          fclose(SourceFileHandle);
-          fclose(DestFileHandle);
-          StrRScan(ErrorMsg, '%')^ := Char(Ch);
-          Error(ErrorMsg);
-        end;
+        if DestLen < 0 then
+          Error('Patch garbled - patch file longer than announced in header');
       end;
-      if DestLen < 0 then
+      if DestLen <> 0 then
         Error(
-          'Patch garbled - patch file longer than announced in header'
+          'Patch garbled - destination file shorter than announced in header'
         );
+
+    finally
+      FileClose(SourceFileHandle);
+      FileClose(DestFileHandle);
     end;
-    if DestLen <> 0 then
-      Error(
-        'Patch garbled - destination file shorter than announced in header'
-      );
-
-    fclose(SourceFileHandle);
-    fclose(DestFileHandle);
-    TempFileHandle := 0;
-
+    // create destination file: overwrites any existing dest file with same name
     SysUtils.DeleteFile(DestFileName);
     if not RenameFile(TempFileName, DestFileName) then
       Error('Can''t rename temporary file');
-    TempFileName := '';
   except
     on E: Exception do
     begin
-      if TempFileHandle > 0 then
-        fclose(TempFileHandle);
-      if TempFileName <> '' then
-        SysUtils.DeleteFile(TempFileName);
+      SysUtils.DeleteFile(TempFileName);
       raise;
     end;
   end;
