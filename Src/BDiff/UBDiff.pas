@@ -61,18 +61,6 @@ var
   gFormat: TFormat = FMT_QUOTED;  // default output format
   gVerbose: Boolean;              // verbose mode defaults to off / false
 
-function LastOSError: EOSError;
-var
-  LastError: Integer;
-begin
-  LastError := GetLastError;
-  if LastError <> 0 then
-    Result := EOSError.Create(SysErrorMessage(LastError))
-  else
-    Result := EOSError.Create('Unknown operating system error');
-  Result.ErrorCode := LastError;
-end;
-
 { Find maximum-length match }
 function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
   SearchText: PSignedAnsiChar; SearchTextLength: size_t): TMatch;
@@ -252,7 +240,7 @@ begin
         // redirect StdOut to patch file
         PatchFileHandle := FileCreate(Params.PatchFileName);
         if PatchFileHandle <= 0 then
-          raise LastOSError;
+          OSError;
         RedirectStdOut(PatchFileHandle);
       end;
 
