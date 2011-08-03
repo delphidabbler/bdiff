@@ -38,7 +38,7 @@ uses
   // Delphi
   SysUtils, Windows,
   // Project
-  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors;
+  UAppInfo, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors, UFileData;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -53,9 +53,9 @@ type
 { Structure for a matching block }
 type
   TMatch = record
-    OldFilePos: size_t;
-    NewFilePos: size_t;
-    Length: size_t;
+    OldOffset: size_t;
+    NewOffset: size_t;
+    BlockLength: size_t;
   end;
   PMatch = ^TMatch;
 
@@ -76,7 +76,7 @@ type
     Copy:
       // todo: remove unused OldBuf param
       procedure(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-        OldBuf: PSignedAnsiCharArray; OldPos: size_t; Length: size_t);
+        OldPos: size_t; Length: size_t);
   end;
 
 procedure PrintBinaryHeader(OldFileName, NewFileName: string;
@@ -91,13 +91,11 @@ procedure PrintFilteredAdd(Data: PSignedAnsiChar; Length: size_t);
   forward;
 procedure PrintQuotedAdd(Data: PSignedAnsiChar; Length: size_t);
   forward;
-// todo: remove unused OldBuf param
 procedure PrintTextCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldBuf: PSignedAnsiCharArray; OldPos: size_t; Length: size_t);
+  OldPos: size_t; Length: size_t);
   forward;
-// todo: remove unused OldBuf param
 procedure PrintBinaryCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldBuf: PSignedAnsiCharArray; OldPos: size_t; Length: size_t);
+  OldPos: size_t; Length: size_t);
   forward;
 
 var
@@ -119,53 +117,6 @@ var
       Copy: PrintTextCopy;
     )
   );
-
-{ Load file, returning pointer to file data, exits with error message if out of
-  memory or not found }
-function LoadFile(FileName: string; FileDataSize: Psize_t):
-  PSignedAnsiCharArray;
-var
-  FP: File of Byte;                         // file pointer
-  Data: PSignedAnsiCharArray;
-  Buffer: array[0..BUFFER_SIZE-1] of Byte;  // buffer to read file
-  Len: size_t;
-  CurLen: size_t;
-  Tmp: PSignedAnsiCharArray;
-begin
-  { open file }
-  AssignFile(FP, FileName);
-  if (IOResult <> 0) then
-    OSError;
-  Reset(FP);
-  if (IOResult <> 0) then
-    OSError;
-  { read file }
-  CurLen := 0;
-  Data := nil;
-  BlockRead(FP, Buffer, BUFFER_SIZE, Len);
-  while (Len > 0) do
-  begin
-    Tmp := Data;
-    ReallocMem(Tmp, CurLen + Len);
-    if not Assigned(Tmp) then
-      Error('Virtual memory exhausted');
-    Data := Tmp;
-    Move(Buffer, Data[CurLen], Len);
-    Inc(CurLen, Len);
-    BlockRead(FP, Buffer, BUFFER_SIZE, Len);
-  end;
-  if not EOF(FP) then
-  begin
-    CloseFile(FP);
-    OSError;
-  end;
-
-  { exit }
-  CloseFile(FP);
-  if Assigned(FileDataSize) then
-    FileDataSize^ := CurLen;
-  Result := Data;
-end;
 
 { Pack long in little-endian format into p }
 procedure PackLong(p: PSignedAnsiChar; l: Longint);
@@ -275,7 +226,7 @@ end;
 
 { Print information for copied data in text mode }
 procedure PrintTextCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldBuf: PSignedAnsiCharArray; OldPos: size_t; Length: size_t);
+  OldPos: size_t; Length: size_t);
 begin
   WriteStrFmt(
     stdout,
@@ -291,7 +242,7 @@ end;
 
 { Print information for copied data in binary mode }
 procedure PrintBinaryCopy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
-  OldBuf: PSignedAnsiCharArray; OldPos: size_t; Length: size_t);
+  OldPos: size_t; Length: size_t);
 var
   rec: array[0..11] of SignedAnsiChar;
 begin
@@ -310,8 +261,8 @@ var
   FoundPos: size_t;
   FoundLen: size_t;
 begin
-  RetVal^.Length := 0;  {no match}
-  RetVal^.NewFilePos := 0;
+  RetVal^.BlockLength := 0;  {no match}
+  RetVal^.NewOffset := 0;
   while (SearchTextLength <> 0) do
   begin
     FoundLen := find_string(
@@ -319,12 +270,12 @@ begin
     );
     if FoundLen >= gMinMatchLength then
     begin
-      RetVal^.OldFilePos := FoundPos;
-      RetVal^.Length := FoundLen;
+      RetVal^.OldOffset := FoundPos;
+      RetVal^.BlockLength := FoundLen;
       Exit;
     end;
     Inc(SearchText);
-    Inc(RetVal^.NewFilePos);
+    Inc(RetVal^.NewOffset);
     Dec(SearchTextLength);
   end;
 end;
@@ -340,59 +291,57 @@ end;
 { Main routine: generate diff }
 procedure CreateDiff(OldFileName, NewFileName: string);
 var
-  OldFileData: PSignedAnsiCharArray;
-  NewFileData: PSignedAnsiCharArray;
-  OldFileLength: size_t;
-  NewFileLength: size_t;
+  OldFile: TFileData;
+  NewFile: TFileData;
   NewOffset: size_t;
   ToDo: size_t;
   SortedOldData: PBlock;
   Match: TMatch;
 begin
   { initialize }
-  OldFileData := nil;
-  NewFileData := nil;
+  OldFile := nil;
+  NewFile := nil;
   SortedOldData := nil;
   try
     LogStatus('loading old file');
-    OldFileData := LoadFile(OldFileName, @OldFileLength);
+    OldFile := TFileData.Create(OldFileName);
     LogStatus('loading new file');
-    NewFileData := LoadFile(NewFileName, @NewFileLength);
+    NewFile := TFileData.Create(NewFileName);
     LogStatus('block sorting old file');
-    SortedOldData := block_sort(OldFileData, OldFileLength);
+    SortedOldData := block_sort(OldFile.Data, OldFile.Size);
     if not Assigned(SortedOldData) then
       Error('virtual memory exhausted');
     LogStatus('generating patch');
     FmtSpec[gFormat].Header(
-      OldFileName, NewFileName, OldFileLength, NewFileLength
+      OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size
     );
     { main loop }
-    ToDo := NewFileLength;
+    ToDo := NewFile.Size;
     NewOffset := 0;
     while (ToDo <> 0) do
     begin
       { invariant: nofs + todo = len2 }
       FindMaxMatch(
-        @Match, OldFileData, SortedOldData, OldFileLength,
-        @NewFileData[NewOffset], ToDo
+        @Match, OldFile.Data, SortedOldData, OldFile.Size,
+        @NewFile.Data[NewOffset], ToDo
       );
-      if Match.Length <> 0 then
+      if Match.BlockLength <> 0 then
       begin
         { found a match }
-        if Match.NewFilePos <> 0 then
+        if Match.NewOffset <> 0 then
           { preceded by a "copy" block }
-          FmtSpec[gFormat].Add(@NewFileData[NewOffset], Match.NewFilePos);
-        Inc(NewOffset, Match.NewFilePos);
-        Dec(ToDo, Match.NewFilePos);
+          FmtSpec[gFormat].Add(@NewFile.Data[NewOffset], Match.NewOffset);
+        Inc(NewOffset, Match.NewOffset);
+        Dec(ToDo, Match.NewOffset);
         FmtSpec[gFormat].Copy(
-          NewFileData, NewOffset, OldFileData, Match.OldFilePos, Match.Length
+          NewFile.Data, NewOffset, Match.OldOffset, Match.BlockLength
         );
-        Inc(NewOffset, Match.Length);
-        Dec(ToDo, Match.Length);
+        Inc(NewOffset, Match.BlockLength);
+        Dec(ToDo, Match.BlockLength);
       end
       else
       begin
-        FmtSpec[gFormat].Add(@NewFileData[NewOffset], ToDo);
+        FmtSpec[gFormat].Add(@NewFile.Data[NewOffset], ToDo);
         Break;
       end;
     end;
@@ -401,10 +350,8 @@ begin
     // finally section new to v1.1
     if Assigned(SortedOldData) then
       FreeMem(SortedOldData);
-    if Assigned(OldFileData) then
-      FreeMem(OldFileData);
-    if Assigned(NewFileData) then
-      FreeMem(NewFileData);
+    OldFile.Free;
+    NewFile.Free;
   end;
 end;
 
