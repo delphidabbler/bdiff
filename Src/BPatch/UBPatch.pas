@@ -38,7 +38,7 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchUtils, UBPatchTypes, UErrors;
+  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors;
 
 
 const
@@ -285,123 +285,51 @@ end;
 { Control }
 procedure Main;
 var
-  OldFileName: string;
-  NewFileName: string;
-  PatchFileName: string;
   PatchFileHandle: Integer;
-  ParamIdx: Integer;        // index of param in parameter list
-  PCh: PChar;               // scans parameter list
-  Param: PChar;             // each command line paramter
+  Params: TParams;
 begin
   ExitCode := 0;
 
-  OldFileName := '';
-  NewFileName := '';
-  PatchFileName := '';
-
+  Params := TParams.Create;
   try
-    ParamIdx := 1;
-    while ParamIdx <= ParamCount do
-    begin
-      Param := PChar(ParamStr(ParamIdx) + #0#0#0);
-      if Param[0] = '-' then
+    try
+      Params.Parse;
+
+      if Params.Help then
       begin
-        if Param[1] = '-' then
-        begin
-          { long option }
-          PCh := Param + 2;
-          if StrComp(PCh, 'help') = 0 then
-          begin
-            DisplayHelp;
-            Exit;
-          end
-          else if StrComp(PCh, 'version') = 0 then
-          begin
-            DisplayVersion;
-            Exit;
-          end
-          else if StrComp(PCh, 'input') = 0 then
-          begin
-            Inc(ParamIdx);
-            Param := PChar(ParamStr(ParamIdx));
-            if (Param^ = #0) then
-              Error('missing argument to ''--input''')
-            else
-              PatchFileName := Param;
-          end
-          else if StrLComp(PCh, 'input=', 6) = 0 then
-            PatchFileName := PCh + 6
-          else
-            Error('unknown option ''--%s''', [PCh])
-        end
-        else
-        begin
-          { short option }
-          PCh := Param + 1;
-          while PCh^ <> #0 do
-          begin
-            case PCh^ of
-              'h':
-                if StrComp(PCh, 'h') = 0 then
-                begin
-                  DisplayHelp;
-                  Exit;
-                end;
-              'v':
-                if StrComp(PCh, 'v') = 0 then
-                begin
-                  DisplayVersion;
-                  Exit;
-                end;
-              'i':
-              begin
-                Inc(ParamIdx);
-                Param := PChar(ParamStr(ParamIdx));
-                if Param^ = #0 then
-                  Error('missing argument to ''-i''')
-                else
-                  PatchFileName := Param;
-              end
-              else
-                Error('unknown option ''-%s''', [PCh^])
-            end;
-            Inc(PCh);
-          end;
-        end;
-      end
-      else
-      begin
-        if OldFileName = '' then
-          OldFileName := ParamStr(ParamIdx)
-        else if NewFileName = '' then
-          NewFileName := ParamStr(ParamIdx)
-        else
-          Error('Too many file names on command line');
+        DisplayHelp;
+        Exit;
       end;
-      Inc(ParamIdx);
+
+      if Params.Version then
+      begin
+        DisplayVersion;
+        Exit;
+      end;
+
+      if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
+      begin
+        PatchFileHandle := FileOpen(
+          Params.PatchFileName, fmOpenRead or fmShareDenyNone
+        );
+        if PatchFileHandle <= 0 then
+          OSError;
+        RedirectStdIn(PatchFileHandle);
+      end;
+
+      ApplyPatch(Params.OldFileName, Params.NewFileName);
+
+    finally
+      Params.Free;
     end;
-
-    if OldFileName = '' then
-      Error('File name argument missing');
-    if NewFileName = '' then
-      NewFileName := OldFileName;
-
-    if (PatchFileName <> '') and (PatchFileName <> '-') then
-    begin
-      PatchFileHandle := FileOpen(PatchFileName, fmOpenRead or fmShareDenyNone);
-      if PatchFileHandle <= 0 then
-        OSError;
-      RedirectStdIn(PatchFileHandle);
-    end;
-
-    ApplyPatch(OldFileName, NewFileName);
   except
     on E: Exception do
     begin
       ExitCode := 1;
-      fprintf(StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
+      fprintf(stderr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]);
     end;
   end;
+
 end;
 
 end.
