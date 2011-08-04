@@ -68,6 +68,8 @@ type
 
   TTextPatchWriter = class(TPatchWriter)
   protected
+    { Checks if an ANSI character is a printable ASCII character. }
+    class function IsPrint(const Ch: AnsiChar): Boolean;
     procedure CopyHeader(NewPos: size_t; OldPos: size_t; Length: size_t);
     procedure Header(const OldFileName, NewFileName: string;
       const OldFileSize, NewFileSize: size_t); override;
@@ -76,6 +78,8 @@ type
   TQuotedPatchWriter = class(TTextPatchWriter)
   private
     procedure QuotedData(Data: PSignedAnsiChar; Length: size_t);
+    { Returns octal representation of given value as a 3 digit string. }
+    class function ByteToOct(const Value: Byte): string;
   public
     procedure Add(Data: PSignedAnsiChar; Length: size_t); override;
     procedure Copy(NewBuf: PSignedAnsiCharArray; NewPos: size_t;
@@ -207,6 +211,11 @@ begin
   );
 end;
 
+class function TTextPatchWriter.IsPrint(const Ch: AnsiChar): Boolean;
+begin
+  Result := Ch in [#32..#126];
+end;
+
 { TQuotedPatchWriter }
 
 procedure TQuotedPatchWriter.Add(Data: PSignedAnsiChar; Length: size_t);
@@ -214,6 +223,22 @@ begin
   TIO.WriteStr(TIO.StdOut, '+');
   QuotedData(Data, Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
+end;
+
+class function TQuotedPatchWriter.ByteToOct(const Value: Byte): string;
+var
+  Idx: Integer;
+  Digit: Byte;
+  Remainder: Byte;
+begin
+  Result := '';
+  Remainder := Value;
+  for Idx := 1 to 3 do
+  begin
+    Digit := Remainder mod 8;
+    Remainder := Remainder div 8;
+    Result := Chr(Digit + Ord('0')) + Result;
+  end;
 end;
 
 procedure TQuotedPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos, OldPos,

@@ -64,6 +64,18 @@ uses
   // Project
   UBDiffUtils;
 
+{ cut down version of C std lib strtoul function that only supports base 10 }
+function StrToULDec(const PS: PChar; var EndPtr: PChar): LongWord;
+begin
+  EndPtr := PS;
+  Result := 0;
+  while EndPtr^ in ['0'..'9'] do
+  begin
+    Result := 10 * Result + LongWord((Ord(EndPtr^) - Ord('0')));
+    Inc(EndPtr);
+  end;
+end;
+
 { TParams }
 
 constructor TParams.Create;
