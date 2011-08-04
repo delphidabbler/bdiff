@@ -33,7 +33,8 @@ uses
   UFileData in 'UFileData.pas',
   UBDiffParams in 'UBDiffParams.pas',
   UPatchWriters in 'UPatchWriters.pas',
-  UUtils in '..\Common\UUtils.pas';
+  UUtils in '..\Common\UUtils.pas',
+  UBaseParams in '..\Common\UBaseParams.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources

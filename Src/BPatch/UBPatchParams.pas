@@ -22,35 +22,35 @@ unit UBPatchParams;
 interface
 
 uses
-  // Delphi
-  SysUtils;
+  // Project
+  UBaseParams;
 
 type
 
-  TParams = class(TObject)
+  TParams = class(TBaseParams)
   private
-    fHelp: Boolean;
-    fVersion: Boolean;
     fOldFileName: string;
     fNewFileName: string;
     fPatchFileName: string;
-    procedure Error(const Msg: string); overload;
-    procedure Error(const Fmt: string; const Args: array of const); overload;
+  protected
+    function ParseLongOption(const Option: string; var ParamIdx: Integer;
+      var Terminated: Boolean): Boolean; override;
+    function ParseShortOption(const Options: string; const OptionIdx: Integer;
+      var ParamIdx: Integer; var Terminated: Boolean): Boolean; override;
+    procedure ParseFileName(const FileName: string); override;
+    procedure Finalize; override;
   public
     constructor Create;
-    procedure Parse;
     property OldFileName: string read fOldFileName;
     property NewFileName: string read fNewFileName;
     property PatchFileName: string read fPatchFileName;
-    property Help: Boolean read fHelp default False;
-    property Version: Boolean read fVersion default False;
+    property Help;
+    property Version;
   end;
-
-  EParams = class(Exception);
 
 implementation
 
-uses   UBPatchUtils,
+uses
   // Delphi
   StrUtils;
 
@@ -62,110 +62,67 @@ begin
   fOldFileName := '';
   fNewFileName := '';
   fPatchFileName := '';
-  fVersion := False;
-  fHelp := False;
 end;
 
-procedure TParams.Error(const Msg: string);
+procedure TParams.Finalize;
 begin
-  raise EParams.Create(Msg);
-end;
-
-procedure TParams.Error(const Fmt: string; const Args: array of const);
-begin
-  raise EParams.CreateFmt(Fmt, Args);
-end;
-
-procedure TParams.Parse;
-var
-  ParamIdx: Integer;  // index of each parameter
-  Param: string;
-  CharIdx: Integer;
-begin
-  // Parse command line
-  ParamIdx := 1;
-  while ParamIdx <= ParamCount do
-  begin
-    Param := ParamStr(ParamIdx);
-    if AnsiStartsStr('-', Param) then
-    begin
-      // options
-      if AnsiStartsStr('--', Param) then
-      begin
-        // long option
-        if Param = '--help' then
-        begin
-          fHelp := True;
-          Exit;
-        end
-        else if Param = '--version' then
-        begin
-          fVersion := True;
-          Exit;
-        end
-        else if Param = '--input' then
-        begin
-          Inc(ParamIdx);
-          if ParamStr(ParamIdx) = '' then
-            Error('missing argument to ''--input''');
-          fPatchFileName := ParamStr(ParamIdx);
-        end
-        else if AnsiStartsStr('--input=', Param) then
-          fPatchFileName :=
-            AnsiRightStr(Param, Length(Param) - Length('--input='))
-        else
-          Error('unknown option ''%s''', [Param]);
-      end
-      else
-      begin
-        // short option
-        for CharIdx := 2 to Length(Param) do
-        begin
-          case Param[CharIdx] of
-            'h':
-              if CharIdx = Length(Param) then
-              begin
-                fHelp := True;
-                Exit;
-              end;
-            'v':
-              if CharIdx = Length(Param) then
-              begin
-                fVersion := True;
-                Exit;
-              end;
-            'i':
-            begin
-              Inc(ParamIdx);
-              if ParamStr(ParamIdx) = '' then
-                Error('missing argument to ''-i''');
-              fPatchFileName := ParamStr(ParamIdx);
-            end
-            else
-              Error('unknown option ''-%s''', [Param[CharIdx]]);
-          end;
-        end;
-      end;
-    end
-    else
-    begin
-      // file names
-      if fOldFileName = '' then
-        fOldFileName := ParamStr(ParamIdx)
-      else if fNewFileName = '' then
-        fNewFileName := ParamStr(ParamIdx)
-      else
-        Error('too many file names on command line');
-    end;
-    Inc(ParamIdx);
-  end;
-
   if fOldFileName = '' then
     Error('file name argument missing');
-
   if fNewFileName = '' then
     fNewFileName := fOldFileName;
+end;
 
+procedure TParams.ParseFileName(const FileName: string);
+begin
+  if fOldFileName = '' then
+    fOldFileName := FileName
+  else if fNewFileName = '' then
+    fNewFileName := FileName
+  else
+    Error('too many file names on command line');
+end;
+
+function TParams.ParseLongOption(const Option: string; var ParamIdx: Integer;
+  var Terminated: Boolean): Boolean;
+begin
+  Result := inherited ParseLongOption(Option, ParamIdx, Terminated);
+  if Result then
+    Exit;
+  Result := True;
+  if Option = '--input' then
+  begin
+    Inc(ParamIdx);
+    if ParamStr(ParamIdx) = '' then
+      Error('missing argument to ''--input''');
+    fPatchFileName := ParamStr(ParamIdx);
+  end
+  else if AnsiStartsStr('--input=', Option) then
+    fPatchFileName := StripLeadingChars(Option, Length('--input='))
+  else
+    Result := False;
+end;
+
+function TParams.ParseShortOption(const Options: string;
+  const OptionIdx: Integer; var ParamIdx: Integer; var Terminated: Boolean):
+  Boolean;
+begin
+  Result := inherited ParseShortOption(
+    Options, OptionIdx, ParamIdx, Terminated
+  );
+  if Result then
+    Exit;
+  Result := True;
+  case Options[OptionIdx] of
+    'i':
+    begin
+      Inc(ParamIdx);
+      if ParamStr(ParamIdx) = '' then
+        Error('missing argument to ''-i''');
+      fPatchFileName := ParamStr(ParamIdx);
+    end
+    else
+      Result := False;
+  end;
 end;
 
 end.

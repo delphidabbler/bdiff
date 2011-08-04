@@ -31,7 +31,8 @@ uses
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
   UBPatchParams in 'UBPatchParams.pas',
-  UUtils in '..\Common\UUtils.pas';
+  UUtils in '..\Common\UUtils.pas',
+  UBaseParams in '..\Common\UBaseParams.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources
