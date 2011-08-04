@@ -64,18 +64,6 @@ uses
   // Project
   UBDiffUtils;
 
-{ cut down version of C std lib strtoul function that only supports base 10 }
-function StrToULDec(const PS: PChar; var EndPtr: PChar): LongWord;
-begin
-  EndPtr := PS;
-  Result := 0;
-  while EndPtr^ in ['0'..'9'] do
-  begin
-    Result := 10 * Result + LongWord((Ord(EndPtr^) - Ord('0')));
-    Inc(EndPtr);
-  end;
-end;
-
 { TParams }
 
 constructor TParams.Create;
@@ -239,17 +227,15 @@ end;
 
 procedure TParams.SetMinEqual(P: PChar);
 var
-  q: PChar;
-  x: LongWord;
+  X: Int64; // number parsed from command line
 begin
-  if not Assigned(p) or (p^ = #0) then
+  if not Assigned(P) or (P^ = #0) then
     Error('missing argument to ''--min-equal'' / ''-m''');
-  x := StrToULDec(p, q);
-  if q^ <> #0 then
+  if not TryStrToInt64(P, X) or (X < 0) then
     Error('malformed number on command line');
-  if (x = 0) or (x > $7FFF) then
+  if (X = 0) or (X > $7FFF) then
     Error('number out of range on command line');
-  fMinEqual := x;
+  fMinEqual := Integer(X);
 end;
 
 end.
