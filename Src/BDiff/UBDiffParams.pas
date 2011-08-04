@@ -41,8 +41,8 @@ type
     fFormat: TFormat;
     procedure Error(const Msg: string); overload;
     procedure Error(const Fmt: string; const Args: array of const); overload;
-    procedure SetFormat(P: PChar);
-    procedure SetMinEqual(P: PChar);
+    procedure SetFormat(const Value: string);
+    procedure SetMinEqual(const Value: string);
   public
     constructor Create;
     procedure Parse;
@@ -61,8 +61,8 @@ type
 implementation
 
 uses
-  // Project
-  UBDiffUtils;
+  // Delphi
+  StrUtils;
 
 { TParams }
 
@@ -91,77 +91,77 @@ end;
 
 procedure TParams.Parse;
 var
-  Idx: Integer;
-  ArgV: PChar;
-  PC: PChar;
+  ParamIdx: Integer;
+  CharIdx: Integer;
+  Param: string;
 begin
-  { Parse command line }
-  Idx := 1;
-  while (Idx <= ParamCount) do
+  // Parse command line
+  ParamIdx := 1;
+  while (ParamIdx <= ParamCount) do
   begin
-    ArgV := PChar(ParamStr(Idx) + #0#0#0);
-    if ArgV[0] = '-' then
+    Param := ParamStr(ParamIdx);
+    if AnsiStartsStr('-', Param) then
     begin
-      if ArgV[1] = '-' then
+      // options
+      if AnsiStartsStr('--', Param) then
       begin
-        { long options }
-        PC := ArgV + 2;
-        if StrComp(PC, 'help') = 0 then
+        // long options
+        if Param = '--help' then
         begin
           fHelp := True;
           Exit;
         end
-        else if StrComp(PC, 'version') = 0 then
+        else if Param = '--version' then
         begin
           fVersion := True;
           Exit;
         end
-        else if StrComp(PC, 'verbose') = 0 then
+        else if Param = '--verbose' then
           fVerbose := True
-        else if StrComp(PC, 'output') = 0 then
+        else if Param = '--output' then
         begin
-          Inc(Idx);
-          ArgV := PChar(ParamStr(Idx));
-          if (ArgV^ = #0) then
+          Inc(ParamIdx);
+          Param := ParamStr(ParamIdx);
+          if Param = '' then
             Error('missing argument to ''--output''');
-          fPatchFileName := ArgV;
+          fPatchFileName := Param;
         end
-        else if StrLComp(PC, 'output=', 7) = 0 then
-          fPatchFileName := PC + 7
-        else if StrComp(PC, 'format') = 0 then
+        else if AnsiStartsStr('--output=', Param) then
+          fPatchFileName :=
+            AnsiRightStr(Param, Length(Param) - Length('--output='))
+        else if Param = '--format' then
         begin
-          Inc(Idx);
-          ArgV := PChar(ParamStr(Idx));
-          SetFormat(ArgV);
+          Inc(ParamIdx);
+          SetFormat(ParamStr(ParamIdx));
         end
-        else if StrLComp(PC, 'format=', 7) = 0 then
-          SetFormat(PC + 7)
-        else if StrComp(PC, 'min-equal') = 0 then
+        else if AnsiStartsStr('--format=', Param) then
+          SetFormat(AnsiRightStr(Param, Length(Param) - Length('--format=')))
+        else if Param = '--min-equal' then
         begin
-          Inc(Idx);
-          ArgV := PChar(ParamStr(Idx));
-          SetMinEqual(ArgV);
+          Inc(ParamIdx);
+          SetMinEqual(ParamStr(ParamIdx));
         end
-        else if StrLComp(PC, 'min-equal=', 10) = 0 then
-          SetMinEqual(PC + 10)
+        else if AnsiStartsStr('--min-equal=', Param) then
+          SetMinEqual(
+            AnsiRightStr(Param, Length(Param) - Length('--min-equal='))
+          )
         else
-          Error('unknown option ''--%s''', [PC]);
+          Error('unknown option ''%s''', [Param]);
       end
       else
       begin
         { short options }
-        PC := ArgV + 1;
-        while PC^ <> #0 do
+        for CharIdx := 2 to Length(Param) do
         begin
-          case PC^ of
+          case Param[CharIdx] of
             'h':
-              if StrComp(PC, 'h') = 0 then
+              if CharIdx = Length(Param) then
               begin
                 fHelp := True;
                 Exit;
               end;
             'v':
-              if StrComp(PC, 'v') = 0 then
+              if CharIdx = Length(Param) then
               begin
                 fVersion := True;
                 Exit;
@@ -176,62 +176,59 @@ begin
               fFormat := FMT_BINARY;
             'm':
             begin
-              Inc(Idx);
-              ArgV := PChar(ParamStr(Idx));
-              SetMinEqual(ArgV);
+              Inc(ParamIdx);
+              SetMinEqual(ParamStr(ParamIdx));
             end;
             'o':
             begin
-              Inc(Idx);
-              ArgV := PChar(ParamStr(Idx));
-              if ArgV^ = #0 then
+              Inc(ParamIdx);
+              if ParamStr(ParamIdx) = '' then
                 Error('missing argument to ''-o''');
-              fPatchFileName := ArgV;
+              fPatchFileName := ParamStr(ParamIdx);
             end;
             else
-              Error('unknown option ''-%s''', [PC^]);
+              Error('unknown option ''-%s''', [Param[CharIdx]]);
           end;
-          Inc(PC);
         end;
       end;
     end
     else
     begin
-      { file names }
+      // file names
       if fOldFileName = '' then
-        fOldFileName := ParamStr(Idx)
+        fOldFileName := ParamStr(ParamIdx)
       else if fNewFileName = '' then
-        fNewFileName := ParamStr(Idx)
+        fNewFileName := ParamStr(ParamIdx)
       else
         Error('too many file names on command line');
     end;
-    Inc(Idx);
+    Inc(ParamIdx);
   end;
   if fNewFileName = '' then
     Error('need two filenames');
 end;
 
-procedure TParams.SetFormat(P: PChar);
+procedure TParams.SetFormat(const Value: string);
 begin
-  if not Assigned(p) then
+  if Value = '' then
     Error('missing argument to ''--format''');
-  if StrComp(p, 'quoted') = 0 then
+  if Value = 'quoted' then
     fFormat := FMT_QUOTED
-  else if (StrComp(p, 'filter') = 0) or (StrComp(p, 'filtered') = 0) then
+  else if (Value = 'filter') or (Value = 'filtered') then
     fFormat := FMT_FILTERED
-  else if StrComp(p, 'binary') = 0 then
+  else if Value = 'binary' then
     fFormat := FMT_BINARY
   else
     Error('invalid format specification');
 end;
 
-procedure TParams.SetMinEqual(P: PChar);
+procedure TParams.SetMinEqual(const Value: string);
 var
   X: Int64; // number parsed from command line
 begin
-  if not Assigned(P) or (P^ = #0) then
+  if Value = '' then
     Error('missing argument to ''--min-equal'' / ''-m''');
-  if not TryStrToInt64(P, X) or (X < 0) then
+  if not TryStrToInt64(Value, X) or (X < 0) then
     Error('malformed number on command line');
   if (X = 0) or (X > $7FFF) then
     Error('number out of range on command line');

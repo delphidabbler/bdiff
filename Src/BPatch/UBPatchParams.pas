@@ -50,6 +50,10 @@ type
 
 implementation
 
+uses   UBPatchUtils,
+  // Delphi
+  StrUtils;
+
 { TParams }
 
 constructor TParams.Create;
@@ -75,57 +79,57 @@ end;
 procedure TParams.Parse;
 var
   ParamIdx: Integer;  // index of each parameter
-  PParam: PChar;      // pointer to each parameter
-  PC: PChar;          // pointer to characters in a parameter
+  Param: string;
+  CharIdx: Integer;
 begin
+  // Parse command line
   ParamIdx := 1;
   while ParamIdx <= ParamCount do
   begin
-    PParam := PChar(ParamStr(ParamIdx) + #0#0#0);
-    if PParam[0] = '-' then
+    Param := ParamStr(ParamIdx);
+    if AnsiStartsStr('-', Param) then
     begin
-      if PParam[1] = '-' then
+      // options
+      if AnsiStartsStr('--', Param) then
       begin
-        { long option }
-        PC := PParam + 2;
-        if StrComp(PC, 'help') = 0 then
+        // long option
+        if Param = '--help' then
         begin
           fHelp := True;
           Exit;
         end
-        else if StrComp(PC, 'version') = 0 then
+        else if Param = '--version' then
         begin
           fVersion := True;
           Exit;
         end
-        else if StrComp(PC, 'input') = 0 then
+        else if Param = '--input' then
         begin
           Inc(ParamIdx);
-          PParam := PChar(ParamStr(ParamIdx));
-          if (PParam^ = #0) then
+          if ParamStr(ParamIdx) = '' then
             Error('missing argument to ''--input''');
-          fPatchFileName := PParam;
+          fPatchFileName := ParamStr(ParamIdx);
         end
-        else if StrLComp(PC, 'input=', 6) = 0 then
-          fPatchFileName := PC + 6
+        else if AnsiStartsStr('--input=', Param) then
+          fPatchFileName :=
+            AnsiRightStr(Param, Length(Param) - Length('--input='))
         else
-          Error('unknown option ''--%s''', [PC]);
+          Error('unknown option ''%s''', [Param]);
       end
       else
       begin
-        { short option }
-        PC := PParam + 1;
-        while PC^ <> #0 do
+        // short option
+        for CharIdx := 2 to Length(Param) do
         begin
-          case PC^ of
+          case Param[CharIdx] of
             'h':
-              if StrComp(PC, 'h') = 0 then
+              if CharIdx = Length(Param) then
               begin
                 fHelp := True;
                 Exit;
               end;
             'v':
-              if StrComp(PC, 'v') = 0 then
+              if CharIdx = Length(Param) then
               begin
                 fVersion := True;
                 Exit;
@@ -133,20 +137,19 @@ begin
             'i':
             begin
               Inc(ParamIdx);
-              PParam := PChar(ParamStr(ParamIdx));
-              if PParam^ = #0 then
+              if ParamStr(ParamIdx) = '' then
                 Error('missing argument to ''-i''');
-              fPatchFileName := PParam;
+              fPatchFileName := ParamStr(ParamIdx);
             end
             else
-              Error('unknown option ''-%s''', [PC^]);
+              Error('unknown option ''-%s''', [Param[CharIdx]]);
           end;
-          Inc(PC);
         end;
       end;
     end
     else
     begin
+      // file names
       if fOldFileName = '' then
         fOldFileName := ParamStr(ParamIdx)
       else if fNewFileName = '' then
@@ -162,6 +165,7 @@ begin
 
   if fNewFileName = '' then
     fNewFileName := fOldFileName;
+
 end;
 
 end.
