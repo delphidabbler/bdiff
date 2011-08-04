@@ -24,14 +24,6 @@ interface
 
 
 type
-  { size_t type is used extensively in C and in original code for this program.
-    We therefore define the size_t and "pointer to size_t" types }
-(*
-  size_t = Cardinal;
-*)
-(*
-  Psize_t = ^Cardinal;
-*)
   { Some uses of *size_t in original C code actually reference an array of
     size_t and are referenced using array[] notation. The following types are
     declared to use in these circumstances to enable similar notation in
