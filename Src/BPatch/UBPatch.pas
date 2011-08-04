@@ -47,7 +47,7 @@ const
 
 
 { Compute simple checksum }
-function CheckSum(Data: PAnsiChar; DataSize: size_t;
+function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
   const BFCheckSum: Longint): Longint;
 begin
   Result := BFCheckSum;
@@ -90,7 +90,7 @@ procedure CopyData(const SourceFileHandle, DestFileHandle: Integer;
 var
   DestCheckSum: Longint;
   Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
-  BytesToCopy: size_t;
+  BytesToCopy: Cardinal;
 begin
   DestCheckSum := 0;
 

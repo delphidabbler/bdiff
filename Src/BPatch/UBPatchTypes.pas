@@ -19,14 +19,7 @@
 
 unit UBPatchTypes;
 
-
 interface
-
-
-type
-  { size_t type is used extensively in C and in original code for this program }
-  size_t = Cardinal;
-
 
 implementation
 

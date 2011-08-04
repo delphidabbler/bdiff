@@ -38,7 +38,7 @@ uses
   @return Pointer to block of sorted indices into Data. Caller must free.
   @except raises EOutOfMemory if can't allocate sorted data block.
 }
-function BlockSort(Data: PSignedAnsiCharArray; DataSize: size_t): PBlock;
+function BlockSort(Data: PSignedAnsiCharArray; DataSize: Cardinal): PBlock;
 
 { Finds maximum length "sub-string" of CompareData that is in Data.
   @param Data [in] Data to be searched for "sub-string".
@@ -50,8 +50,8 @@ function BlockSort(Data: PSignedAnsiCharArray; DataSize: size_t): PBlock;
   @return Length of found "sub-string".
 }
 function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-  DataSize: size_t; CompareData: PSignedAnsiChar; CompareDataSize: size_t;
-  out FoundPos: size_t): size_t;
+  DataSize: Cardinal; CompareData: PSignedAnsiChar; CompareDataSize: Cardinal;
+  out FoundPos: Cardinal): Cardinal;
 
 
 implementation
@@ -86,12 +86,12 @@ uses
   UBDiffUtils;
 
 
-function BlockSortCompare(A: size_t; B: size_t; Data: PSignedAnsiCharArray;
-  DataSize: size_t): Integer;
+function BlockSortCompare(A: Cardinal; B: Cardinal; Data: PSignedAnsiCharArray;
+  DataSize: Cardinal): Integer;
 var
   PA: PSignedAnsiChar;
   PB: PSignedAnsiChar;
-  Len: size_t;
+  Len: Cardinal;
 begin
   PA := @Data[A];
   PB := @Data[B];
@@ -113,10 +113,10 @@ begin
 end;
 
 { The 'sink element' part of heapsort }
-procedure BlockSortSink(Left: size_t; Right: size_t; Block: PBlock;
-  Data: PSignedAnsiCharArray; DataSize: size_t);
+procedure BlockSortSink(Left: Cardinal; Right: Cardinal; Block: PBlock;
+  Data: PSignedAnsiCharArray; DataSize: Cardinal);
 var
-  I, J, X: size_t;
+  I, J, X: Cardinal;
 begin
   I := Left;
   X := Block[I];
@@ -136,9 +136,9 @@ begin
   Block[I] := X;
 end;
 
-function BlockSort(Data: PSignedAnsiCharArray; DataSize: size_t): PBlock;
+function BlockSort(Data: PSignedAnsiCharArray; DataSize: Cardinal): PBlock;
 var
-  I, Temp, Left, Right: size_t;
+  I, Temp, Left, Right: Cardinal;
 begin
   if DataSize = 0 then
   begin
@@ -146,7 +146,7 @@ begin
     Exit;
   end;
 
-  GetMem(Result, SizeOf(size_t) * DataSize);
+  GetMem(Result, SizeOf(Cardinal) * DataSize);
 
   // initialize unsorted data
   for I := 0 to Pred(DataSize) do
@@ -171,14 +171,14 @@ begin
 end;
 
 function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-  DataSize: size_t; CompareData: PSignedAnsiChar; CompareDataSize: size_t;
-  out FoundPos: size_t): size_t;
+  DataSize: Cardinal; CompareData: PSignedAnsiChar; CompareDataSize: Cardinal;
+  out FoundPos: Cardinal): Cardinal;
 var
-  First: size_t;                  // first position in Data to search
-  Last: size_t;                   // last position in Data to search
-  Mid: size_t;                    // mid point of Data to search
-  FoundSize: size_t;              // size of matching "sub-string"
-  FoundMax: size_t;               // maximum size of matching "sub-string"
+  First: Cardinal;                // first position in Data to search
+  Last: Cardinal;                 // last position in Data to search
+  Mid: Cardinal;                  // mid point of Data to search
+  FoundSize: Cardinal;            // size of matching "sub-string"
+  FoundMax: Cardinal;             // maximum size of matching "sub-string"
   PData: PSignedAnsiChar;         // ptr to char in Data to be compared
   PCompareData: PSignedAnsiChar;  // ptr to char in CompareData to be compared
 begin

@@ -49,24 +49,24 @@ const
 { Structure for a matching block }
 type
   TMatch = record
-    OldOffset: size_t;
-    NewOffset: size_t;
-    BlockLength: size_t;
+    OldOffset: Cardinal;
+    NewOffset: Cardinal;
+    BlockLength: Cardinal;
   end;
   PMatch = ^TMatch;
 
 { Global variables }
 var
-  gMinMatchLength: size_t = 24;   // default minimum match length
+  gMinMatchLength: Cardinal = 24; // default minimum match length
   gFormat: TFormat = FMT_QUOTED;  // default output format
   gVerbose: Boolean;              // verbose mode defaults to off / false
 
 { Find maximum-length match }
 function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-  SearchText: PSignedAnsiChar; SearchTextLength: size_t): TMatch;
+  SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
 var
-  FoundPos: size_t;
-  FoundLen: size_t;
+  FoundPos: Cardinal;
+  FoundLen: Cardinal;
 begin
   Result.BlockLength := 0;  {no match}
   Result.NewOffset := 0;
@@ -105,8 +105,8 @@ procedure CreateDiff(OldFileName, NewFileName: string);
 var
   OldFile: TFileData;
   NewFile: TFileData;
-  NewOffset: size_t;
-  ToDo: size_t;
+  NewOffset: Cardinal;
+  ToDo: Cardinal;
   SortedOldData: PBlock;
   Match: TMatch;
   PatchWriter: TPatchWriter;
