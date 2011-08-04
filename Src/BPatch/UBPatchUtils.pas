@@ -26,7 +26,7 @@ interface
 
 uses
   // Project
-  UBPatchTypes, UUtils;
+  UUtils;
 
 const
   // Value representing end of file (as returned from TIO.GetCh).
@@ -55,21 +55,6 @@ implementation
 uses
   // Delphi
   SysUtils, Windows;
-
-
-{ emulates C std lib fread function using Windows file handle }
-function fread(ptr: Pointer; size: size_t; nobj: size_t;
-  stream: Integer): size_t;
-begin
-  Result := size_t(SysUtils.FileRead(stream, ptr^, size * nobj)) div size;
-end;
-
-{ emulates C std lib fwrite function using Windows file handle }
-function fwrite(ptr: Pointer; size: size_t; nobj: size_t;
-  stream: Integer): size_t;
-begin
-  Result := size_t(SysUtils.FileWrite(stream, ptr^, size * nobj)) div size;
-end;
 
 { TIO }
 
