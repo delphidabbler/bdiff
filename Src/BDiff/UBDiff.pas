@@ -39,7 +39,7 @@ uses
   SysUtils, Windows,
   // Project
   UAppInfo, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors,
-  UFileData, UPatchWriters, UUtils;
+  UFileData, UPatchWriters;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version

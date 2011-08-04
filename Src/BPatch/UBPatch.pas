@@ -38,7 +38,7 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors, UUtils;
+  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors;
 
 
 const

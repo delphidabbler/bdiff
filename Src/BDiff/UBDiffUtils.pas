@@ -26,11 +26,13 @@ interface
 
 uses
   // Delphi
-  Windows;
+  Windows,
+  // Project
+  UUtils;
 
 
 { emulates C std lib isprint function: does not support locales }
-function isprint(Ch: AnsiChar): Boolean;  // todo: note changed to ansichar from char
+function isprint(Ch: AnsiChar): Boolean;  
 
 { cut down version of C std lib strtoul function that only supports base 10 }
 function StrToULDec(const s: PChar; var endp: PChar): LongWord;
@@ -39,6 +41,13 @@ function StrToULDec(const s: PChar; var endp: PChar): LongWord;
   string: note that the value has no leading '\', just the digits }
 function ByteToOct(V: Byte): string;
 
+
+type
+  TIO = class(TCommonIO)
+  public
+    { Redirects standard output to a given file handle }
+    class procedure RedirectStdOut(const Handle: Integer);
+  end;
 
 implementation
 
@@ -80,6 +89,13 @@ begin
     Result := 10 * Result + LongWord((Ord(endp^) - Ord('0')));
     inc(endp);
   end;
+end;
+
+{ TIO }
+
+class procedure TIO.RedirectStdOut(const Handle: Integer);
+begin
+  Windows.SetStdHandle(STD_OUTPUT_HANDLE, Cardinal(Handle));
 end;
 
 end.
