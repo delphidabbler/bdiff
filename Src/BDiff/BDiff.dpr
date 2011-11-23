@@ -34,7 +34,8 @@ uses
   UBDiffParams in 'UBDiffParams.pas',
   UPatchWriters in 'UPatchWriters.pas',
   UUtils in '..\Common\UUtils.pas',
-  UBaseParams in '..\Common\UBaseParams.pas';
+  UBaseParams in '..\Common\UBaseParams.pas',
+  ULogger in 'ULogger.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources

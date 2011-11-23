@@ -39,7 +39,7 @@ uses
   SysUtils, Windows,
   // Project
   UAppInfo, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors,
-  UFileData, UPatchWriters;
+  UFileData, ULogger, UPatchWriters;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -59,7 +59,6 @@ type
 var
   gMinMatchLength: Cardinal = 24; // default minimum match length
   gFormat: TFormat = FMT_QUOTED;  // default output format
-  gVerbose: Boolean;              // verbose mode defaults to off / false
 
 { Find maximum-length match }
 function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
@@ -92,16 +91,9 @@ begin
   end;
 end;
 
-{ Print log message, if enabled. Log messages go to standard error because we
-  may be writing patch file contents to standard output }
-procedure LogStatus(const Msg: string);
-begin
-  if gVerbose then
-    TIO.WriteStrFmt(TIO.StdErr, '%s: %s'#13#10, [ProgramFileName, Msg]);
-end;
 
 { Main routine: generate diff }
-procedure CreateDiff(OldFileName, NewFileName: string);
+procedure CreateDiff(OldFileName, NewFileName: string; Logger: TLogger);
 var
   OldFile: TFileData;
   NewFile: TFileData;
@@ -117,15 +109,15 @@ begin
   SortedOldData := nil;
   PatchWriter := TPatchWriterFactory.Instance(gFormat);
   try
-    LogStatus('loading old file');
+    Logger.Log('loading old file');
     OldFile := TFileData.Create(OldFileName);
-    LogStatus('loading new file');
+    Logger.Log('loading new file');
     NewFile := TFileData.Create(NewFileName);
-    LogStatus('block sorting old file');
+    Logger.Log('block sorting old file');
     SortedOldData := BlockSort(OldFile.Data, OldFile.Size);
     if not Assigned(SortedOldData) then
       Error('virtual memory exhausted');
-    LogStatus('generating patch');
+    Logger.Log('generating patch');
     PatchWriter.Header(OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size);
     { main loop }
     ToDo := NewFile.Size;
@@ -156,7 +148,7 @@ begin
         Break;
       end;
     end;
-    LogStatus('done');
+    Logger.Log('done');
   finally
     // finally section new to v1.1
     if Assigned(SortedOldData) then
@@ -213,6 +205,7 @@ procedure Main;
 var
   PatchFileHandle: Integer;
   Params: TParams;
+  Logger: TLogger;
 begin
   ExitCode := 0;
 
@@ -235,7 +228,6 @@ begin
 
       gMinMatchLength := Params.MinEqual;
       gFormat := Params.Format;
-      gVerbose := Params.Verbose;
 
       if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
       begin
@@ -247,7 +239,12 @@ begin
       end;
 
       // create the diff
-      CreateDiff(Params.OldFileName, Params.NewFileName);
+      Logger := TLoggerFactory.Instance(Params.Verbose);
+      try
+        CreateDiff(Params.OldFileName, Params.NewFileName, Logger);
+      finally
+        Logger.Free;
+      end;
 
     finally
       Params.Free;
