@@ -24,7 +24,6 @@ program BPatch;
 
 
 uses
-  Windows,
   UBPatch in 'UBPatch.pas',
   UBPatchUtils in 'UBPatchUtils.pas',
   UBPatchTypes in 'UBPatchTypes.pas',

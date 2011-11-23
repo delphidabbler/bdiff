@@ -23,8 +23,6 @@ unit UBDiffUtils;
 interface
 
 uses
-  // Delphi
-  Windows,
   // Project
   UUtils;
 
@@ -39,7 +37,7 @@ implementation
 
 uses
   // Delphi
-  SysUtils;
+  Windows;
 
 { TIO }
 

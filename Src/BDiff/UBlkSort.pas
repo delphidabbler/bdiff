@@ -26,8 +26,6 @@ unit UBlkSort;
 interface
 
 uses
-  // Delphi
-  Windows, SysUtils,
   // Project
   UBDiffTypes;
 
@@ -66,11 +64,6 @@ implementation
     we use a specially defined SignedAnsiChar to maintain the data buffer to
     ensure that the the Pascal performs in the same way as the C code.
 }
-
-
-uses
-  // Project
-  UBDiffUtils;
 
 
 function BlockSortCompare(A: Cardinal; B: Cardinal; Data: PSignedAnsiCharArray;

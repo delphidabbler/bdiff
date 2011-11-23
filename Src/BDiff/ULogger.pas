@@ -22,22 +22,22 @@ unit ULogger;
 
 interface
 
-uses
-  UAppInfo, UBDiffUtils;
-
 type
-
   TLogger = class(TObject)
   public
     procedure Log(const Msg: string); virtual; abstract;
   end;
 
+type
   TLoggerFactory = class(TObject)
   public
     class function Instance(Verbose: Boolean): TLogger;
   end;
 
 implementation
+
+uses
+  UAppInfo, UBDiffUtils;
 
 type
   TVerboseLogger = class(TLogger)

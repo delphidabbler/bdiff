@@ -23,7 +23,6 @@ program BDiff;
 {$APPTYPE CONSOLE}
 
 uses
-  Windows,
   UBDiff in 'UBDiff.pas',
   UBlkSort in 'UBlkSort.pas',
   UBDiffUtils in 'UBDiffUtils.pas',

@@ -78,11 +78,8 @@ implementation
 {$IOCHECKS OFF}
 
 uses
-  // Delphi
-  SysUtils, Windows,
   // Project
-  UAppInfo, UBDiffInfoWriter, UBDiffParams, UBDiffUtils, UBlkSort, UErrors,
-  UPatchWriters;
+  UBlkSort, UErrors, UPatchWriters;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
