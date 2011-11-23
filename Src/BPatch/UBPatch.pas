@@ -1,7 +1,7 @@
 {
  * UBPatch.pas
  *
- * Main program logic for BPatch.
+ * Code that applies patch to source file to re-create destination file.
  *
  * Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
  * <Streu@gmx.de>.
@@ -26,8 +26,7 @@ unit UBPatch;
 interface
 
 
-{ The program's main interface code: called from the project file }
-procedure Main;
+procedure ApplyPatch(const SourceFileName, DestFileName: string);
 
 
 implementation
@@ -158,7 +157,7 @@ const
   ErrorMsg = 'Patch garbled - invalid section ''%''';
 begin
   try
-    // read header from patch file
+    // read header from patch file on standard input
     if FileRead(TIO.StdIn, Header, 16) <> 16 then
       Error('Patch not in BINARY format');
     if StrLComp(Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
@@ -250,57 +249,6 @@ begin
   end;
 end;
 
-{ Control }
-procedure Main;
-var
-  PatchFileHandle: Integer;
-  Params: TParams;
-begin
-  ExitCode := 0;
-
-  Params := TParams.Create;
-  try
-    try
-      Params.Parse;
-
-      if Params.Help then
-      begin
-        TBPatchInfoWriter.HelpScreen;
-        Exit;
-      end;
-
-      if Params.Version then
-      begin
-        TBPatchInfoWriter.VersionInfo;
-        Exit;
-      end;
-
-      if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
-      begin
-        PatchFileHandle := FileOpen(
-          Params.PatchFileName, fmOpenRead or fmShareDenyNone
-        );
-        if PatchFileHandle <= 0 then
-          OSError;
-        TIO.RedirectStdIn(PatchFileHandle);
-      end;
-
-      ApplyPatch(Params.OldFileName, Params.NewFileName);
-
-    finally
-      Params.Free;
-    end;
-  except
-    on E: Exception do
-    begin
-      ExitCode := 1;
-      TIO.WriteStrFmt(
-        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
-      );
-    end;
-  end;
-
-end;
-
 end.
+
 

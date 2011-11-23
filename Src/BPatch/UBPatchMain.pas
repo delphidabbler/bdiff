@@ -1,0 +1,97 @@
+{
+ * UBPatchMain.pas
+ *
+ * Static class containing main program logic for BPatch program.
+ *
+ * Copyright (c) 2011 Peter D Johnson (www.delphidabbler.com).
+ *
+ * $Rev$
+ * $Date$
+ *
+ * THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY.
+ * IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE
+ * USE OF THIS SOFTWARE.
+ *
+ * For conditions of distribution and use see the LICENSE file of visit
+ * http://www.delphidabbler.com/software/bdiff/license
+}
+
+
+unit UBPatchMain;
+
+interface
+
+type
+  TMain = class(TObject)
+  private
+    class procedure DisplayHelp;
+    class procedure DisplayVersion;
+    class procedure RedirectStdIn(const FileName: string);
+  public
+    class procedure Run;
+  end;
+
+implementation
+
+uses
+  SysUtils,
+  UAppInfo, UBPatch, UBPatchInfoWriter, UBPatchParams, UBPatchUtils, UErrors;
+
+{ TMain }
+
+class procedure TMain.DisplayHelp;
+begin
+  TBPatchInfoWriter.HelpScreen;
+end;
+
+class procedure TMain.DisplayVersion;
+begin
+  TBPatchInfoWriter.VersionInfo;
+end;
+
+class procedure TMain.RedirectStdIn(const FileName: string);
+var
+  PatchFileHandle: Integer;
+begin
+  PatchFileHandle := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
+  if PatchFileHandle <= 0 then
+    OSError;
+  TIO.RedirectStdIn(PatchFileHandle);
+end;
+
+class procedure TMain.Run;
+var
+  PatchFileHandle: Integer;
+  Params: TParams;
+begin
+  ExitCode := 0;
+  Params := TParams.Create;
+  try
+    try
+      Params.Parse;
+      if Params.Help then
+        DisplayHelp
+      else if Params.Version then
+        DisplayVersion
+      else
+      begin
+        if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
+          RedirectStdIn(Params.PatchFileName);
+        ApplyPatch(Params.OldFileName, Params.NewFileName);
+      end;
+    finally
+      Params.Free;
+    end;
+  except
+    on E: Exception do
+    begin
+      ExitCode := 1;
+      TIO.WriteStrFmt(
+        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
+      );
+    end;
+  end;
+end;
+
+
+end.

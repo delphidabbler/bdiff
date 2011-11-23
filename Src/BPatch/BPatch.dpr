@@ -33,12 +33,13 @@ uses
   UUtils in '..\Common\UUtils.pas',
   UBaseParams in '..\Common\UBaseParams.pas',
   UBPatchInfoWriter in 'UBPatchInfoWriter.pas',
-  UInfoWriter in '..\Common\UInfoWriter.pas';
+  UInfoWriter in '..\Common\UInfoWriter.pas',
+  UBPatchMain in 'UBPatchMain.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources
 
 begin
-  UBPatch.Main;
+  TMain.Run;
 end.
 
