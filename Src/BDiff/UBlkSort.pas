@@ -3,8 +3,8 @@
  *
  * Implements block sort / search mechanism.
  *
- * Based on a blksort.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
- * <Streu@gmx.de>.
+ * Based on parts of blksort.c by Stefan Reuther, copyright (c) 1999 Stefan
+ * Reuther <Streu@gmx.de>.
  *
  * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
@@ -39,19 +39,6 @@ uses
   @except raises EOutOfMemory if can't allocate sorted data block.
 }
 function BlockSort(Data: PSignedAnsiCharArray; DataSize: Cardinal): PBlock;
-
-{ Finds maximum length "sub-string" of CompareData that is in Data.
-  @param Data [in] Data to be searched for "sub-string".
-  @param Block [in] Block of indexes into Data that sort sub-strings of Data.
-  @param DataSize [in] Size of Data.
-  @param CompareData [in] Pointer to data to be compared to Data.
-  @param CompareDataSize [in] Size of data pointed to by CompareData.
-  @param FoundPos [out] Position in Data where "sub-string" was found.
-  @return Length of found "sub-string".
-}
-function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-  DataSize: Cardinal; CompareData: PSignedAnsiChar; CompareDataSize: Cardinal;
-  out FoundPos: Cardinal): Cardinal;
 
 
 implementation
@@ -167,69 +154,6 @@ begin
     Result[Right-1] := Temp;
     Dec(Right);
     BlockSortSink(Left, Right, Result, Data, DataSize);
-  end;
-end;
-
-function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-  DataSize: Cardinal; CompareData: PSignedAnsiChar; CompareDataSize: Cardinal;
-  out FoundPos: Cardinal): Cardinal;
-var
-  First: Cardinal;                // first position in Data to search
-  Last: Cardinal;                 // last position in Data to search
-  Mid: Cardinal;                  // mid point of Data to search
-  FoundSize: Cardinal;            // size of matching "sub-string"
-  FoundMax: Cardinal;             // maximum size of matching "sub-string"
-  PData: PSignedAnsiChar;         // ptr to char in Data to be compared
-  PCompareData: PSignedAnsiChar;  // ptr to char in CompareData to be compared
-begin
-  First := 0;
-  Last := DataSize - 1;
-  Result := 0;
-  FoundPos := 0;
-
-  // Do binary search of Data
-  while First <= Last do
-  begin
-    // Get mid point of (sorted) Data to search
-    Mid := (First + Last) div 2;
-    // Set pointer to start of Data search string
-    PData := @Data[Block[Mid]];
-    // Set pointer to start of CompareData
-    PCompareData := CompareData;
-    // Calculate maximum possible size of matching substring
-    FoundMax := DataSize - Block[Mid];
-    if FoundMax > CompareDataSize then
-      FoundMax := CompareDataSize;
-    // Find and count match chars from Data and CompareData
-    FoundSize := 0;
-    while (FoundSize < FoundMax) and (PData^ = PCompareData^) do
-    begin
-      Inc(FoundSize);
-      Inc(PData);
-      Inc(PCompareData);
-    end;
-
-    // We found a "match" of length FoundSize, position Block[Mid]
-    if FoundSize > Result then
-    begin
-      Result := FoundSize;
-      FoundPos := Block[Mid];
-    end;
-
-    // Determine next search area
-    // Note: If FoundSize = FoundMatch then substrings match
-    if (FoundSize = FoundMax) or (PData^ < PCompareData^) then
-      // substring <= current data string: search above
-      First := Mid + 1
-    else
-      // substring < current data string: search below
-      begin
-        Last := Mid;
-        if Last <> 0 then
-          Dec(Last)
-        else
-          Break;
-      end;
   end;
 end;
 

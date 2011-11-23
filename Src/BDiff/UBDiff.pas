@@ -3,8 +3,8 @@
  *
  * Main program logic for BDiff.
  *
- * Based on bdiff.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
- * <Streu@gmx.de>.
+ * Based on bdiff.c and part of blksort.c by Stefan Reuther, copyright (c) 1999
+ * Stefan Reuther <Streu@gmx.de>.
  *
  * Copyright (c) 2003-2011 Peter D Johnson (www.delphidabbler.com).
  *
@@ -61,6 +61,23 @@ type
     fFormat: TFormat;
     function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
       SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
+    ///  <summary>Finds maximum length "sub-string" of CompareData that is in
+    ///  Data.</summary>
+    ///  <param name="Data">PSignedAnsiCharArray [in] Data to be searched for
+    ///  "sub-string".</param>
+    ///  <param name="Block">PBlock [in] Block of indexes into Data that sort
+    ///  sub-strings of Data.</param>
+    ///  <param name="DataSize">Cardinal [in] Size of Data.</param>
+    ///  <param name="CompareData">PSignedAnsiChar [in] Pointer to data to be
+    ///  compared to Data.</param>
+    ///  <param name="CompareDataSize">Cardinal [in] Size of data pointed to by
+    ///  CompareData.</param>
+    ///  <param name="FoundPos">Cardinal [out] Position in Data where
+    ///  "sub-string" was found.</param>
+    ///  <returns>Cardinal. Length of found "sub-string".</returns>
+    function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
+      DataSize: Cardinal; CompareData: PSignedAnsiChar;
+      CompareDataSize: Cardinal; out FoundPos: Cardinal): Cardinal;
   public
     constructor Create;
     destructor Destroy; override;
@@ -219,6 +236,69 @@ begin
     Inc(SearchText);
     Inc(Result.NewOffset);
     Dec(SearchTextLength);
+  end;
+end;
+
+function TDiffer.FindString(Data: PSignedAnsiCharArray; Block: PBlock;
+  DataSize: Cardinal; CompareData: PSignedAnsiChar;
+  CompareDataSize: Cardinal; out FoundPos: Cardinal): Cardinal;
+var
+  First: Cardinal;                // first position in Data to search
+  Last: Cardinal;                 // last position in Data to search
+  Mid: Cardinal;                  // mid point of Data to search
+  FoundSize: Cardinal;            // size of matching "sub-string"
+  FoundMax: Cardinal;             // maximum size of matching "sub-string"
+  PData: PSignedAnsiChar;         // ptr to char in Data to be compared
+  PCompareData: PSignedAnsiChar;  // ptr to char in CompareData to be compared
+begin
+  First := 0;
+  Last := DataSize - 1;
+  Result := 0;
+  FoundPos := 0;
+
+  // Do binary search of Data
+  while First <= Last do
+  begin
+    // Get mid point of (sorted) Data to search
+    Mid := (First + Last) div 2;
+    // Set pointer to start of Data search string
+    PData := @Data[Block[Mid]];
+    // Set pointer to start of CompareData
+    PCompareData := CompareData;
+    // Calculate maximum possible size of matching substring
+    FoundMax := DataSize - Block[Mid];
+    if FoundMax > CompareDataSize then
+      FoundMax := CompareDataSize;
+    // Find and count match chars from Data and CompareData
+    FoundSize := 0;
+    while (FoundSize < FoundMax) and (PData^ = PCompareData^) do
+    begin
+      Inc(FoundSize);
+      Inc(PData);
+      Inc(PCompareData);
+    end;
+
+    // We found a "match" of length FoundSize, position Block[Mid]
+    if FoundSize > Result then
+    begin
+      Result := FoundSize;
+      FoundPos := Block[Mid];
+    end;
+
+    // Determine next search area
+    // Note: If FoundSize = FoundMatch then substrings match
+    if (FoundSize = FoundMax) or (PData^ < PCompareData^) then
+      // substring <= current data string: search above
+      First := Mid + 1
+    else
+      // substring < current data string: search below
+      begin
+        Last := Mid;
+        if Last <> 0 then
+          Dec(Last)
+        else
+          Break;
+      end;
   end;
 end;
 
