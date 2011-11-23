@@ -81,10 +81,6 @@ uses
   // Project
   UBlkSort, UErrors, UPatchWriters;
 
-const
-  FORMAT_VERSION  = '02';       // binary diff file format version
-  BUFFER_SIZE     = 4096;       // size of buffer used to read files
-
 
 { TDiffer }
 
