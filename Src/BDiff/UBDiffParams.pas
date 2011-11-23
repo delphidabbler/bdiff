@@ -79,8 +79,11 @@ procedure TParams.Finalize;
 begin
   if fNewFileName = '' then
     Error('need two filenames');
-  if AnsiCompareFileName(fOldFileName, fNewFileName) = 0 then
+  if SameFileName(fOldFileName, fNewFileName) then
     Error('file names must not be the same');
+  if SameFileName(fOldFileName, fPatchFileName)
+    or SameFileName(fNewFileName, fPatchFileName) then
+    Error('output file name must differ from other file names');
 end;
 
 procedure TParams.ParseFileName(const FileName: string);
