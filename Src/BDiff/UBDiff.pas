@@ -1,7 +1,7 @@
 {
  * UBDiff.pas
  *
- * Main program logic for BDiff.
+ * Class that generates a diff for two files, logging progress as required.
  *
  * Based on bdiff.c and part of blksort.c by Stefan Reuther, copyright (c) 1999
  * Stefan Reuther <Streu@gmx.de>.
@@ -25,25 +25,8 @@ unit UBDiff;
 
 interface
 
-
-{ Program's main interface code: called from the project file }
-procedure Main;
-
-
-implementation
-
-{$IOCHECKS OFF}
-
 uses
-  // Delphi
-  SysUtils, Windows,
-  // Project
-  UAppInfo, UBDiffInfoWriter, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort,
-  UErrors, UFileData, ULogger, UPatchWriters;
-
-const
-  FORMAT_VERSION  = '02';       // binary diff file format version
-  BUFFER_SIZE     = 4096;       // size of buffer used to read files
+  UBDiffTypes, UFileData, ULogger;
 
 
 { Structure for a matching block }
@@ -55,6 +38,7 @@ type
   end;
   PMatch = ^TMatch;
 
+type
   TDiffer = class(TObject)
   private
     fMinMatchLength: Cardinal;
@@ -89,70 +73,21 @@ type
       read fFormat write fFormat default FMT_QUOTED;
   end;
 
-{ Main routine: parses arguments and creates diff using CreateDiff() }
-procedure Main;
-var
-  PatchFileHandle: Integer;
-  Params: TParams;
-  Differ: TDiffer;
-  Logger: TLogger;
-begin
-  ExitCode := 0;
+implementation
 
-  Params := TParams.Create;
-  try
-    try
-      Params.Parse;
+{$IOCHECKS OFF}
 
-      if Params.Help then
-      begin
-        TBDiffInfoWriter.HelpScreen;
-        Exit;
-      end;
+uses
+  // Delphi
+  SysUtils, Windows,
+  // Project
+  UAppInfo, UBDiffInfoWriter, UBDiffParams, UBDiffUtils, UBlkSort, UErrors,
+  UPatchWriters;
 
-      if Params.Version then
-      begin
-        TBDiffInfoWriter.VersionInfo;
-        Exit;
-      end;
+const
+  FORMAT_VERSION  = '02';       // binary diff file format version
+  BUFFER_SIZE     = 4096;       // size of buffer used to read files
 
-      if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
-      begin
-        // redirect standard output to patch file
-        PatchFileHandle := FileCreate(Params.PatchFileName);
-        if PatchFileHandle <= 0 then
-          OSError;
-        TIO.RedirectStdOut(PatchFileHandle);
-      end;
-
-      // create the diff
-      Logger := TLoggerFactory.Instance(Params.Verbose);
-      try
-        Differ := TDiffer.Create;
-        try
-          Differ.MinMatchLength := Params.MinEqual;
-          Differ.Format := Params.Format;
-          Differ.MakeDiff(Params.OldFileName, Params.NewFileName, Logger);
-        finally
-          Differ.Free;
-        end;
-      finally
-        Logger.Free;
-      end;
-
-    finally
-      Params.Free;
-    end;
-  except
-    on E: Exception do
-    begin
-      ExitCode := 1;
-      TIO.WriteStrFmt(
-        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
-      );
-    end;
-  end;
-end;
 
 { TDiffer }
 

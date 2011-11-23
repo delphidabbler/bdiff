@@ -37,12 +37,13 @@ uses
   UBaseParams in '..\Common\UBaseParams.pas',
   ULogger in 'ULogger.pas',
   UInfoWriter in '..\Common\UInfoWriter.pas',
-  UBDiffInfoWriter in 'UBDiffInfoWriter.pas';
+  UBDiffInfoWriter in 'UBDiffInfoWriter.pas',
+  UMain in 'UMain.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
 
 begin
-  UBDiff.Main;
+  TMain.Run;
 end.
 
