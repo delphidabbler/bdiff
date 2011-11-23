@@ -1,7 +1,7 @@
 {
  * UBlkSort.dpr
  *
- * Implements block sort / search mechanism.
+ * Implements block sort.
  *
  * Based on parts of blksort.c by Stefan Reuther, copyright (c) 1999 Stefan
  * Reuther <Streu@gmx.de>.
