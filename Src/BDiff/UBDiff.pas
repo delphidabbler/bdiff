@@ -55,109 +55,22 @@ type
   end;
   PMatch = ^TMatch;
 
-{ Global variables }
-var
-  gMinMatchLength: Cardinal = 24; // default minimum match length
-  gFormat: TFormat = FMT_QUOTED;  // default output format
-
-{ Find maximum-length match }
-function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-  SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
-var
-  FoundPos: Cardinal;
-  FoundLen: Cardinal;
-begin
-  Result.BlockLength := 0;  {no match}
-  Result.NewOffset := 0;
-  while (SearchTextLength <> 0) do
-  begin
-    FoundLen := FindString(
-      OldFile.Data,
-      SortedOldData,
-      OldFile.Size,
-      SearchText,
-      SearchTextLength,
-      FoundPos
-    );
-    if FoundLen >= gMinMatchLength then
-    begin
-      Result.OldOffset := FoundPos;
-      Result.BlockLength := FoundLen;
-      Exit;
-    end;
-    Inc(SearchText);
-    Inc(Result.NewOffset);
-    Dec(SearchTextLength);
+  TDiffer = class(TObject)
+  private
+    fMinMatchLength: Cardinal;
+    fFormat: TFormat;
+    function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
+      SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
+  public
+    constructor Create;
+    destructor Destroy; override;
+    procedure MakeDiff(const OldFileName, NewFileName: string;
+      const Logger: TLogger);
+    property MinMatchLength: Cardinal
+      read fMinMatchLength write fMinMatchLength default 24;
+    property Format: TFormat
+      read fFormat write fFormat default FMT_QUOTED;
   end;
-end;
-
-
-{ Main routine: generate diff }
-procedure CreateDiff(OldFileName, NewFileName: string; Logger: TLogger);
-var
-  OldFile: TFileData;
-  NewFile: TFileData;
-  NewOffset: Cardinal;
-  ToDo: Cardinal;
-  SortedOldData: PBlock;
-  Match: TMatch;
-  PatchWriter: TPatchWriter;
-begin
-  { initialize }
-  OldFile := nil;
-  NewFile := nil;
-  SortedOldData := nil;
-  PatchWriter := TPatchWriterFactory.Instance(gFormat);
-  try
-    Logger.Log('loading old file');
-    OldFile := TFileData.Create(OldFileName);
-    Logger.Log('loading new file');
-    NewFile := TFileData.Create(NewFileName);
-    Logger.Log('block sorting old file');
-    SortedOldData := BlockSort(OldFile.Data, OldFile.Size);
-    if not Assigned(SortedOldData) then
-      Error('virtual memory exhausted');
-    Logger.Log('generating patch');
-    PatchWriter.Header(OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size);
-    { main loop }
-    ToDo := NewFile.Size;
-    NewOffset := 0;
-    while (ToDo <> 0) do
-    begin
-      { invariant: nofs + todo = len2 }
-      Match := FindMaxMatch(
-        OldFile, SortedOldData, @NewFile.Data[NewOffset], ToDo
-      );
-      if Match.BlockLength <> 0 then
-      begin
-        { found a match }
-        if Match.NewOffset <> 0 then
-          { preceded by a "copy" block }
-          PatchWriter.Add(@NewFile.Data[NewOffset], Match.NewOffset);
-        Inc(NewOffset, Match.NewOffset);
-        Dec(ToDo, Match.NewOffset);
-        PatchWriter.Copy(
-          NewFile.Data, NewOffset, Match.OldOffset, Match.BlockLength
-        );
-        Inc(NewOffset, Match.BlockLength);
-        Dec(ToDo, Match.BlockLength);
-      end
-      else
-      begin
-        PatchWriter.Add(@NewFile.Data[NewOffset], ToDo);
-        Break;
-      end;
-    end;
-    Logger.Log('done');
-  finally
-    // finally section new to v1.1
-    if Assigned(SortedOldData) then
-      FreeMem(SortedOldData);
-    OldFile.Free;
-    NewFile.Free;
-    PatchWriter.Free;
-  end;
-end;
 
 { Display help screen  }
 procedure DisplayHelp;
@@ -205,6 +118,7 @@ procedure Main;
 var
   PatchFileHandle: Integer;
   Params: TParams;
+  Differ: TDiffer;
   Logger: TLogger;
 begin
   ExitCode := 0;
@@ -226,9 +140,6 @@ begin
         Exit;
       end;
 
-      gMinMatchLength := Params.MinEqual;
-      gFormat := Params.Format;
-
       if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
       begin
         // redirect standard output to patch file
@@ -241,7 +152,14 @@ begin
       // create the diff
       Logger := TLoggerFactory.Instance(Params.Verbose);
       try
-        CreateDiff(Params.OldFileName, Params.NewFileName, Logger);
+        Differ := TDiffer.Create;
+        try
+          Differ.MinMatchLength := Params.MinEqual;
+          Differ.Format := Params.Format;
+          Differ.MakeDiff(Params.OldFileName, Params.NewFileName, Logger);
+        finally
+          Differ.Free;
+        end;
       finally
         Logger.Free;
       end;
@@ -257,6 +175,116 @@ begin
         TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
       );
     end;
+  end;
+end;
+
+{ TDiffer }
+
+constructor TDiffer.Create;
+begin
+  inherited Create;
+  fMinMatchLength := 24;   // default minimum match length
+  fFormat := FMT_QUOTED;   // default output format
+end;
+
+destructor TDiffer.Destroy;
+begin
+  inherited;
+end;
+
+function TDiffer.FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
+  SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
+var
+  FoundPos: Cardinal;
+  FoundLen: Cardinal;
+begin
+  Result.BlockLength := 0;  {no match}
+  Result.NewOffset := 0;
+  while (SearchTextLength <> 0) do
+  begin
+    FoundLen := FindString(
+      OldFile.Data,
+      SortedOldData,
+      OldFile.Size,
+      SearchText,
+      SearchTextLength,
+      FoundPos
+    );
+    if FoundLen >= fMinMatchLength then
+    begin
+      Result.OldOffset := FoundPos;
+      Result.BlockLength := FoundLen;
+      Exit;
+    end;
+    Inc(SearchText);
+    Inc(Result.NewOffset);
+    Dec(SearchTextLength);
+  end;
+end;
+
+procedure TDiffer.MakeDiff(const OldFileName, NewFileName: string;
+  const Logger: TLogger);
+var
+  OldFile: TFileData;
+  NewFile: TFileData;
+  NewOffset: Cardinal;
+  ToDo: Cardinal;
+  SortedOldData: PBlock;
+  Match: TMatch;
+  PatchWriter: TPatchWriter;
+begin
+  { initialize }
+  OldFile := nil;
+  NewFile := nil;
+  SortedOldData := nil;
+  PatchWriter := TPatchWriterFactory.Instance(fFormat);
+  try
+    Logger.Log('loading old file');
+    OldFile := TFileData.Create(OldFileName);
+    Logger.Log('loading new file');
+    NewFile := TFileData.Create(NewFileName);
+    Logger.Log('block sorting old file');
+    SortedOldData := BlockSort(OldFile.Data, OldFile.Size);
+    if not Assigned(SortedOldData) then
+      Error('virtual memory exhausted');
+    Logger.Log('generating patch');
+    PatchWriter.Header(OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size);
+    { main loop }
+    ToDo := NewFile.Size;
+    NewOffset := 0;
+    while (ToDo <> 0) do
+    begin
+      Match := FindMaxMatch(
+        OldFile, SortedOldData, @NewFile.Data[NewOffset], ToDo
+      );
+      if Match.BlockLength <> 0 then
+      begin
+        { found a match }
+        if Match.NewOffset <> 0 then
+          { preceded by a "copy" block }
+          PatchWriter.Add(@NewFile.Data[NewOffset], Match.NewOffset);
+        Inc(NewOffset, Match.NewOffset);
+        Dec(ToDo, Match.NewOffset);
+        PatchWriter.Copy(
+          NewFile.Data, NewOffset, Match.OldOffset, Match.BlockLength
+        );
+        Inc(NewOffset, Match.BlockLength);
+        Dec(ToDo, Match.BlockLength);
+      end
+      else
+      begin
+        PatchWriter.Add(@NewFile.Data[NewOffset], ToDo);
+        Break;
+      end;
+    end;
+    Logger.Log('done');
+  finally
+    // finally section new to v1.1
+    if Assigned(SortedOldData) then
+      FreeMem(SortedOldData);
+    OldFile.Free;
+    NewFile.Free;
+    PatchWriter.Free;
   end;
 end;
 
