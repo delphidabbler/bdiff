@@ -1,5 +1,5 @@
 {
- * UMain.pas
+ * UBDiffMain.pas
  *
  * Static class containing main program logic for BDiff program.
  *
@@ -17,7 +17,7 @@
 }
 
 
-unit UMain;
+unit UBDiffMain;
 
 interface
 

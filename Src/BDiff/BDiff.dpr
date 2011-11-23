@@ -37,7 +37,7 @@ uses
   ULogger in 'ULogger.pas',
   UInfoWriter in '..\Common\UInfoWriter.pas',
   UBDiffInfoWriter in 'UBDiffInfoWriter.pas',
-  UMain in 'UMain.pas';
+  UBDiffMain in 'UBDiffMain.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources
