@@ -35,7 +35,7 @@ finds.
 
 Alternatives:
 
-  + Earlier version of Delphi may work, but haven't been tested.
+  + Earlier versions of Delphi may work, but haven't been tested.
 
   + The Win32 personalities of Delphi 2005, 2006 and 2007 should work OK.
 
@@ -43,8 +43,8 @@ Alternatives:
     command line compiler, so you may need to compile only from the IDE.
 
   + Be very careful with Delphi 2009 and any later Unicode enabled versions: In
-    places the code requires single byte characters. I hope that the relevant
-    code uses explicit single-byte type, but this hasn't been tested.
+    places the code requires single byte characters. The source is not Unicode
+    compatible as it stands.
 
   + As noted above you can compile Pascal code from the Delphi IDE instead of
     running DCC32.
@@ -113,37 +113,24 @@ You have two options for getting the source code:
      where MY-PATH is the local directory where you want to store the code.
 
      To check out a release first check what releases are available with:
-     svn list http://my-svn.assembla.com/svn/bdiff/tags
+
+       > svn list http://my-svn.assembla.com/svn/bdiff/tags
+
      Now checkout the selected version (where 9.9.9 is the version number) with:
 
        > svn checkout
          http://subversion.assembla.com/svn/bdiff/tags/version-9.9.9 MY-PATH
-         [all on one line].
 
      Please ignore version-0.2.5 - these instructions won't work for that
      release.
 
-  2) You can view code repository on assembla.com using their code browser to
-     navigate to the branch you are interested in. Once you've found it you can
-     download that code tree by clicking the Download button on the code browser
-     page.
+  2) You can download the source code for the latest version of the programs
+     from http://www.delphidabbler.com/download?id=bdiff&type=src
 
-     You will find the repository root at
-     http://code.assembla.com/bdiff/subversion/nodes
-     From there you can navigate to the trunk or find a suitable release under
-     the tags branch. Once you have found the one you want download a zip file
-     containing that source tree by clicking the Download button.
+     This will download a zip file which you should un-zip, preserving the
+     directory structure.
 
-     Then copy the content of zip file to a suitable folder on your local
-     computer.
-
-     Shortcuts:
-       The current development branch (which may not be stable) is at:
-       http://code.assembla.com/bdiff/subversion/nodes/trunk
-       The releases are listed at
-       http://code.assembla.com/bdiff/subversion/nodes/tags
-       Just click on the one you want. But please ignore version-0.2.5 - these
-       instructions won't work.
+     If you want earlier versions you must use Subversion.
 
 Whichever method you used, you should end up with a folder structure like this:
 
