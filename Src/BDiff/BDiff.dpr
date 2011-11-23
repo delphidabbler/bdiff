@@ -1,5 +1,5 @@
 {*
- * BDiff.dpr
+ * BDiff.dpr   
  *
  * Main project file for BDiff.exe.
  *
@@ -35,7 +35,9 @@ uses
   UPatchWriters in 'UPatchWriters.pas',
   UUtils in '..\Common\UUtils.pas',
   UBaseParams in '..\Common\UBaseParams.pas',
-  ULogger in 'ULogger.pas';
+  ULogger in 'ULogger.pas',
+  UInfoWriter in '..\Common\UInfoWriter.pas',
+  UBDiffInfoWriter in 'UBDiffInfoWriter.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources

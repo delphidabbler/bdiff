@@ -38,7 +38,8 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchParams, UBPatchUtils, UBPatchTypes, UErrors;
+  UAppInfo, UBPatchInfoWriter, UBPatchParams, UBPatchUtils, UBPatchTypes,
+  UErrors;
 
 
 const
@@ -250,39 +251,6 @@ begin
   end;
 end;
 
-procedure DisplayHelp;
-begin
-  TIO.WriteStrFmt(
-    TIO.StdOut,
-    '%0:s: binary ''patch'' - apply binary patch'#13#10
-    + #13#10
-    + 'Usage: %0:s [options] old-file [new-file] [<patch-file]'#13#10#13#10
-    + 'Creates new-file from old-file and patch-file'#13#10
-    + 'If new-file is not provided old-file is updated in place'#13#10
-    + #13#10
-    + 'Valid options:'#13#10
-    + ' -i FN --input=FN     Set input file name (instead of stdin)'
-    + #13#10
-    + ' -h    --help         Show this help screen'#13#10
-    + ' -v    --version      Show version information'#13#10
-    + #13#10
-    + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-    + '(c) copyright 2003-2009 Peter Johnson (www.delphidabbler.com)'#13#10,
-    [ProgramFileName]);
-end;
-
-procedure DisplayVersion;
-begin
-  // NOTE: original code displayed compile date using C's __DATE__ macro. Since
-  // there is no Pascal equivalent of __DATE__ we display update date of program
-  // file instead
-  TIO.WriteStrFmt(
-    TIO.StdOut,
-    '%s-%s %s '#13#10,
-    [ProgramBaseName, ProgramVersion, ProgramExeDate]
-  );
-end;
-
 { Control }
 procedure Main;
 var
@@ -298,13 +266,13 @@ begin
 
       if Params.Help then
       begin
-        DisplayHelp;
+        TBPatchInfoWriter.HelpScreen;
         Exit;
       end;
 
       if Params.Version then
       begin
-        DisplayVersion;
+        TBPatchInfoWriter.VersionInfo;
         Exit;
       end;
 

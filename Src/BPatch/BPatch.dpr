@@ -32,7 +32,9 @@ uses
   UErrors in '..\Common\UErrors.pas',
   UBPatchParams in 'UBPatchParams.pas',
   UUtils in '..\Common\UUtils.pas',
-  UBaseParams in '..\Common\UBaseParams.pas';
+  UBaseParams in '..\Common\UBaseParams.pas',
+  UBPatchInfoWriter in 'UBPatchInfoWriter.pas',
+  UInfoWriter in '..\Common\UInfoWriter.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources

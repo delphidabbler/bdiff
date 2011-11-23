@@ -38,8 +38,8 @@ uses
   // Delphi
   SysUtils, Windows,
   // Project
-  UAppInfo, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort, UErrors,
-  UFileData, ULogger, UPatchWriters;
+  UAppInfo, UBDiffInfoWriter, UBDiffParams, UBDiffTypes, UBDiffUtils, UBlkSort,
+  UErrors, UFileData, ULogger, UPatchWriters;
 
 const
   FORMAT_VERSION  = '02';       // binary diff file format version
@@ -89,47 +89,6 @@ type
       read fFormat write fFormat default FMT_QUOTED;
   end;
 
-{ Display help screen  }
-procedure DisplayHelp;
-begin
-  TIO.WriteStrFmt(
-    TIO.StdOut,
-    '%0:s: binary ''diff'' - compare two binary files'#13#10#13#10
-      + 'Usage: %0:s [options] old-file new-file [>patch-file]'#13#10#13#10
-      + 'Difference between old-file and new-file written to standard output'
-      + #13#10#13#10
-      + 'Valid options:'#13#10
-      + ' -q                   Use QUOTED format'#13#10
-      + ' -f                   Use FILTERED format'#13#10
-      + ' -b                   Use BINARY format'#13#10
-      + '       --format=FMT   Use format FMT (''quoted'', ''filter[ed]'' '
-      + 'or ''binary'')'#13#10
-      + ' -m N  --min-equal=N  Minimum equal bytes to recognize an equal chunk'
-      + #13#10
-      + ' -o FN --output=FN    Set output file name (instead of stdout)'#13#10
-      + ' -V    --verbose      Show status messages'#13#10
-      + ' -h    --help         Show this help screen'#13#10
-      + ' -v    --version      Show version information'#13#10
-      + #13#10
-      + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-      + '(c) copyright 2003-2009 Peter Johnson (www.delphidabbler.com)'#13#10,
-    [ProgramFileName]
-  );
-end;
-
-{ Display version }
-procedure DisplayVersion;
-begin
-  // NOTE: original code displayed compile date using C's __DATE__ macro. Since
-  // there is no Pascal equivalent of __DATE__ we display update date of program
-  // file instead
-  TIO.WriteStrFmt(
-    TIO.StdOut,
-    '%s-%s %s '#13#10,
-    [ProgramBaseName, ProgramVersion, ProgramExeDate]
-  );
-end;
-
 { Main routine: parses arguments and creates diff using CreateDiff() }
 procedure Main;
 var
@@ -147,13 +106,13 @@ begin
 
       if Params.Help then
       begin
-        DisplayHelp;
+        TBDiffInfoWriter.HelpScreen;
         Exit;
       end;
 
       if Params.Version then
       begin
-        DisplayVersion;
+        TBDiffInfoWriter.VersionInfo;
         Exit;
       end;
 
