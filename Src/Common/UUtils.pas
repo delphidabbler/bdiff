@@ -67,6 +67,8 @@ class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
 var
   Dummy: DWORD;
 begin
+  if Size <= 0 then
+    Exit;
   Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
