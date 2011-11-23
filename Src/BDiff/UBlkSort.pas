@@ -217,7 +217,7 @@ begin
     end;
 
     // Determine next search area
-    // Note: FoundSize = FoundMatch => substrings match
+    // Note: If FoundSize = FoundMatch then substrings match
     if (FoundSize = FoundMax) or (PData^ < PCompareData^) then
       // substring <= current data string: search above
       First := Mid + 1
