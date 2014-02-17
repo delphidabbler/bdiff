@@ -18,6 +18,8 @@ The original C source was translated into Object Pascal by Peter D Johnson ([@de
 
 The programs should run on any current version of Windows.
 
+For more information see the see the [project web pages](http://delphidabbler.com/software/bdiff).
+
 Installation
 ------------
 
@@ -55,3 +57,4 @@ Change Log
 ----------
 
 The change log is provided in the file `ChangeLog.txt`.
+
