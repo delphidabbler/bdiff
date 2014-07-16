@@ -82,7 +82,7 @@ want to:
 Assume that Test.bat is stored in D:\BDiff\Test.
 
 Open a command console then enter the following commands. In the following items
-preceeded by ">" are the commands you type and any following text represents the
+preceded by ">" are the commands you type and any following text represents the
 output (your output may vary).
 
   >cd D:\BDiff\Test
