@@ -5,9 +5,9 @@ _BDiff_ and _BPatch_ have been developed from a Pascal translation of original C
 
 The original C source code is copyright (c) 1999 by Stefan Reuther <Streu@gmx.de>.
 
-The Pascal translation and subsequent updates are copyright (c) 2003-2009 by Peter D Johnson (@delphidabbler).
+The Pascal translation and subsequent updates are copyright (c) 2003-2014 by Peter D Johnson (@delphidabbler).
 
-**This license applies to the Pascal source code and binary distributions created from that code base.**
+**This license applies to v0.2.3 and later. Licenses that applied to earlier versions can be found in `OldLicenses.txt`.**
 
 THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF THIS SOFTWARE.
 
