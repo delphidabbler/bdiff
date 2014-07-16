@@ -4,9 +4,6 @@
 @rem See file ReadMe.txt for a description of available tests and requirements.
 @rem
 @rem Copyright (C) Peter Johnson (www.delphidabbler.com), 2007-2009
-@rem
-@rem $Rev$
-@rem $Date$
 @rem ---------------------------------------------------------------------------
 
 

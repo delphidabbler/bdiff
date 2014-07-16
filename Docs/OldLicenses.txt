@@ -39,6 +39,3 @@ included here for obvious reasons - please see the file bdiff.1 that is included
 in the download for details.
 
 ================================================================================
-$Rev$
-$Date$
-================================================================================

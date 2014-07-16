@@ -5,9 +5,6 @@
 #
 # Copyright (c) 2009 Peter D Johnson (www.delphidabbler.com)
 #
-# $Rev$
-# $Date$
-#
 # Usage:
 #   Run one of the following commands on the same directory as this file:
 #     Make

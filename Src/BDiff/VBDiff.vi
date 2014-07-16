@@ -5,9 +5,6 @@
 ;
 ; Copyright (c) 2003-2009 Peter D Johnson (www.delphidabbler.com).
 ;
-; $Rev$
-; $Date$
-;
 ; Usage:
 ;   1) Generate a .rc resource source file from this file using DelphiDabbler
 ;      Version Information Editor (http://www.delphidabbler.com/vied).

@@ -49,6 +49,3 @@ From this release BDiff and BPatch broke the link with the original C source and
 began to develop separately, so further translation notes are not provided.
 
 --------------------------------------------------------------------------------
-$Rev$
-$Date$
---------------------------------------------------------------------------------
