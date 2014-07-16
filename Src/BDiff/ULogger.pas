@@ -1,17 +1,6 @@
 {
- * ULogger.pas
- *
  * Classes used to log messages plus a factory class. One logger class logs to
  * standard error while the second does nothing.
- *
- * Copyright (c) 2011 Peter D Johnson (www.delphidabbler.com).
- *
- * THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY.
- * IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE
- * USE OF THIS SOFTWARE.
- *
- * For conditions of distribution and use see the LICENSE file of visit
- * http://www.delphidabbler.com/software/bdiff/license
 }
 
 

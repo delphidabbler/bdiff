@@ -2,14 +2,12 @@
 @rem Script used to run tests on BDiff and BPatch.
 @rem
 @rem See file ReadMe.txt for a description of available tests and requirements.
-@rem
-@rem Copyright (C) Peter Johnson (www.delphidabbler.com), 2007-2009
 @rem ---------------------------------------------------------------------------
 
 
 @echo off
 
-setlocal 
+setlocal
 
 rem Get directory containing BDiff and BPatch
 set ExeDir=..\Exe

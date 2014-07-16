@@ -1,17 +1,6 @@
 # ------------------------------------------------------------------------------
-# Common.mak
-#
 # Common code for inclusion in all make files. Defines common macros and rules.
 # Files that require Common.mak must include it using the !include directive.
-#
-# Copyright (c) 2009 Peter D Johnson (www.delphidabbler.com)
-#
-# THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
-# NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
-# OF THIS SOFTWARE.
-#
-# For conditions of distribution and use see the LICENSE file of visit
-# http://www.delphidabbler.com/software/bdiff/license
 # ------------------------------------------------------------------------------
 
 

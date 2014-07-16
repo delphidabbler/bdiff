@@ -1,9 +1,5 @@
 # ------------------------------------------------------------------------------
-# Makefile
-#
 # Makefile for the whole project.
-#
-# Copyright (c) 2009 Peter D Johnson (www.delphidabbler.com)
 #
 # Usage:
 #   Run one of the following commands on the same directory as this file:
@@ -26,13 +22,6 @@
 #       Cleans up temporary files.
 #     Make release
 #       Creates binary release file.
-#
-# THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
-# NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE
-# OF THIS SOFTWARE.
-#
-# For conditions of distribution and use see the LICENSE file of visit
-# http://www.delphidabbler.com/software/bdiff/license
 # ------------------------------------------------------------------------------
 
 
