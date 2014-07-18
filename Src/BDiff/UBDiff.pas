@@ -65,7 +65,7 @@ implementation
 
 uses
   // Project
-  UBlkSort, UErrors, UPatchWriters;
+  UBlockSort, UErrors, UPatchWriters;
 
 
 { TDiffer }
