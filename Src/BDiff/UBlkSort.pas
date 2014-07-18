@@ -16,13 +16,24 @@ uses
   UBDiffTypes;
 
 
-{ Returns array of offsets into data, sorted by position.
-  @param Data [in] Data to be sorted. Must not be nil.
-  @param DataSize [in] Size of data to be sorted, must be > 0.
-  @return Pointer to block of sorted indices into Data. Caller must free.
-  @except raises EOutOfMemory if can't allocate sorted data block.
-}
-function BlockSort(Data: PSignedAnsiCharArray; DataSize: Cardinal): PBlock;
+type
+  TBlockSort = class(TObject)
+  private
+    class function Compare(A: Cardinal; B: Cardinal; Data: PSignedAnsiCharArray;
+      DataSize: Cardinal): Integer;
+    { The 'sink element' part of heapsort }
+    class procedure Sink(Left: Cardinal; Right: Cardinal; Block: PBlock; 
+      Data: PSignedAnsiCharArray; DataSize: Cardinal);
+  public
+    { Returns array of offsets into data, sorted by position.
+      @param Data [in] Data to be sorted. Must not be nil.
+      @param DataSize [in] Size of data to be sorted, must be > 0.
+      @return Pointer to block of sorted indices into Data. Caller must free.
+      @except raises EOutOfMemory if can't allocate sorted data block.
+    }
+    class function Execute(Data: PSignedAnsiCharArray; DataSize: Cardinal):
+      PBlock;
+  end;
 
 
 implementation
@@ -52,8 +63,10 @@ implementation
 }
 
 
-function BlockSortCompare(A: Cardinal; B: Cardinal; Data: PSignedAnsiCharArray;
-  DataSize: Cardinal): Integer;
+{ TBlockSort }
+
+class function TBlockSort.Compare(A, B: Cardinal;
+  Data: PSignedAnsiCharArray; DataSize: Cardinal): Integer;
 var
   PA: PSignedAnsiChar;
   PB: PSignedAnsiChar;
@@ -78,31 +91,8 @@ begin
   Result := PA^ - PB^;
 end;
 
-{ The 'sink element' part of heapsort }
-procedure BlockSortSink(Left: Cardinal; Right: Cardinal; Block: PBlock;
-  Data: PSignedAnsiCharArray; DataSize: Cardinal);
-var
-  I, J, X: Cardinal;
-begin
-  I := Left;
-  X := Block[I];
-  while True do
-  begin
-    J := 2 * I + 1;
-    if J >= Right then
-      Break;
-    if J < Right - 1 then
-      if BlockSortCompare(Block[J], Block[J+1], Data, DataSize) < 0 then
-        Inc(J);
-    if BlockSortCompare(X, Block[J], Data, DataSize) > 0 then
-      Break;
-    Block[I] := Block[J];
-    I := J;
-  end;
-  Block[I] := X;
-end;
-
-function BlockSort(Data: PSignedAnsiCharArray; DataSize: Cardinal): PBlock;
+class function TBlockSort.Execute(Data: PSignedAnsiCharArray;
+  DataSize: Cardinal): PBlock;
 var
   I, Temp, Left, Right: Cardinal;
 begin
@@ -124,7 +114,7 @@ begin
   while Left > 0 do
   begin
     Dec(Left);
-    BlockSortSink(Left, Right, Result, Data, DataSize);
+    Sink(Left, Right, Result, Data, DataSize);
   end;
   while Right > 0 do
   begin
@@ -132,8 +122,31 @@ begin
     Result[Left] := Result[Right-1];
     Result[Right-1] := Temp;
     Dec(Right);
-    BlockSortSink(Left, Right, Result, Data, DataSize);
+    Sink(Left, Right, Result, Data, DataSize);
   end;
+end;
+
+class procedure TBlockSort.Sink(Left, Right: Cardinal; Block: PBlock;
+  Data: PSignedAnsiCharArray; DataSize: Cardinal);
+var
+  I, J, X: Cardinal;
+begin
+  I := Left;
+  X := Block[I];
+  while True do
+  begin
+    J := 2 * I + 1;
+    if J >= Right then
+      Break;
+    if J < Right - 1 then
+      if Compare(Block[J], Block[J+1], Data, DataSize) < 0 then
+        Inc(J);
+    if Compare(X, Block[J], Data, DataSize) > 0 then
+      Break;
+    Block[I] := Block[J];
+    I := J;
+  end;
+  Block[I] := X;
 end;
 
 end.
