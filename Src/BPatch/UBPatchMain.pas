@@ -47,7 +47,6 @@ end;
 
 class procedure TMain.Run;
 var
-  PatchFileHandle: Integer;
   Params: TParams;
 begin
   ExitCode := 0;
