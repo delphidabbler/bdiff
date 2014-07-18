@@ -9,47 +9,56 @@ unit UAppInfo;
 
 interface
 
-{ Name of program's executable file, without path }
-function ProgramFileName: string;
-
-{ Name of program, without file extension }
-function ProgramBaseName: string;
-
-{ Program's product version number }
-function ProgramVersion: string;
-
-{ Last modification date of program's executable file }
-function ProgramExeDate: string;
+type
+  TAppInfo = class(TObject)
+  private
+    { Fully specified file name of program, with absolute path }
+    class function ProgramPath: string;
+  public
+    { Name of program's executable file, without path }
+    class function ProgramFileName: string;
+    { Name of program, without file extension }
+    class function ProgramBaseName: string;
+    { Program's product version number }
+    class function ProgramVersion: string;
+    { Last modification date of program's executable file }
+    class function ProgramExeDate: string;
+  end;
 
 
 implementation
-
 
 uses
   // Delphi
   SysUtils, Windows;
 
 
-{ Fully specified file name of program, with absolute path }
-function ProgramPath: string;
-begin
-  Result := ParamStr(0);
-end;
+{ TAppInfo }
 
-{ Name of program's executable file, without path }
-function ProgramFileName: string;
-begin
-  Result := ExtractFileName(ProgramPath);
-end;
-
-{ Name of program, without file extension }
-function ProgramBaseName: string;
+class function TAppInfo.ProgramBaseName: string;
 begin
   Result := ChangeFileExt(ProgramFileName, '');
 end;
 
-{ Program's product version number }
-function ProgramVersion: string;
+class function TAppInfo.ProgramExeDate: string;
+var
+  DOSDate: Integer; // file modification date as integer
+begin
+  DOSDate := FileAge(ProgramPath);
+  Result := FormatDateTime('dd mmm yyyy', FileDateToDateTime(DOSDate));
+end;
+
+class function TAppInfo.ProgramFileName: string;
+begin
+  Result := ExtractFileName(ProgramPath);
+end;
+
+class function TAppInfo.ProgramPath: string;
+begin
+  Result := ParamStr(0);
+end;
+
+class function TAppInfo.ProgramVersion: string;
 var
   Dummy: DWORD;           // unused variable required in API calls
   VerInfoSize: Integer;   // size of version information data
@@ -89,15 +98,6 @@ begin
       FreeMem(VerInfoBuf);
     end;
   end;
-end;
-
-{ Last modification date of program's executable file }
-function ProgramExeDate: string;
-var
-  DOSDate: Integer; // file modification date as integer
-begin
-  DOSDate := FileAge(ProgramPath);
-  Result := FormatDateTime('dd mmm yyyy', FileDateToDateTime(DOSDate));
 end;
 
 end.

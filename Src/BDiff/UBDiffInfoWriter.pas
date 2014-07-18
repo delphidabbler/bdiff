@@ -47,7 +47,7 @@ begin
       + #13#10
       + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
       + '(c) copyright 2003-2011 Peter Johnson (www.delphidabbler.com)'#13#10,
-    [ProgramFileName]
+    [TAppInfo.ProgramFileName]
   );
 end;
 

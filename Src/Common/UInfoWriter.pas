@@ -38,7 +38,7 @@ begin
   TCommonIO.WriteStrFmt(
     TCommonIO.StdOut,
     '%s-%s %s '#13#10,
-    [ProgramBaseName, ProgramVersion, ProgramExeDate]
+    [TAppInfo.ProgramBaseName, TAppInfo.ProgramVersion, TAppInfo.ProgramExeDate]
   );
 end;
 

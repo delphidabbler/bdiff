@@ -41,7 +41,7 @@ type
 
 procedure TVerboseLogger.Log(const Msg: string);
 begin
-  TIO.WriteStrFmt(TIO.StdErr, '%s: %s'#13#10, [ProgramFileName, Msg]);
+  TIO.WriteStrFmt(TIO.StdErr, '%s: %s'#13#10, [TAppInfo.ProgramFileName, Msg]);
 end;
 
 { TSilentLogger }

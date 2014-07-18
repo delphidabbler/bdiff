@@ -10,7 +10,7 @@ program BDiff;
 
 uses
   UBDiff in 'UBDiff.pas',
-  UBlkSort in 'UBlkSort.pas',
+  UBlockSort in 'UBlockSort.pas',
   UBDiffUtils in 'UBDiffUtils.pas',
   UBDiffTypes in 'UBDiffTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',

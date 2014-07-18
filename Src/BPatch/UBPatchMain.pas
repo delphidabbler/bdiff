@@ -72,7 +72,7 @@ begin
     begin
       ExitCode := 1;
       TIO.WriteStrFmt(
-        TIO.StdErr, '%0:s: %1:s'#13#10, [ProgramFileName, E.Message]
+        TIO.StdErr, '%0:s: %1:s'#13#10, [TAppInfo.ProgramFileName, E.Message]
       );
     end;
   end;
