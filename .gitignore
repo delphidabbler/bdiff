@@ -1,5 +1,6 @@
 Bin/
 Exe/
+Release/
 *.~*
 *.cfg
 *.dof
