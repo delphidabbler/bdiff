@@ -9,8 +9,8 @@
 
 
 [Fixed File Info]
-File Version #=0, 2, 6, 7
-Product Version #=0, 2, 6, 0
+File Version #=0, 2, 7, 8
+Product Version #=0, 2, 7, 0
 File OS=4
 File Type=1
 File Sub-Type=0
@@ -22,7 +22,7 @@ Language=2057
 Character Set=1252
 
 [String File Info]
-Comments=This program may be freely used and distributed providing the terms of the license are adhered to (see License.txt).
+Comments=This program may be freely used and distributed providing the terms of the license are adhered to (see LICENSE.md).
 Company Name=
 File Description=Windows console application recreates a binary file from another file and a binary diff.
 File Version=v<#F1>.<#F2>.<#F3> Build <#F4>
