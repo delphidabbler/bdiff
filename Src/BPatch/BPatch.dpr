@@ -12,7 +12,6 @@ program BPatch;
 uses
   UPatcher in 'UPatcher.pas',
   UBPatchUtils in 'UBPatchUtils.pas',
-  UBPatchTypes in 'UBPatchTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
   UBPatchParams in 'UBPatchParams.pas',
