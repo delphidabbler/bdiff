@@ -13,8 +13,8 @@ Delphi IDE can be used to modify the source and to perform test builds. Final
 builds should be built using the provided makefile, but you can get away with
 using the IDE if you don't change any resources.
 
-These instructions only apply to building BDiff / BPatch v0.2.6a and later. For
-earlier versions please see any instructions that came with the source code.
+These instructions only apply to building the current release of BDiff / BPatch.
+Earlier releases back to v0.2.6a will have there own version of this file
 
 
 Requirements
@@ -59,9 +59,9 @@ Borland MAKE
 ------------
 
 This is the make tool that ships with Delphi. You can use any version that
-works. I've tested the versions that ship with Delphi 7 and Delphi 2006. The
-makefile calls Make recursively: it uses the same command line that you used so
-there are no requirements as to the location of Make.
+works. I've tested the versions that ship with Delphi 7, Delphi 2006 and Delphi
+XE. The makefile calls Make recursively: it uses the same command line that you
+used so there are no requirements as to the location of Make.
 
 DelphiDabbler Version Information Editor (VIEd)
 -----------------------------------------------
@@ -94,49 +94,20 @@ Preparations
 Get the source code
 -------------------
 
-You have two options for getting the source code:
+The source code of BDiff / BPatch is maintained in the delphidabbler/bdiff Git
+repository on GitHub (https://github.com/delphidabbler/bdiff).
 
-  1) If you have Subversion client you can use it to checkout a copy of the
-     source code. The BDiff / BPatch repository URL is at:
-     http://subversion.assembla.com/svn/bdiff
+Each release from v0.2.5 onwards is available from GitHub. You can download an
+archive containing the required release. Note that releases prior to v0.2.7 were
+originally maintained in a Subversion repository and therefore their
+documentation will refer to Subversion rather than Git.
 
-     You can checkout either the current development branch (may not be stable),
-     or you can select one of the release versions.
-     The development branch is in the trunk branch of the repository.
-     The release versions are in sub-directories of the tags branch of the
-     repository.
+Once the source is cloned or forked you should end up with a folder structure
+like this:
 
-     To checkout the main development branch do
-
-       > svn checkout http://subversion.assembla.com/svn/bdiff/trunk MY-PATH
-
-     where MY-PATH is the local directory where you want to store the code.
-
-     To check out a release first check what releases are available with:
-
-       > svn list http://my-svn.assembla.com/svn/bdiff/tags
-
-     Now checkout the selected version (where 9.9.9 is the version number) with:
-
-       > svn checkout
-         http://subversion.assembla.com/svn/bdiff/tags/version-9.9.9 MY-PATH
-
-     Please ignore version-0.2.5 - these instructions won't work for that
-     release.
-
-  2) You can download the source code for the latest version of the programs
-     from http://www.delphidabbler.com/download?id=bdiff&type=src
-
-     This will download a zip file which you should un-zip, preserving the
-     directory structure.
-
-     If you want earlier versions you must use Subversion.
-
-Whichever method you used, you should end up with a folder structure like this:
-
-  +--+
+  +--+                { root: .gitignore, this file, read-me and license }
      |
-     +-- Docs         { documentation file }
+     +-- Docs         { documentation files }
      |
      +-- OrigC        { original C source - not used }
      |
@@ -151,7 +122,7 @@ Whichever method you used, you should end up with a folder structure like this:
      +-- Test         { test scripts }
 
 If, by chance you also have a Bin, Exe and Release directory don't worry.
-Subversion users will also see the usual .svn hidden directories.
+Git users will also see the usual .git hidden directory.
 
 Configure the source tree
 -------------------------
@@ -191,10 +162,10 @@ Once "Make config" has completed your folder structure should have changed to:
      +-- Test
 
 If the Bin, Exe and Release folders already existed they will have been emptied.
-Subversion has been configured to ignore these folders. In addition, Make will
-have created .cfg and .dof files from templates. .cfg files are needed for DCC32
-to run correctly and .dof files enable use of the Delphi IDE. These files will
-be ignored by Subversion.
+Git has been configured to ignore these folders. In addition, Make will have
+created .cfg and .dof files from templates. .cfg files are needed for DCC32 to
+run correctly and .dof files enable use of the Delphi IDE. These files will be
+ignored by Git.
 
 If you are intending to use the Delphi IDE to compile code, you should also do:
 
@@ -212,9 +183,8 @@ If you are using the Delphi IDE you should load the BDiff.bpg project group file
 in from the Src folder into the IDE - this contains both the BDiff and BPatch
 targets.
 
-Versions of Delphi after Delphi 7 will emit additional project files. Subversion
-users will have to decide which files to add to the repository and which to
-ignore.
+Versions of Delphi after Delphi 7 will emit additional project files. Git users
+will have to decide which files to add to the repository and which to ignore.
 
 Compile
 -------
@@ -264,7 +234,7 @@ At any time you can tidy up temporary files by doing:
   > Make clean
 
 If you are using a Delphi IDE that maintain a history you will need to modify
-the makefile to delete the various hidden __history directories. Subversion
-users will need to get subversion to ignore these directories.
+the makefile to delete the various hidden __history directories. Git users will
+need to get modify .gitignore to ignore these directories.
 
 --------------------------------------------------------------------------------
