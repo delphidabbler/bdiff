@@ -6,7 +6,7 @@
 }
 
 
-unit UBDiff;
+unit UDiffer;
 
 
 interface

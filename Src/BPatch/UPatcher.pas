@@ -1,12 +1,12 @@
 {
- * Code that applies patch to source file to re-create destination file.
+ * Class that applies patch to source file to re-create destination file.
  *
  * Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
  * <Streu@gmx.de>.
 }
 
 
-unit UBPatch;
+unit UPatcher;
 
 
 interface

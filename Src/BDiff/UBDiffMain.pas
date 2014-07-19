@@ -25,7 +25,7 @@ implementation
 
 uses
   SysUtils,
-  UAppInfo, UBDiff, UBDiffInfoWriter, UBDiffUtils, UErrors, ULogger;
+  UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffUtils, UErrors, ULogger;
 
 { TMain }
 

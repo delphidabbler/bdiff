@@ -10,7 +10,7 @@ program BPatch;
 
 
 uses
-  UBPatch in 'UBPatch.pas',
+  UPatcher in 'UPatcher.pas',
   UBPatchUtils in 'UBPatchUtils.pas',
   UBPatchTypes in 'UBPatchTypes.pas',
   UAppInfo in '..\Common\UAppInfo.pas',

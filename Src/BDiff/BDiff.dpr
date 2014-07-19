@@ -9,7 +9,7 @@ program BDiff;
 {$APPTYPE CONSOLE}
 
 uses
-  UBDiff in 'UBDiff.pas',
+  UDiffer in 'UDiffer.pas',
   UBlockSort in 'UBlockSort.pas',
   UBDiffUtils in 'UBDiffUtils.pas',
   UBDiffTypes in 'UBDiffTypes.pas',
