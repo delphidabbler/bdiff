@@ -1,3 +1,17 @@
+v0.2.7 - released 19 Jul 2014
+BDiff.exe v0.2.7 (build 8)
+BPatch.exe v0.2.7 (build 8)
++ Bug fixes in BDiff:
+  -  "New" and "old" file names for a diff cannot now be the same.
+  - Patch file name specified in --output or -o switches must now have a different name from other file names specified on command line.
++ Major refactoring:
+  - Big change from procedural to modularised, mainly OOP code split into several units.
+  - Pascalified code in terms of variable names, camel casing etc.
+  - Revised logic of some methods.
+  - Reduced usage of some pointers, including replacing use characters pointers with Pascal strings.
++ Revised and reformatted documentation: license and read-me files converted to markdown format.
++ Minor changes to the license.
+
 v0.2.6a - released 06 Aug 2009
 BDiff.exe v0.2.6 (build 7)
 BPatch.exe v0.2.6 (build 7)
