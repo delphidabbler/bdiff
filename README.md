@@ -34,9 +34,9 @@ Source Code
 
 ### Pascal Source
 
-The current source code is maintained in the [delphidabbler/bdiff] (https://github.com/delphidabbler/bdiff) Git repository on GitHub. It contains releases going back to v0.2.5. Earlier versions were not under version control.
+The current source code is maintained in the [delphidabbler/bdiff](https://github.com/delphidabbler/bdiff) Git repository on GitHub. It contains releases going back to v0.2.5. Earlier versions were not under version control and are no longer available.
 
-> **Note:** Until February 2014 the source code is maintained in a [Subversion repository](https://www.assembla.com/code/bdiff/subversion/nodes) on assembla.com. This repo remains in place for the time being, but is no longer being updated.
+> **Note:** Until February 2014 the source code was maintained in a [Subversion repository](https://www.assembla.com/code/bdiff/subversion/nodes) on assembla.com. This repo remains in place for the time being, but is no longer being updated.
 
 For information on how to build the Pascal source, see `Build.txt` in the root of the Git repo.
 
