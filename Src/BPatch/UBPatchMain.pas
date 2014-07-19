@@ -62,7 +62,7 @@ begin
       begin
         if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
           RedirectStdIn(Params.PatchFileName);
-        ApplyPatch(Params.OldFileName, Params.NewFileName);
+        TPatcher.Apply(Params.OldFileName, Params.NewFileName);
       end;
     finally
       Params.Free;

@@ -12,7 +12,31 @@ unit UBPatch;
 interface
 
 
-procedure ApplyPatch(const SourceFileName, DestFileName: string);
+type
+  TPatcher = class(TObject)
+  private
+    { Compute simple checksum }
+    class function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
+      const BFCheckSum: Longint): Longint;
+    { Get 32-bit quantity from char array }
+    class function GetLong(PCh: PAnsiChar): Longint;
+    { Copy data from one stream to another, computing checksums
+      @param SourceFileHandle [in] Handle to file containing data to be copied.
+      @param DestFileHandle [in] Handle to file to receive copied data.
+      @param Count [in] Number of bytes to copy.
+      @param SourceCheckSum [in] Checksum for data to be copied
+      @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
+        False when SourceFileHandle is source file.
+    }
+    class procedure CopyData(const SourceFileHandle, DestFileHandle: Integer;
+      Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
+    { Creates a temporary file in user's temp directory and returns its name }
+    class function GetTempFileName: string;
+  public
+    { Apply patch from standard input to SourceFileName and regenerate
+      DestFileName. }
+    class procedure Apply(const SourceFileName, DestFileName: string);
+  end;
 
 
 implementation
@@ -31,104 +55,9 @@ const
   BUFFER_SIZE = 4096;     // size of buffer used to read files
 
 
-{ Compute simple checksum }
-function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
-  const BFCheckSum: Longint): Longint;
-begin
-  Result := BFCheckSum;
-  while DataSize <> 0 do
-  begin
-    Dec(DataSize);
-    Result := ((Result shr 30) and 3) or (Result shl 2);
-    Result := Result xor PShortInt(Data)^;
-    Inc(Data);
-  end;
-end;
+{ TPatcher }
 
-{ Get 32-bit quantity from char array }
-function GetLong(PCh: PAnsiChar): Longint;
-var
-  PB: PByte;
-  LW: LongWord;
-begin
-  PB := PByte(PCh);
-  LW := PB^;
-  Inc(PB);
-  LW := LW + 256 * PB^;
-  Inc(PB);
-  LW := LW + 65536 * PB^;
-  Inc(PB);
-  LW := LW + 16777216 * PB^;
-  Result := LW;
-end;
-
-{ Copy data from one stream to another, computing checksums
-  @param SourceFileHandle [in] Handle to file containing data to be copied.
-  @param DestFileHandle [in] Handle to file to receive copied data.
-  @param Count [in] Number of bytes to copy.
-  @param SourceCheckSum [in] Checksum for data to be copied
-  @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
-    False when SourceFileHandle is source file.
-}
-procedure CopyData(const SourceFileHandle, DestFileHandle: Integer;
-  Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
-var
-  DestCheckSum: Longint;
-  Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
-  BytesToCopy: Cardinal;
-begin
-  DestCheckSum := 0;
-
-  while Count <> 0 do
-  begin
-    if Count > BUFFER_SIZE then
-      BytesToCopy := BUFFER_SIZE
-    else
-      BytesToCopy := Count;
-    if FileRead(SourceFileHandle, Buffer, BytesToCopy)
-      <> Integer(BytesToCopy) then
-    begin
-      if TIO.AtEOF(SourceFileHandle) then
-      begin
-        if SourceIsPatch then
-          Error('Patch garbled - unexpected end of data')
-        else
-          Error('Source file does not match patch');
-      end
-      else
-      begin
-        if SourceIsPatch then
-          Error('Error reading patch file')
-        else
-          Error('Error reading source file');
-      end;
-    end;
-    if DestFileHandle <> 0 then
-      if FileWrite(DestFileHandle, Buffer, BytesToCopy)
-        <> Integer(BytesToCopy) then
-        Error('Error writing temporary file');
-    DestCheckSum := CheckSum(Buffer, BytesToCopy, DestCheckSum);
-    Dec(Count, BytesToCopy);
-  end;
-  if not SourceIsPatch and (DestCheckSum <> SourceCheckSum) then
-    Error('Source file does not match patch');
-end;
-
-{ Creates a temporary file in user's temp directory and returns its name }
-function GetTempFileName: string;
-begin
-  // Get temporary folder
-  SetLength(Result, Windows.MAX_PATH);
-  Windows.GetTempPath(Windows.MAX_PATH, PChar(Result));
-  // Get unique temporary file name (it is created as side effect of this call)
-  if Windows.GetTempFileName(
-    PChar(Result), '', 0, PChar(Result)
-  ) = 0 then
-    Error('Can''t create temporary file');
-  Result := PChar(Result)
-end;
-
-procedure ApplyPatch(const SourceFileName, DestFileName: string);
+class procedure TPatcher.Apply(const SourceFileName, DestFileName: string);
 var
   SourceFileHandle: Integer;        // source file handle
   DestFileHandle: Integer;          // destination file handle
@@ -235,6 +164,92 @@ begin
   end;
 end;
 
-end.
+class function TPatcher.CheckSum(Data: PAnsiChar; DataSize: Cardinal;
+  const BFCheckSum: Integer): Longint;
+begin
+  Result := BFCheckSum;
+  while DataSize <> 0 do
+  begin
+    Dec(DataSize);
+    Result := ((Result shr 30) and 3) or (Result shl 2);
+    Result := Result xor PShortInt(Data)^;
+    Inc(Data);
+  end;
+end;
 
+class procedure TPatcher.CopyData(const SourceFileHandle,
+  DestFileHandle: Integer; Count, SourceCheckSum: Integer;
+  const SourceIsPatch: Boolean);
+var
+  DestCheckSum: Longint;
+  Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
+  BytesToCopy: Cardinal;
+begin
+  DestCheckSum := 0;
+
+  while Count <> 0 do
+  begin
+    if Count > BUFFER_SIZE then
+      BytesToCopy := BUFFER_SIZE
+    else
+      BytesToCopy := Count;
+    if FileRead(SourceFileHandle, Buffer, BytesToCopy)
+      <> Integer(BytesToCopy) then
+    begin
+      if TIO.AtEOF(SourceFileHandle) then
+      begin
+        if SourceIsPatch then
+          Error('Patch garbled - unexpected end of data')
+        else
+          Error('Source file does not match patch');
+      end
+      else
+      begin
+        if SourceIsPatch then
+          Error('Error reading patch file')
+        else
+          Error('Error reading source file');
+      end;
+    end;
+    if DestFileHandle <> 0 then
+      if FileWrite(DestFileHandle, Buffer, BytesToCopy)
+        <> Integer(BytesToCopy) then
+        Error('Error writing temporary file');
+    DestCheckSum := CheckSum(Buffer, BytesToCopy, DestCheckSum);
+    Dec(Count, BytesToCopy);
+  end;
+  if not SourceIsPatch and (DestCheckSum <> SourceCheckSum) then
+    Error('Source file does not match patch');
+end;
+
+class function TPatcher.GetLong(PCh: PAnsiChar): Longint;
+var
+  PB: PByte;
+  LW: LongWord;
+begin
+  PB := PByte(PCh);
+  LW := PB^;
+  Inc(PB);
+  LW := LW + 256 * PB^;
+  Inc(PB);
+  LW := LW + 65536 * PB^;
+  Inc(PB);
+  LW := LW + 16777216 * PB^;
+  Result := LW;
+end;
+
+class function TPatcher.GetTempFileName: string;
+begin
+  // Get temporary folder
+  SetLength(Result, Windows.MAX_PATH);
+  Windows.GetTempPath(Windows.MAX_PATH, PChar(Result));
+  // Get unique temporary file name (it is created as side effect of this call)
+  if Windows.GetTempFileName(
+    PChar(Result), '', 0, PChar(Result)
+  ) = 0 then
+    Error('Can''t create temporary file');
+  Result := PChar(Result)
+end;
+
+end.
 
