@@ -38,4 +38,12 @@ Many thanks to Stefan for creating this software.
 included here for obvious reasons - please see the file bdiff.1 that is included
 in the download for details.
 
+
+================================================================================
+License used for current version BDiff / BPatch
+================================================================================
+
+The current version of the license can be found in LICENSE.md in the root of the
+Git repository.
+
 ================================================================================
