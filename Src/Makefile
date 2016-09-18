@@ -84,11 +84,10 @@ release: clean
   # Store exe files in zip file root
   @$(ZIP) -j -9 $(OUTFILE) Exe\*.exe
   # Copy license and readme files to root
-  @$(ZIP) -j -9 $(OUTFILE) README.md LICENSE.md
+  @$(ZIP) -j -9 $(OUTFILE) README.md LICENSE.md CHANGELOG.txt
   # Copy other docs to docs sub-directory
   @$(ZIP) -r -9 $(OUTFILE) Docs\BDiff.txt
   @$(ZIP) -r -9 $(OUTFILE) Docs\BPatch.txt
-  @$(ZIP) -r -9 $(OUTFILE) Docs\ChangeLog.txt
   # Copy test code
   @$(ZIP) -r -9 $(OUTFILE) Test
   @cd Src
