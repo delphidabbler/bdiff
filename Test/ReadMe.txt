@@ -63,7 +63,14 @@ Tests
    Both BDiff and BPatch are called with the --version switch and both output
    their current version on the console.
 
-5) Cleanup
+5) Help test
+
+   Call "Test.bat help" to run this test.
+
+   Both BDiff and BPatch are called with the --help switch and both output their
+   help screen on the console.
+
+6) Cleanup
 
    Call "Test.bat clean" to run this test.
 
