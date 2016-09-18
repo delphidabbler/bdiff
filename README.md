@@ -38,7 +38,7 @@ The current source code is maintained in the [delphidabbler/bdiff](https://githu
 
 > **Note:** Until February 2014 the source code was maintained in a Subversion repository. A dump of the repo is available from [Google Drive](https://drive.google.com/file/d/0B8qEVqTUMgmJcF9zVnk0Zk1VMDQ/view?usp=sharing).
 
-For information on how to build the Pascal source, see `Build.txt` in the root of the Git repo.
+For information on how to build the Pascal source, see [`Build.txt`](Build.txt) in the root of the Git repo.
 
 ### C Source
 
