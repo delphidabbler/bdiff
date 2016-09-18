@@ -221,3 +221,8 @@ Tidy up
 At any time you can tidy up temporary files by doing:
 
   > Make clean
+
+If you also want to remove the .cfg files generated from .cfg.tplt files along
+with the entire Build directory you can do:
+
+  > Make deepclean

@@ -20,6 +20,9 @@
 #     Make clean
 #     Make tidy
 #       Cleans up temporary files.
+#     Make deepclean
+#       Remove temorary files as per clean target along with generated .cfg
+#       files and Build directory and its contents.
 #     Make release
 #       Creates binary release file.
 # ------------------------------------------------------------------------------
@@ -60,7 +63,7 @@ pascal:
   $(MAKE) -f BPatch.mak pascal
   @cd ..
 
-# Clean up unwanted files etc created by IDE
+# Clean up unwanted and temporary files etc created by IDE
 clean:
   @echo.
   @echo Clean Unwanted Files
@@ -75,6 +78,20 @@ clean:
   -@for /F "usebackq" %i in (`dir /S /B /A:D ..\__history`) do @rmdir /S /Q %i
   @cd Src
   @echo Done.
+
+# Clean up temporary files, generated files and delete Build directory and its
+# contents
+deepclean: clean
+  # remove directories created by config
+  @cd ..
+  @if exist Build\Exe rmdir /S /Q Build\Exe
+  @if exist Build\Bin rmdir /S /Q Build\Bin
+  @if exist Build\Release rmdir /S /Q Build\Release
+  @if exist Build rmdir /S /Q Build
+  @cd Src
+  # remove .cfg files created by config
+  @if exist BDiff\BDiff.cfg del BDiff\BDiff.cfg
+  @if exist BPatch\BPatch.cfg del BPatch\BPatch.cfg
 
 # Build release files (.zip)
 !ifndef RELEASEFILENAME
