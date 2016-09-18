@@ -38,6 +38,5 @@
 -O"..\..\Bin\BDiff"
 -I"..\..\Bin\BDiff"
 -R"..\..\Bin\BDiff"
--w-UNSAFE_TYPE
--w-UNSAFE_CODE
--w-UNSAFE_CAST
+-w-SYMBOL_PLATFORM
+-w+EXPLICIT_STRING_CAST_LOSS

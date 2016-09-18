@@ -38,6 +38,5 @@
 -O"..\..\Bin\BPatch"
 -I"..\..\Bin\BPatch"
 -R"..\..\Bin\BPatch"
--w-UNSAFE_TYPE
--w-UNSAFE_CODE
--w-UNSAFE_CAST
+-w-SYMBOL_PLATFORM
+-w+EXPLICIT_STRING_CAST_LOSS
