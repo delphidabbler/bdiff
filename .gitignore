@@ -1,6 +1,13 @@
+# .gitignore file for BDiff project
+
+*.cfg
+*.dsk
+*.identcache
+*.local
+*.projdata
+*.tvsconfig
+*.~*
+__history/
 Bin/
 Exe/
 Release/
-*.~*
-*.cfg
-*.dof
