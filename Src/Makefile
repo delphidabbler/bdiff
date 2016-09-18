@@ -66,7 +66,13 @@ clean:
   @echo Clean Unwanted Files
   @echo --------------------
   @cd ..
-  -@del *.~* /S 2>nul
+  -@del /S *.~* 2>nul
+  -@del /S ~* 2>nul
+  -@del /S *.dsk 2>nul
+  -@del /S *.local 2>nul
+  -@del /S *.identcache 2>nul
+  -@del /S *.tvsconfig 2>nul
+  -@for /F "usebackq" %i in (`dir /S /B /A:D ..\__history`) do @rmdir /S /Q %i
   @cd Src
   @echo Done.
 
