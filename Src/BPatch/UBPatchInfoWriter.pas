@@ -41,7 +41,7 @@ begin
       + ' -v    --version      Show version information'#13#10
       + #13#10
       + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-      + '(c) copyright 2003-2011 Peter Johnson (www.delphidabbler.com)'#13#10,
+      + '(c) copyright 2003-2016 Peter Johnson (@delphidabbler)'#13#10,
     [TAppInfo.ProgramFileName]
   );
 end;
