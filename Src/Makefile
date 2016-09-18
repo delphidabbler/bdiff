@@ -103,16 +103,13 @@ config:
   @echo.
   @echo Configuring
   @echo -----------
-  @echo Creating empty output directories
+  @echo Creating output directories
   -@if not exist ..\Exe md ..\Exe
-  @del ..\Exe\*.* /Q /S /F
   -@if not exist ..\Release md ..\Release
-  @del ..\Release\*.* /Q /S /F
   -@if not exist ..\Bin md ..\Bin
-  @del ..\Bin\*.* /Q /S /F
   -@if not exist ..\Bin\BDiff md ..\Bin\BDiff
   -@if not exist ..\Bin\BPatch md ..\Bin\BPatch
-  @echo Creating .cfg and .dof files
+  @echo Creating .cfg file
   @cd BDiff
   @$(MAKE) -f BDiff.mak config >nul
   @cd ..\BPatch
