@@ -37,6 +37,5 @@ pascal: BPatch.exe
 # Configure source folder
 config:
   -@del BPatch.cfg
-  -@del BPatch.dof
   -@copy BPatch.cfg.tplt BPatch.cfg
-  -@copy BPatch.dof.tplt BPatch.dof
+s

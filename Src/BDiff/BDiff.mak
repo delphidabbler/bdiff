@@ -37,6 +37,4 @@ pascal: BDiff.exe
 # Configure source folder
 config:
   -@del BDiff.cfg
-  -@del BDiff.dof
   -@copy BDiff.cfg.tplt BDiff.cfg
-  -@copy BDiff.dof.tplt BDiff.dof
