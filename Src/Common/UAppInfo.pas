@@ -42,10 +42,12 @@ end;
 
 class function TAppInfo.ProgramExeDate: string;
 var
-  DOSDate: Integer; // file modification date as integer
+  FileDate: TDateTime;  // date stamp of exe file
 begin
-  DOSDate := FileAge(ProgramPath);
-  Result := FormatDateTime('dd mmm yyyy', FileDateToDateTime(DOSDate));
+  if FileAge(ProgramPath, FileDate) then
+    Result := FormatDateTime('dd mmm yyyy', FileDate)
+  else
+    Result := '';
 end;
 
 class function TAppInfo.ProgramFileName: string;

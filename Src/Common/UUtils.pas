@@ -19,7 +19,8 @@ type
     { Writes binary data to a file }
     class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
     { Writes a string to a file }
-    class procedure WriteStr(Handle: THandle; const S: string);
+    class procedure WriteStr(Handle: THandle; const S: UnicodeString); overload;
+    class procedure WriteStr(Handle: THandle; const S: AnsiString); overload;
     { Writes a string built from format string and arguments to file }
     class procedure WriteStrFmt(Handle: THandle; const Fmt: string;
       Args: array of const);
@@ -58,9 +59,17 @@ begin
   Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
-class procedure TCommonIO.WriteStr(Handle: THandle; const S: string);
+class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);
+var
+  Bytes: TBytes;
 begin
-  WriteRaw(Handle, PChar(S), Length(S));
+  Bytes := TEncoding.Default.GetBytes(S);
+  WriteRaw(Handle, Bytes, Length(S));
+end;
+
+class procedure TCommonIO.WriteStr(Handle: THandle; const S: AnsiString);
+begin
+  WriteRaw(Handle, PAnsiChar(S), Length(S));
 end;
 
 class procedure TCommonIO.WriteStrFmt(Handle: THandle; const Fmt: string;
