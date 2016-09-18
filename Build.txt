@@ -8,13 +8,13 @@ BDiff / BPatch Build Instructions
 Introduction
 --------------------------------------------------------------------------------
 
-BDiff / BPatch is written in Object Pascal and is targeted at Delphi 7. The
+BDiff / BPatch is written in Object Pascal and is targeted at Delphi XE. The
 Delphi IDE can be used to modify the source and to perform test builds. Final
 builds should be built using the provided makefile, but you can get away with
 using the IDE if you don't change any resources.
 
 These instructions only apply to building the current release of BDiff / BPatch.
-Earlier releases back to v0.2.6a will have there own version of this file
+Earlier releases back to v0.2.6a will have their own version of this file
 
 
 Requirements
@@ -26,25 +26,17 @@ BPatch:
 Delphi Command Line compiler (DCC32)
 ------------------------------------
 
-The preferred version is Delphi 7. If you have this compiler please use it. If
-you set the DELPHI7 environment variable to Delphi 7's install directory, the
-makefile will use it. If DELPHI7 is not set you should set DELPHIROOT to the
-install root of the Delphi you are using. If DELPHIROOT is not set then the
-makefile will assume Delphi is on the path and will use the first version it
-finds.
+The preferred version is Delphi XE. If you have this compiler please use it. The
+DELPHIROOT environment variable must be set to the install root of the version
+Delphi you are using. If DELPHIROOT then Make will fail.
 
 Alternatives:
 
-  + Earlier versions of Delphi may work, but haven't been tested.
+  + Other Unicode versions of Delphi may work, but haven't been tested. Non
+    Unicode compilers will fail to compile the code.
 
-  + The Win32 personalities of Delphi 2005, 2006 and 2007 should work OK.
-
-  + The Turbo versions may work, but I'm not sure if they ship with the DCC32
-    command line compiler, so you may need to compile only from the IDE.
-
-  + Be very careful with Delphi 2009 and any later Unicode enabled versions: In
-    places the code requires single byte characters. The source is not Unicode
-    compatible as it stands.
+  + Only versions of Delphi that ship with the DCC32 command line compiler can
+    be used with the make files.
 
   + As noted above you can compile Pascal code from the Delphi IDE instead of
     running DCC32.
@@ -59,9 +51,9 @@ Borland MAKE
 ------------
 
 This is the make tool that ships with Delphi. You can use any version that
-works. I've tested the versions that ship with Delphi 7, Delphi 2006 and Delphi
-XE. The makefile calls Make recursively: it uses the same command line that you
-used so there are no requirements as to the location of Make.
+works. I've tested the version that ships with Delphi XE. The makefile calls
+Make recursively: it uses the same command line that you used so there are no
+requirements as to the location of Make.
 
 DelphiDabbler Version Information Editor (VIEd)
 -----------------------------------------------
@@ -95,7 +87,7 @@ Get the source code
 -------------------
 
 The source code of BDiff / BPatch is maintained in the delphidabbler/bdiff Git
-repository on GitHub (https://github.com/delphidabbler/bdiff).
+repository on GitHub at https://github.com/delphidabbler/bdiff
 
 Each release from v0.2.5 onwards is available from GitHub. You can download an
 archive containing the required release. Note that releases prior to v0.2.7 were
@@ -105,7 +97,7 @@ documentation will refer to Subversion rather than Git.
 Once the source is cloned or forked you should end up with a folder structure
 like this:
 
-  +--+                { root: .gitignore, this file, read-me and license }
+  +--+                { root: .gitignore, this file, and some documentation}
      |
      +-- Docs         { documentation files }
      |
@@ -163,9 +155,8 @@ Once "Make config" has completed your folder structure should have changed to:
 
 If the Bin, Exe and Release folders already existed they will have been emptied.
 Git has been configured to ignore these folders. In addition, Make will have
-created .cfg and .dof files from templates. .cfg files are needed for DCC32 to
-run correctly and .dof files enable use of the Delphi IDE. These files will be
-ignored by Git.
+created .cfg files from templates. .cfg files are needed for DCC32 to run
+correctly. These files will be ignored by Git.
 
 If you are intending to use the Delphi IDE to compile code, you should also do:
 
@@ -179,12 +170,9 @@ Modify the source
 
 If you plan to modify the source, you can do it now.
 
-If you are using the Delphi IDE you should load the BDiff.bpg project group file
-in from the Src folder into the IDE - this contains both the BDiff and BPatch
-targets.
-
-Versions of Delphi after Delphi 7 will emit additional project files. Git users
-will have to decide which files to add to the repository and which to ignore.
+If you are using the Delphi IDE you should load the BDiff.groupproj project
+group file from the Src folder into the IDE - this contains both the BDiff and
+BPatch targets.
 
 Compile
 -------
@@ -232,9 +220,3 @@ Tidy up
 At any time you can tidy up temporary files by doing:
 
   > Make clean
-
-If you are using a Delphi IDE that maintain a history you will need to modify
-the makefile to delete the various hidden __history directories. Git users will
-need to get modify .gitignore to ignore these directories.
-
---------------------------------------------------------------------------------
