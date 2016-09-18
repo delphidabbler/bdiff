@@ -10,7 +10,7 @@
 setlocal
 
 rem Get directory containing BDiff and BPatch
-set ExeDir=..\Exe
+set ExeDir=..\Build\Exe
 if not "%BDIFFPATH%" == "" set ExeDir=%BDIFFPATH%
 rem Record path to BDiff and BPatch
 set BDiff=%ExeDir%\BDiff.exe
