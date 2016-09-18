@@ -38,4 +38,3 @@ pascal: BPatch.exe
 config:
   -@del BPatch.cfg
   -@copy BPatch.cfg.tplt BPatch.cfg
-s
