@@ -113,7 +113,7 @@ like this:
      |
      +-- Test         { test scripts }
 
-If, by chance you also have a Bin, Exe and Release directory don't worry.
+If, by chance you also have a Build directory and sub-directories don't worry.
 Git users will also see the usual .git hidden directory.
 
 Configure the source tree
@@ -131,19 +131,21 @@ Once "Make config" has completed your folder structure should have changed to:
 
   +--+
      |
-     +-- Bin           { parent of binary folders }
+     +-- Build           { contains files created in build process }
      |   |
-     |   +-- BDiff     { receives binary files for BDiff (.dcu and .res) }
+     |   +-- Bin         { parent of binary folders }
+     |   |   |
+     |   |   +-- BDiff   { receives binary files for BDiff (.dcu and .res) }
+     |   |   |
+     |   |   +-- BPatch  { receives binary files for BPatch (.dcu and .res) }
      |   |
-     |   +-- BPatch    { receives binary files for BPatch (.dcu and .res) }
+     |   +-- Exe         { receives executable files }
+     |   |
+     |   +-- Release     { receives release zip file }
      |
      +-- Docs
      |
-     +-- Exe           { receives executable files }
-     |
      +-- OrigC
-     |
-     +-- Release       { receives release zip file }
      |
      +-- Src
      |   |
@@ -153,10 +155,9 @@ Once "Make config" has completed your folder structure should have changed to:
      |
      +-- Test
 
-If the Bin, Exe and Release folders already existed they will have been emptied.
-Git has been configured to ignore these folders. In addition, Make will have
-created .cfg files from templates. .cfg files are needed for DCC32 to run
-correctly. These files will be ignored by Git.
+Git has been configured to ignore the Build folder and its contents. In addition
+Make will have created .cfg files from templates. These files are needed for
+DCC32 to run correctly. The files will be ignored by Git.
 
 If you are intending to use the Delphi IDE to compile code, you should also do:
 

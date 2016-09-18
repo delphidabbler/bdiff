@@ -80,7 +80,7 @@ clean:
 !ifndef RELEASEFILENAME
 RELEASEFILENAME = dd-bdiff
 !endif
-OUTFILE = Release\$(RELEASEFILENAME).zip
+OUTFILE = Build\Release\$(RELEASEFILENAME).zip
 release: clean
   @echo.
   @echo Creating Release File
@@ -88,7 +88,7 @@ release: clean
   @cd ..
   -@if exist $(OUTFILE) del $(OUTFILE)
   # Store exe files in zip file root
-  @$(ZIP) -j -9 $(OUTFILE) Exe\*.exe
+  @$(ZIP) -j -9 $(OUTFILE) Build\Exe\*.exe
   # Copy license and readme files to root
   @$(ZIP) -j -9 $(OUTFILE) README.md LICENSE.md CHANGELOG.txt
   # Copy other docs to docs sub-directory
@@ -104,11 +104,12 @@ config:
   @echo Configuring
   @echo -----------
   @echo Creating output directories
-  -@if not exist ..\Exe md ..\Exe
-  -@if not exist ..\Release md ..\Release
-  -@if not exist ..\Bin md ..\Bin
-  -@if not exist ..\Bin\BDiff md ..\Bin\BDiff
-  -@if not exist ..\Bin\BPatch md ..\Bin\BPatch
+  -@if not exist ..\Build md ..\Build
+  -@if not exist ..\Build\Exe md ..\Build\Exe
+  -@if not exist ..\Build\Release md ..\Build\Release
+  -@if not exist ..\Build\Bin md ..\Build\Bin
+  -@if not exist ..\Build\Bin\BDiff md ..\Build\Bin\BDiff
+  -@if not exist ..\Build\Bin\BPatch md ..\Build\Bin\BPatch
   @echo Creating .cfg file
   @cd BDiff
   @$(MAKE) -f BDiff.mak config >nul

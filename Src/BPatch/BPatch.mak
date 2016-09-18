@@ -19,7 +19,7 @@
 !include "..\Common.mak"
 
 # Define location of binary output directory relative to Src\BPatch
-BIN = ..\..\Bin\BPatch
+BIN = ..\..\Build\Bin\BPatch
 
 # Default is to build all
 exe: res pascal

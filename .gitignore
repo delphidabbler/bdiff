@@ -8,6 +8,4 @@
 *.tvsconfig
 *.~*
 __history/
-Bin/
-Exe/
-Release/
+Build/

@@ -19,7 +19,7 @@
 !include "..\Common.mak"
 
 # Define location of binary output directory relative to Src\BDiff
-BIN = ..\..\Bin\BDiff
+BIN = ..\..\Build\Bin\BDiff
 
 # Default is to build all
 exe: res pascal

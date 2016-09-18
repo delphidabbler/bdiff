@@ -14,12 +14,12 @@
 			<Base>true</Base>
 		</PropertyGroup>
 		<PropertyGroup Condition="'$(Base)'!=''">
-			<DCC_UnitSearchPath>..\..\Bin\BDiff;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+			<DCC_UnitSearchPath>..\..\Build\Bin\BDiff;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
 			<DCC_ConsoleTarget>true</DCC_ConsoleTarget>
-			<DCC_ExeOutput>..\..\Exe</DCC_ExeOutput>
+			<DCC_ExeOutput>..\..\Build\Exe</DCC_ExeOutput>
 			<DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
 			<DCC_EXPLICIT_STRING_CAST_LOSS>true</DCC_EXPLICIT_STRING_CAST_LOSS>
-			<DCC_DcuOutput>..\..\Bin\BDiff</DCC_DcuOutput>
+			<DCC_DcuOutput>..\..\Build\Bin\BDiff</DCC_DcuOutput>
 			<DCC_E>false</DCC_E>
 			<DCC_ImageBase>00400000</DCC_ImageBase>
 			<DCC_F>false</DCC_F>
