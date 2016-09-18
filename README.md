@@ -49,9 +49,7 @@ The copy used for the original Pascal translation is included in the Git reposit
 Copyright and License
 ---------------------
 
-See the file `LICENSE.md` for details of copyright and the license that applies to this software. The license can also be found at http://www.delphidabbler.com/software/bdiff/license.
-
-The original C source is provided under different licensing terms. For details see the comments in the ADMINISTRATIVIA section of `bdiff.1` and `bpatch.1` that are located with the C source code in the Subversion repository.
+See the file [`LICENCE.md`](LICENSE.md) for details of copyright and the license that applies to this software.
 
 Change Log
 ----------
