@@ -2,7 +2,7 @@ v0.2.7 - released 19 Jul 2014
 BDiff.exe v0.2.7 (build 8)
 BPatch.exe v0.2.7 (build 8)
 + Bug fixes in BDiff:
-  -  "New" and "old" file names for a diff cannot now be the same.
+  - "New" and "old" file names for a diff cannot now be the same.
   - Patch file name specified in --output or -o switches must now have a different name from other file names specified on command line.
 + Major refactoring:
   - Big change from procedural to modularised, mainly OOP code split into several units.
