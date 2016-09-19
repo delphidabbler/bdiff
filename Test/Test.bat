@@ -10,7 +10,7 @@
 setlocal
 
 rem Get directory containing BDiff and BPatch
-set ExeDir=..\Exe
+set ExeDir=..\Build\Exe
 if not "%BDIFFPATH%" == "" set ExeDir=%BDIFFPATH%
 rem Record path to BDiff and BPatch
 set BDiff=%ExeDir%\BDiff.exe
@@ -25,6 +25,7 @@ if "%1" == "patch" goto DoPatchTest
 if "%1" == "quoted" goto DoQuotedTest
 if "%1" == "filtered" goto DoFilteredTest
 if "%1" == "version" goto DoVersionTest
+if "%1" == "help" goto DoHelpTest
 if "%1" == "clean" goto DoClean
 set ErrorMsg=Unknown test "%1".
 goto usage
@@ -82,6 +83,17 @@ if errorlevel 1 set ErrorMsg=BPatch failed
 if not "%ErrorMsg%"=="" goto error
 goto end
 
+rem Run help screen test
+:DoHelpTest
+%BDiff% --help
+if errorlevel 1 set ErrorMsg=BDiff failed
+if not "%ErrorMsg%"=="" goto error
+echo.
+%BPatch% --help
+if errorlevel 1 set ErrorMsg=BPatch failed
+if not "%ErrorMsg%"=="" goto error
+goto end
+
 rem Remove generated files
 :DoClean
 del Test3 2>nul
@@ -100,6 +112,8 @@ echo   test.bat filtered [view]
 echo     test filtered text diff (specify view to display diff in notepad)
 echo   test.bat version
 echo     display version information for BDiff and BPatch
+echo   test.bat help
+echo     display help screens for BDiff and BPatch
 echo   test.bat clean
 echo     remove all generated files
 echo For more information see ReadMe.txt

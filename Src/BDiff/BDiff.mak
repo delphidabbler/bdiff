@@ -19,7 +19,7 @@
 !include "..\Common.mak"
 
 # Define location of binary output directory relative to Src\BDiff
-BIN = ..\..\Bin\BDiff
+BIN = ..\..\Build\Bin\BDiff
 
 # Default is to build all
 exe: res pascal
@@ -37,6 +37,4 @@ pascal: BDiff.exe
 # Configure source folder
 config:
   -@del BDiff.cfg
-  -@del BDiff.dof
   -@copy BDiff.cfg.tplt BDiff.cfg
-  -@copy BDiff.dof.tplt BDiff.dof

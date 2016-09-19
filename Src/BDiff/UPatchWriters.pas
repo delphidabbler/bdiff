@@ -240,8 +240,8 @@ procedure TQuotedPatchWriter.QuotedData(Data: PSignedAnsiChar;
 begin
   while (Length <> 0) do
   begin
-    if IsPrint(Char(Data^)) and (Char(Data^) <> '\') then
-      TIO.WriteStr(TIO.StdOut, Char(Data^))
+    if IsPrint(AnsiChar(Data^)) and (AnsiChar(Data^) <> '\') then
+      TIO.WriteStr(TIO.StdOut, AnsiChar(Data^))
     else
       TIO.WriteStr(TIO.StdOut, '\' + ByteToOct(Data^ and $FF));
     Inc(Data);
@@ -271,8 +271,8 @@ procedure TFilteredPatchWriter.FilteredData(Data: PSignedAnsiChar;
 begin
   while Length <> 0  do
   begin
-    if IsPrint(Char(Data^)) then
-      TIO.WriteStr(TIO.StdOut, Char(Data^))
+    if IsPrint(AnsiChar(Data^)) then
+      TIO.WriteStr(TIO.StdOut, AnsiChar(Data^))
     else
       TIO.WriteStr(TIO.StdOut, '.');
     Inc(Data);

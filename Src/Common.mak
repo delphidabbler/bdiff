@@ -7,28 +7,20 @@
 # Requires that the BIN macro is defined to point to directory that is to
 # receive .res and .dcu output.
 
-# The preferred compiler is Delphi 7. If the DELPHI7 evironment variable is set,
-# it will be used and expected to Delphi 7 install directory.
-# If DELPHI7 is not set then the DELPHIROOT environment variable is examined.
-# This can be set to any Delphi compiler (should compile if later than Delphi
-# 7). If neither DELPHI7 nor DELPHIROOT is set then a Delphi compiler is
-# expected to be present on the system path.
-!ifdef DELPHI7
-DELPHIROOT = $(DELPHI7)
+# The DELPHIROOT environment variable must be set and must reference the install
+# directory of the version of Delphi being used. Delphi XE is the recommended
+# compiler, but other Unicode versions of the compiler may be able to be used.
+
+!ifndef DELPHIROOT
+!error DELPHIROOT environment variable required.
 !endif
 
 # Define macros that access required build tools
 # We use same version of MAKE as that used to build this file
 MAKE = "$(MAKEDIR)\Make.exe" -$(MAKEFLAGS)
-# If DELPHIROOT set assume DCC32 and BRCC32 are in the Bin sub-directory of root
-# directory, otherwise assume the tools are on the path
-!ifdef DELPHIROOT
 DCC32 = "$(DELPHIROOT)\Bin\DCC32.exe"
 BRCC32 = "$(DELPHIROOT)\Bin\BRCC32.exe"
-!else
-DCC32 = DCC32.exe
-BRCC32 = BRCC32.exe
-!endif
+
 # If VIEDROOT is set then use that directory for VIEd, otherwise assume VIEd is
 # on the path
 !ifdef VIEDROOT

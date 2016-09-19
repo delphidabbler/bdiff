@@ -4,10 +4,12 @@ This file contains copies of emails exchanged between Peter Johnson and Stefan
 Reuther that relate to licensing of Peter's Pascal translation of Stefan's
 original source code.
 
+**NOTE:** Email addresses have been partially obscured.
+
 --------------------------------------------------------------------------------
 
-From: peter@delphidabbler.com
-To:   Streu@gmx.de
+From: xxxxx@delphidabbler.com
+To:   Streu@xxxxx.de
 Date: 04/12/2003 01:59
 
 Hi Stefan
@@ -35,13 +37,13 @@ any comments.
 
 Regards
 Peter Johnson
-peter.johnson@openlink.org
+xxxxx@openlink.org
 http://www.delphidabbler.com/
 
 --------------------------------------------------------------------------------
 
-From: Streu@gmx.de
-To:   peter@delphidabbler.com
+From: Streu@xxxxx.de
+To:   xxxxx@delphidabbler.com
 Date: 04/12/2003 12:06
 
 Hello,

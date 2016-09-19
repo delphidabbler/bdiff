@@ -20,6 +20,9 @@
 #     Make clean
 #     Make tidy
 #       Cleans up temporary files.
+#     Make deepclean
+#       Remove temorary files as per clean target along with generated .cfg
+#       files and Build directory and its contents.
 #     Make release
 #       Creates binary release file.
 # ------------------------------------------------------------------------------
@@ -60,21 +63,41 @@ pascal:
   $(MAKE) -f BPatch.mak pascal
   @cd ..
 
-# Clean up unwanted files etc created by IDE
+# Clean up unwanted and temporary files etc created by IDE
 clean:
   @echo.
   @echo Clean Unwanted Files
   @echo --------------------
   @cd ..
-  -@del *.~* /S 2>nul
+  -@del /S *.~* 2>nul
+  -@del /S ~* 2>nul
+  -@del /S *.dsk 2>nul
+  -@del /S *.local 2>nul
+  -@del /S *.identcache 2>nul
+  -@del /S *.tvsconfig 2>nul
+  -@for /F "usebackq" %i in (`dir /S /B /A:D ..\__history`) do @rmdir /S /Q %i
   @cd Src
   @echo Done.
+
+# Clean up temporary files, generated files and delete Build directory and its
+# contents
+deepclean: clean
+  # remove directories created by config
+  @cd ..
+  @if exist Build\Exe rmdir /S /Q Build\Exe
+  @if exist Build\Bin rmdir /S /Q Build\Bin
+  @if exist Build\Release rmdir /S /Q Build\Release
+  @if exist Build rmdir /S /Q Build
+  @cd Src
+  # remove .cfg files created by config
+  @if exist BDiff\BDiff.cfg del BDiff\BDiff.cfg
+  @if exist BPatch\BPatch.cfg del BPatch\BPatch.cfg
 
 # Build release files (.zip)
 !ifndef RELEASEFILENAME
 RELEASEFILENAME = dd-bdiff
 !endif
-OUTFILE = Release\$(RELEASEFILENAME).zip
+OUTFILE = Build\Release\$(RELEASEFILENAME).zip
 release: clean
   @echo.
   @echo Creating Release File
@@ -82,13 +105,12 @@ release: clean
   @cd ..
   -@if exist $(OUTFILE) del $(OUTFILE)
   # Store exe files in zip file root
-  @$(ZIP) -j -9 $(OUTFILE) Exe\*.exe
+  @$(ZIP) -j -9 $(OUTFILE) Build\Exe\*.exe
   # Copy license and readme files to root
-  @$(ZIP) -j -9 $(OUTFILE) README.md LICENSE.md
+  @$(ZIP) -j -9 $(OUTFILE) README.md LICENSE.md CHANGELOG.txt
   # Copy other docs to docs sub-directory
   @$(ZIP) -r -9 $(OUTFILE) Docs\BDiff.txt
   @$(ZIP) -r -9 $(OUTFILE) Docs\BPatch.txt
-  @$(ZIP) -r -9 $(OUTFILE) Docs\ChangeLog.txt
   # Copy test code
   @$(ZIP) -r -9 $(OUTFILE) Test
   @cd Src
@@ -98,16 +120,14 @@ config:
   @echo.
   @echo Configuring
   @echo -----------
-  @echo Creating empty output directories
-  -@if not exist ..\Exe md ..\Exe
-  @del ..\Exe\*.* /Q /S /F
-  -@if not exist ..\Release md ..\Release
-  @del ..\Release\*.* /Q /S /F
-  -@if not exist ..\Bin md ..\Bin
-  @del ..\Bin\*.* /Q /S /F
-  -@if not exist ..\Bin\BDiff md ..\Bin\BDiff
-  -@if not exist ..\Bin\BPatch md ..\Bin\BPatch
-  @echo Creating .cfg and .dof files
+  @echo Creating output directories
+  -@if not exist ..\Build md ..\Build
+  -@if not exist ..\Build\Exe md ..\Build\Exe
+  -@if not exist ..\Build\Release md ..\Build\Release
+  -@if not exist ..\Build\Bin md ..\Build\Bin
+  -@if not exist ..\Build\Bin\BDiff md ..\Build\Bin\BDiff
+  -@if not exist ..\Build\Bin\BPatch md ..\Build\Bin\BPatch
+  @echo Creating .cfg file
   @cd BDiff
   @$(MAKE) -f BDiff.mak config >nul
   @cd ..\BPatch

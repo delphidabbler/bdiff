@@ -6,7 +6,8 @@ BDIFF / BPATCH: Historical update information from v0.2.1 to v0.2.5
 
 This file records known changes to files and releases of the BDiff / BPatch
 utilities from the first Pascal release (v0.2.1) until release 0.2.5 when the
-project was placed was placed under version control with Subversion.
+project was placed under version control with Subversion. Later the code was
+ported from Subversion to Git.
 
 There are three sections:
   + Files: Lists all source code and development tools and provides details of

@@ -21,7 +21,7 @@ BDiff v0.2 and BPatch v0.2. The differences are:
 
   The Pascal translation does not have this problem and shell redirection can be
   used safely on Windows systems. Therefore the --input and --output switches
-  are not required.
+  are not required, but have been retained.
 
 + The numeric parameter to BDiff's -m or --min-equal switches can be specified
   in decimal, octal or hexadecimal notation on the C version. The Pascal
@@ -47,5 +47,8 @@ Release 0.2.3 and later
 
 From this release BDiff and BPatch broke the link with the original C source and
 began to develop separately, so further translation notes are not provided.
+
+Note though that all 0.2.x releases remained functionally equivalent other than
+for bug fixes.
 
 --------------------------------------------------------------------------------
