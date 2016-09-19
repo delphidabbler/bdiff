@@ -29,6 +29,11 @@ You may want to modify the Windows PATH environment variable to include the loca
 
 To uninstall simply delete the programs. They make no changes to the system. If you changed the PATH environment variable you may wish to adjust this.
 
+Tests
+-----
+
+You can test the operation of _BDiff_ and _BPatch_ using the `Test.bat` script in the `Test` directory. See `ReadMe.txt` in that directory for details.
+
 Source Code
 -----------
 
