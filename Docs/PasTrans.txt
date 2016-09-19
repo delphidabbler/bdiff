@@ -48,4 +48,7 @@ Release 0.2.3 and later
 From this release BDiff and BPatch broke the link with the original C source and
 began to develop separately, so further translation notes are not provided.
 
+Note though that all 0.2.x releases remained functionally equivalent other than
+for bug fixes.
+
 --------------------------------------------------------------------------------
