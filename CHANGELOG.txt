@@ -1,3 +1,11 @@
+v0.2.8 - released 19 Sep 2016
+BDiff.exe v0.2.8 (build 9)
+BPatch.exe v0.2.8 (build 9)
++ Converted to support Unicode file names and use of Unicode strings internally.
++ Switched to Delphi XE compiler from Delphi 7.
++ Added new test to test script.
++ Significant overhaul and updates to documentation.
+
 v0.2.7 - released 19 Jul 2014
 BDiff.exe v0.2.7 (build 8)
 BPatch.exe v0.2.7 (build 8)
@@ -15,7 +23,7 @@ BPatch.exe v0.2.7 (build 8)
 v0.2.6a - released 06 Aug 2009
 BDiff.exe v0.2.6 (build 7)
 BPatch.exe v0.2.6 (build 7)
-+ Removed source code from distribution. (Source code now available from assembla.com code repository).
++ Removed source code from distribution.
 + Documentation updated re changes.
 + No changes to executable code other than to update build numbers.
 
@@ -56,6 +64,7 @@ BPatch.exe v0.2.3 (build 3) [v0.2.2 skipped]
 + Fixed bug where BPatch could not overwrite existing files.
 + Fixed small bug in -h and -v switches in both programs.
 + Fixed memory leaks in BDiff.
++ Switched to Delphi 7 compiler from Delphi 4.
 + Prevented compiler warnings in both programs.
 + Added batch files to build projects.
 + Updated help screens.
