@@ -112,9 +112,7 @@ ADMINISTRATIVIA
 
 This manual page is for version 0.2.6 or later of bdiff.
 
-bdiff is (c) copyright 1999 Stefan Reuther <Streu@gmx.de> and (c) 2003-2016
-Peter Johnson (www.delphidabbler.com). See the file LICENSE.md for details of
-permisable use.
+See the file LICENSE.md for details of licensing and copyright.
 
 THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
 NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF
