@@ -14,7 +14,7 @@ builds should be built using the provided makefile, but you can get away with
 using the IDE if you don't change any resources.
 
 These instructions only apply to building the current release of BDiff / BPatch.
-Earlier releases back to v0.2.6a will have their own version of this file
+Earlier releases back to v0.2.6a will have their own versions of this file.
 
 
 Requirements
@@ -27,13 +27,14 @@ Delphi Command Line compiler (DCC32)
 ------------------------------------
 
 The preferred version is Delphi XE. If you have this compiler please use it. The
-DELPHIROOT environment variable must be set to the install root of the version
-Delphi you are using. If DELPHIROOT then Make will fail.
+DELPHIROOT environment variable must be set to the install path of the version
+Delphi you are using. DCC32.exe must be present in the Bin sub-directory of the
+path specified by DELPHIROOT. If DELPHIROOT is not set then Make will fail.
 
 Alternatives:
 
-  + Other Unicode versions of Delphi may work, but haven't been tested. Non
-    Unicode compilers will fail to compile the code.
+  + Unicode versions of Delphi other than XE may work, but haven't been tested.
+    Non Unicode compilers will fail to compile the code.
 
   + Only versions of Delphi that ship with the DCC32 command line compiler can
     be used with the make files.
@@ -51,9 +52,9 @@ Borland MAKE
 ------------
 
 This is the make tool that ships with Delphi. You can use any version that
-works. I've tested the version that ships with Delphi XE. The makefile calls
-Make recursively: it uses the same command line that you used so there are no
-requirements as to the location of Make.
+works. I've tested only the version that ships with Delphi XE. The makefile
+calls Make recursively: it uses the same command line that you used to call it,
+so there are no requirements as to the location of Make.
 
 DelphiDabbler Version Information Editor (VIEd)
 -----------------------------------------------
@@ -62,7 +63,7 @@ This program is required to convert the .vi files that specify version
 information into an intermediate .rc file that is compiled by BRCC32. VIEd is
 expected to be on the system path unless the VIEDROOT environment variable is
 set to indicate VIEd's installation directory. You can get VIEd here:
-http://www.delphidabbler.com/software/vied
+http://delphidabbler.com/software/vied
 
 Zip.exe
 -------
@@ -119,8 +120,8 @@ Git users will also see the usual .git hidden directory.
 Configure the source tree
 -------------------------
 
-Before you can get hacking, you need to prepare the code. Open a command console
-and navigate into the Src sub-folder and do:
+Before you can get hacking, you need to prepare the code. Open a command
+console, navigate into the Src sub-folder and do:
 
   > Make config
 
@@ -157,7 +158,7 @@ Once "Make config" has completed your folder structure should have changed to:
 
 Git has been configured to ignore the Build folder and its contents. In addition
 Make will have created .cfg files from templates. These files are needed for
-DCC32 to run correctly. The files will be ignored by Git.
+DCC32 to run correctly. The .cfg files will be ignored by Git.
 
 If you are intending to use the Delphi IDE to compile code, you should also do:
 
@@ -206,9 +207,9 @@ documentation do:
 
 This deletes any temporary files then creates the required zip file. You can
 change the default name of the zip file by defining the RELEASEFILENAME
-environment variable as the required name (excluding extension). For example, to
-generate a release file named my-file.zip define RELEASEFILENAME as 'my-file' or
-do:
+environment variable with the required name (excluding extension). For example,
+to generate a release file named my-file.zip define RELEASEFILENAME as 'my-file'
+or do:
 
   > Make -DRELEASEFILENAME=myfile release
 
