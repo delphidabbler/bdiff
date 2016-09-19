@@ -44,8 +44,6 @@ For information on how to build the Pascal source, see [`Build.txt`](Build.txt) 
 
 The original C source code can be downloaded from http://phost.de/~stefan/Files/bdiff-02.zip.
 
-The copy used for the original Pascal translation is included in the Git repository.
-
 Copyright and License
 ---------------------
 

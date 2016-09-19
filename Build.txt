@@ -102,8 +102,6 @@ like this:
      |
      +-- Docs         { documentation files }
      |
-     +-- OrigC        { original C source - not used }
-     |
      +-- Src          { project group and master make files }
      |   |
      |   +-- BDiff    { source and makefile for BDiff }
@@ -145,8 +143,6 @@ Once "Make config" has completed your folder structure should have changed to:
      |   +-- Release     { receives release zip file }
      |
      +-- Docs
-     |
-     +-- OrigC
      |
      +-- Src
      |   |
