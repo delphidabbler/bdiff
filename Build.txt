@@ -63,7 +63,7 @@ This program is required to convert the .vi files that specify version
 information into an intermediate .rc file that is compiled by BRCC32. VIEd is
 expected to be on the system path unless the VIEDROOT environment variable is
 set to indicate VIEd's installation directory. You can get VIEd here:
-http://delphidabbler.com/software/vied
+https://github.com/delphidabbler/vied
 
 Zip.exe
 -------
