@@ -1,124 +1,107 @@
-NAME
+# BDiff
 
-bdiff - difference of binary files
+## Precis
 
+BDiff computes the difference of two binary files.
 
-SYNOPSIS
+## Synopsis 
 
-bdiff [options] old-file new-file [>patch-file]
+    bdiff [options] old-file new-file [>patch-file]
 
+## Description
 
-DESCRIPTION
+BDiff computes differences between two binary files. Text files are treated as a simple sequence of bytes. Output can be either a somewhat human-readable protocol, or a binary file readable by BPatch. Output is sent to standard output unless shell redirection is used or the `--output` option is used to specify an output file.
 
-bdiff computes differences between two binary files. Output can be either a
-somewhat human-readable protocol, or a binary file readable by bpatch. Output is
-sent to standard output unless the --output option is used to specify an output
-file.
+BDiff handles insertion and deletion of data as well as changed bytes.
 
-bdiff handles insertion and deletion of data as well as changed bytes.
+## Options
 
+| Short option | Long option | Description |
+|--------------|-------------|-------------|
+| `-q`         |             | Use quoted format (default). |
+| `-f`         |             | Use filtered format. |
+| `-b`         |             | Use binary format. |
+|              | `--format=FMT`| Select format by name: `FMT` is one of `binary`, `filtered` or `quoted`. |
+|`-m N`        | `--min-equal=N`| Two chunks of data are recognized as being identical if they are at least `N` bytes long, the default is `24`. |
+| `-o FILENAME` | `--output=FILENAME`| Write diff to specified file instead of standard output. Specifying `--output=-` does nothing. Use as an alternative to shell redirection. |
+| `-V`          |  `--verbose`| Print status messages while processing input. |
+|`-h`           |  `--help`   | Show help screen and exit. |
+|`-v`           |  `--version`| Show version number and exit. |
 
-OPTIONS
+## Algorithm
 
--q                   - Use QUOTED format (default);
+BDiff tries to locate maximum-length substrings of the new file in the old data. Substrings shorter than `N` (argument to the `-m` option) are not considered acceptable matches. Everything covered by such a substring is transmitted as a position, length pair. Everything else is literal data.
 
--f                   - Use FILTERED format;
+BDiff uses the block-sort technique to allow O(lgN) searches in the file, giving an estimated O(NlgN) algorithm on average.
 
--b                   - Use BINARY format;
+The program requires about five times as much memory as the old file, plus storage for the new file. This should be real memory, BDiff accesses all of it very often.
 
---format=FMT         - Select format by name: (binary, filtered, quoted)
+## Output Formats
 
--m N,                - Two chunks of data are recognized as being identical if
---min-equal=N          they are at least N bytes long, the default is 24.
+### Quoted Format
 
--o FILENAME,         - Write diff to specified file instead of standard output.
---output=FILENAME      Specifying --output=- does nothing. Use as an alternative
-                       to shell redirection.
+The quoted format (default) is similar to [diff(1)] output in unified format: `+` means added data, and a space means data kept from the old file. Lines prefixed with `@` inform you about the position of the next 'space' line in the source file (byte offset).
 
--V,                  - Print status messages while processing input;
---verbose
+Unlike in diff, there's no implicit line feed after each line of output. Bytes are treated as ASCII characters. Non-printable characters (see [isprint(3)]) and the backslash character are represented by a `\` followed by the octal three-digit character code.
 
--h,                  - Show help screen and exit;
---help
+### Filtered Format
 
--v,                  - Show version number and exit.
---version
+The filtered format is like the quoted format, but non-printable characters are replaced by dots (`.`).
 
+### Binary Format
 
-ALGORITHM
+The binary format is machine-readable, and omits details for common blocks. All words are in little-endian format (low byte first). The format is:
 
-bdiff tries to locate maximum-length substrings of the new file in the old data.
-Substrings shorter than N (argument to the -m option) are not considered
-acceptable matches. Everything covered by such a substring is transmitted as a
-position, length pair, everything else as literal data.
+| Number of bytes | Description |
+|-----------------|-------------|
+| 8 | Signature. ASCII character sequence `bdiff02\x1A`, where `02` is kind-of a version number. (An earlier version used the number `01`). `\x1A` is ASCII 26 (Control-Z, an MS-DOS end-of-file marker). |
+| 4 | Length of old file in bytes. |
+| 4 | Length of new file in bytes. |
+| n | The patch itself, a sequence of _literally added data_ and _common block records_ (see below). |
 
-bdiff uses the block-sort technique to allow O(lgN) searches in the file, giving
-an estimated O(NlgN) algorithm on average.
+Literally added data records have the following format:
 
-The program requires about five times as much memory as the old file, plus
-storage for the new file. This should be real memory, bdiff accesses all of it
-very often.
+| Number of bytes | Description                |
+|-----------------|----------------------------|
+|  1              | `43` (ASCII code for `+`). |
+|  4              | Number of bytes.           |
+|  n              | Data.                      |
 
+Common block records have the following format:
 
-OUTPUT FORMATS
+| Number of bytes | Description                |
+|-----------------|----------------------------|
+| 1               | `64` (ASCII code for `@`). |
+| 4               | File position in old file. |
+| 4               | Number of bytes.           |
+| 4               | Checksum (details below).  |
 
-The quoted format (default) is similar to diff output in unified format: '+'
-means added data, and a space means data kept from the old file. Lines prefixed
-with '@' inform you about the position of the next 'space' line in the source
-file (byte offset).
+The checksum is computed using the following algorithm:
 
-Unlike in diff, there's no implicit line feed after each line of output.
-Non-printable characters (see isprint(3)[1]) and the backslash character are
-represented by a \ followed by the octal three-digit character code.
+```pascal
+// rotate current checksum left by two and xor in the current byte
+function CheckSum(Data: array of Int8): Int32;
+var
+  I: Int8;
+begin
+  Result := 0;
+  for I in Data do
+  begin
+    Result := ((Result shr 30) and 3) or (Result shl 2);
+    Result := Result xor I;
+  end;
+end;
+```
 
-The filtered format is like the quoted format, but non-printable characters are
-replaced by dots (.).
+## Administrativia
 
-The binary format is machine-readable, and omits details for common blocks. All
-words are in little-endian format (low byte first). The format is:
+This document relates to BDiff version 0.2.6 and later.
 
-8 bytes  - Signature "bdiff02\x1A", where 02 is kind-of a version number. An
-           earlier version (with an O(n^3) algorithm) used the number 01. \x1A
-           is ASCII 26 (Control-Z, an MS-DOS end-of-file marker).
-4 bytes  - Length of old file in bytes.
-4 bytes  - Length of new file in bytes.
-n bytes  - The patch itself, a sequence of the following records:
-
-  literally added data:
-  1 byte   - ASCII 43 ('+');
-  4 bytes  - number of bytes;
-  n bytes  - data.
-
-  common block:
-  1 byte   - ASCII 64 ('@');
-  4 bytes  - file position in old file;
-  4 bytes  - number of bytes;
-  4 bytes  - checksum.
-
-  The checksum is computed using the following algorithm:
-    long checksum(char* data, size_t len)
-    {
-        long l = 0;
-        while(len--) {
-            l = ((l >> 30) & 3) | (l << 2);
-            l ^= *data++;
-        }
-        return l;
-    }
-    (rotate current checksum left by two and xor in the current byte)
-
-
-ADMINISTRATIVIA
-
-This manual page is for version 0.2.6 or later of bdiff.
-
-See the file LICENSE.md for details of licensing and copyright.
+See the file `LICENSE.md` for details of licensing and copyright.
 
 THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN
 NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF
 THIS SOFTWARE.
 
-
-FOOTNOTES
-
-[1] http://www.openbsd.org/cgi-bin/man.cgi?query=isprint&sektion=3
+[diff(1)]: https://man.openbsd.org/diff.1
+[isprint(3)]: https://man.openbsd.org/isprint.3
