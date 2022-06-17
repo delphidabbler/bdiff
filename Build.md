@@ -134,7 +134,7 @@ At any time you can rebuild the resources using `Make res` or rebuild the pascal
 
 ### Testing
 
-Some simple tests can be run to check that _BDiff_ and _BPatch_ are working correctly. For details see `ReadMe.txt` in the `Test` folder.
+Some simple tests can be run to check that _BDiff_ and _BPatch_ are working correctly. For details see `ReadMe.md` in the `Test` folder.
 
 ### Prepare the executable release file
 
