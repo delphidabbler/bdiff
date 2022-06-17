@@ -1,7 +1,7 @@
 @rem ---------------------------------------------------------------------------
 @rem Script used to run tests on BDiff and BPatch.
 @rem
-@rem See file ReadMe.txt for a description of available tests and requirements.
+@rem See file ReadMe.md for a description of available tests and requirements.
 @rem ---------------------------------------------------------------------------
 
 
