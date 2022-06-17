@@ -14,7 +14,7 @@ See the files `BDiff.md` and `BPatch.md` in the `Docs` directory for details of 
 
 _BDiff_ and _BPatch_ are derived from Stefan Reuther's _bdiff_ and _bpatch_ v0.2 and a later bug fix by Stefan.
 
-The original C source was translated into Object Pascal by Peter D Johnson ([@delphdabbler](https://twitter.com/delphidabbler)). The programs are are based on updates of the Pascal code base.
+The original C source was translated into Object Pascal by [Peter D Johnson](https://gravatar.com/delphidabbler). The programs are are based on updates of the Pascal code base.
 
 The programs should run on any current version of Windows.
 
