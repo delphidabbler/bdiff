@@ -57,4 +57,4 @@ See the file `LICENCE.md` for details of copyright and the license that applies 
 Change Log
 ----------
 
-The change log is provided in the file `CHANGELOG.txt`.
+The change log is provided in the file `CHANGELOG.md`.
