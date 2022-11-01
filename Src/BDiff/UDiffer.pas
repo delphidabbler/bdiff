@@ -30,7 +30,7 @@ type
     fMinMatchLength: Cardinal;
     fFormat: TFormat;
     function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-      SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
+      SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
     ///  <summary>Finds maximum length "sub-string" of CompareData that is in
     ///  Data.</summary>
     ///  <param name="Data">PSignedAnsiCharArray [in] Data to be searched for
@@ -45,9 +45,9 @@ type
     ///  <param name="FoundPos">Cardinal [out] Position in Data where
     ///  "sub-string" was found.</param>
     ///  <returns>Cardinal. Length of found "sub-string".</returns>
-    function FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-      DataSize: Cardinal; CompareData: PSignedAnsiChar;
-      CompareDataSize: Cardinal; out FoundPos: Cardinal): Cardinal;
+    function FindString(Data: PCCharArray; Block: PBlock; DataSize: Cardinal;
+      CompareData: PCChar; CompareDataSize: Cardinal; out FoundPos: Cardinal):
+      Cardinal;
   public
     constructor Create;
     destructor Destroy; override;
@@ -83,7 +83,7 @@ begin
 end;
 
 function TDiffer.FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-  SearchText: PSignedAnsiChar; SearchTextLength: Cardinal): TMatch;
+  SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
 var
   FoundPos: Cardinal;
   FoundLen: Cardinal;
@@ -112,17 +112,17 @@ begin
   end;
 end;
 
-function TDiffer.FindString(Data: PSignedAnsiCharArray; Block: PBlock;
-  DataSize: Cardinal; CompareData: PSignedAnsiChar;
-  CompareDataSize: Cardinal; out FoundPos: Cardinal): Cardinal;
+function TDiffer.FindString(Data: PCCharArray; Block: PBlock;
+  DataSize: Cardinal; CompareData: PCChar; CompareDataSize: Cardinal;
+  out FoundPos: Cardinal): Cardinal;
 var
-  First: Cardinal;                // first position in Data to search
-  Last: Cardinal;                 // last position in Data to search
-  Mid: Cardinal;                  // mid point of Data to search
-  FoundSize: Cardinal;            // size of matching "sub-string"
-  FoundMax: Cardinal;             // maximum size of matching "sub-string"
-  PData: PSignedAnsiChar;         // ptr to char in Data to be compared
-  PCompareData: PSignedAnsiChar;  // ptr to char in CompareData to be compared
+  First: Cardinal;      // first position in Data to search
+  Last: Cardinal;       // last position in Data to search
+  Mid: Cardinal;        // mid point of Data to search
+  FoundSize: Cardinal;  // size of matching "sub-string"
+  FoundMax: Cardinal;   // maximum size of matching "sub-string"
+  PData: PCChar;        // ptr to char in Data to be compared
+  PCompareData: PCChar; // ptr to char in CompareData to be compared
 begin
   First := 0;
   Last := DataSize - 1;
