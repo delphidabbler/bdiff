@@ -17,13 +17,14 @@ type
   TBlock = array[0..0] of Cardinal;
   PBlock = ^TBlock;
 
-  { The original C code refers to the buffered file contents as an array of
-    Char. The fact that Char is signed in C (-127..128) and unsigned in Pascal
-    (0..255) means that the block sort algorithm and string lookup functions
-    operate differently in C and Pascal. We therefore define a signed *ansi*
-    char type - SignedAnsiChar - of the correct range and refer to the buffered
-    file contents as an array of this new type. Since ShortInt is defined as
-    (-127..128) we use this as the basis for SignedAnsiChar}
+  {
+    Some of the original C code, for example the block sort algorithm and string
+    lookup functions, depended on the fact that the C char type is signed, with
+    range (-127..128). Therefore, where those assumptions hold, we replace char
+    with the Pascal Int8 type, which has the same range. Since the C code also
+    used char arrays and char pointers, the following types are defined to
+    enable the Pascal code to emulate this usage:
+  }
   TCChar = type Int8;
   PCChar = ^TCChar;
   TCCharArray = array[0..(MaxInt div SizeOf(TCChar) - 1)] of TCChar;
