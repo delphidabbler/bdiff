@@ -24,11 +24,10 @@ type
     char type - SignedAnsiChar - of the correct range and refer to the buffered
     file contents as an array of this new type. Since ShortInt is defined as
     (-127..128) we use this as the basis for SignedAnsiChar}
-  SignedAnsiChar = type ShortInt;
-  PSignedAnsiChar = ^SignedAnsiChar;
-  TSignedAnsiCharArray = array[0..(MaxInt div SizeOf(SignedAnsiChar) - 1)]
-    of SignedAnsiChar;
-  PSignedAnsiCharArray = ^TSignedAnsiCharArray;
+  TCChar = type Int8;
+  PCChar = ^TCChar;
+  TCCharArray = array[0..(MaxInt div SizeOf(TCChar) - 1)] of TCChar;
+  PCCharArray = ^TCCharArray;
 
   { Output format to use }
   TFormat = (FMT_BINARY, FMT_FILTERED, FMT_QUOTED);

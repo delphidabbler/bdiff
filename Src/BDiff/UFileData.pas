@@ -15,7 +15,7 @@ type
 
   TFileData = class(TObject)
   private
-    fData: PSignedAnsiCharArray;
+    fData: PCCharArray;
     fSize: Cardinal;
     fName: string;
     procedure LoadFile;
@@ -24,7 +24,7 @@ type
     destructor Destroy; override;
     property Name: string read fName;
     property Size: Cardinal read fSize;
-    property Data: PSignedAnsiCharArray read fData;
+    property Data: PCCharArray read fData;
   end;
 
 implementation
