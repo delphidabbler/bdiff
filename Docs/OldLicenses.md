@@ -17,7 +17,7 @@ License used for BDiff / BPatch v0.2.1 and v0.2.2
 The copyright statement and terms of use and distribution granted by the
 original author are:
 
-  © copyright 1999 by Stefan Reuther*. Copying this program is allowed, as long
+  Â© copyright 1999 by Stefan Reuther*. Copying this program is allowed, as long
   as you include source code and document changes you made in a user-visible way
   so people know they're using your version, not mine.
 
@@ -26,7 +26,7 @@ original author are:
 
 Additional copyright and terms of using the Pascal translation are as follows:
 
-  The Pascal translation is © copyright 2003 by Peter Johnson. Copying the
+  The Pascal translation is Â© copyright 2003 by Peter Johnson. Copying the
   Pascal translation and any modifications of the original code is allowed
   providing changes are made clear.
 
