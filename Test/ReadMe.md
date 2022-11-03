@@ -10,7 +10,7 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 3. `Test.bat` must be able to find the copies of `BDiff.exe` and `BPatch.exe` that it is to test. By default they are expected to be in the `..\Build\Exe` directory relative to the directory where `Test.bat` is located.
 
-  If the programs are not in `..\Build\Exe` then the `BDIFFPATH` environment variable must be set to the directory that contains both programs. Do not include a backslash at the end of the path.
+    If the programs are not in `..\Build\Exe` then the `BDIFFPATH` environment variable must be set to the directory that contains both programs. Do not include a backslash at the end of the path.
 
 4. Files `Diff-b`, `Diff-f` and `Diff-q` must be in the test directory and ***must not be modified***. These files are used to check for the expected output from `test patch`, `test quoted` and `test filtered`, respectively. The tests will fail if these files or `Test1` or `Test2` have been modified.
 
@@ -28,16 +28,24 @@ BDiff is run on `Test1` and `Test2` and creates a binary diff file named `Patch`
 
 Run the test by entering the command: 
 
-    Test.bat quoted [view]
+    Test.bat quoted
 
+or
+
+    Test.bat quoted view
+    
 BDiff is run on `Test1` and `Test2` and creates a quoted text diff file named `Diff` that is compared against the expected content in `Diff-q`. If the optional `view` parameter is provided `Diff` is displayed in NotePad.
 
 ### Filtered format diff test
 
 Run the test by entering the command: 
 
-    Test.bat filtered [view]
+    Test.bat filtered
     
+or
+
+    Test.bat filtered view
+
 BDiff is run on `Test1` and `Test2` and creates a filtered text diff file named `Diff` that is compared against the expected content in `Diff-f`. If the optional `view` parameter is provided `Diff` is displayed in NotePad.
 
 ### Version test
