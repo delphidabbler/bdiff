@@ -50,9 +50,15 @@ Copies of this license can be found at http://www.delphidabbler.com/software/bdi
 
 ### Footnotes (not part of original license)
 
-\* The year YYYY is 2007 for v0.2.3 and 2008 for v0.2.4.
+\* The year YYYY is 2007 for v0.2.3 and 2008 for v0.2.4.\
 \** This URL is no longer valid and results in a 404 error.
 
-## License used for current version BDiff / BPatch
+## License used for v0.2.5 and later
 
-The current version of the license can be found in `LICENSE.md` in the root of the Git repository.
+From v0.2.5, licenses have been recorded in Git. The following links will display the licenses on GitHub:
+
+* [v0.2.5](https://github.com/delphidabbler/bdiff/blob/v0.2.5/Docs/LICENSE)
+* [v0.2.6](https://github.com/delphidabbler/bdiff/blob/v0.2.6/Docs/LICENSE)
+* [v0.2.6a](https://github.com/delphidabbler/bdiff/blob/v0.2.6a/Docs/LICENSE)
+
+From v0.2.7 onwards the license is stored in the file `LICENSE.md` in the repository root. On [GitHub](https://github.com/delphidabbler/bdiff) select the tag relating to the required release and then click on `LICENSE.md` to view it.
