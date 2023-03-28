@@ -41,11 +41,14 @@ begin
 end;
 
 class function TAppInfo.ProgramExeDate: string;
+const
+  InternationalDateFmtStr = 'yyyy"-"mm"-"dd';
 var
   FileDate: TDateTime;  // date stamp of exe file
 begin
   if FileAge(ProgramPath, FileDate) then
-    Result := FormatDateTime('dd mmm yyyy', FileDate)
+    // Use international date format
+    Result := FormatDateTime(InternationalDateFmtStr, FileDate)
   else
     Result := '';
 end;

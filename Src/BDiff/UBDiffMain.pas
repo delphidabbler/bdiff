@@ -25,7 +25,7 @@ implementation
 
 uses
   SysUtils,
-  UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffUtils, UErrors, ULogger;
+  UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffIO, UErrors, ULogger;
 
 { TMain }
 
@@ -62,11 +62,11 @@ end;
 
 class procedure TMain.RedirectStdOut(const FileName: string);
 var
-  PatchFileHandle: Integer;
+  PatchFileHandle: THandle;
 begin
   // redirect standard output to patch file
   PatchFileHandle := FileCreate(FileName);
-  if PatchFileHandle <= 0 then
+  if NativeInt(PatchFileHandle) <= 0 then
     OSError;
   TIO.RedirectStdOut(PatchFileHandle);
 end;

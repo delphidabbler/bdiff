@@ -13,17 +13,16 @@ interface
 
 uses
   // Project
-  UBDiffTypes;
+  UBDiffTypes, UFileData;
 
 type
 
   TPatchWriter = class(TObject)
   public
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); virtual; abstract;
-    procedure Add(Data: PSignedAnsiChar; Length: Cardinal); virtual; abstract;
-    procedure Copy(NewBuf: PSignedAnsiCharArray; NewPos: Cardinal;
-      OldPos: Cardinal; Length: Cardinal); virtual; abstract;
+    procedure Header(const OldFile, NewFile: TFileData); virtual; abstract;
+    procedure Add(Data: PCChar; Length: Cardinal); virtual; abstract;
+    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
+      Length: Cardinal); virtual; abstract;
   end;
 
   TPatchWriterFactory = class(TObject)
@@ -37,19 +36,18 @@ uses
   // Delphi
   SysUtils,
   // Project
-  UBDiffUtils;
+  UCheckSum, UBDiffIO;
 
 type
   TBinaryPatchWriter = class(TPatchWriter)
   private
-    procedure PackLong(P: PSignedAnsiChar; L: Longint);
-    function CheckSum(Data: PSignedAnsiChar; Length: Cardinal): Longint;
+    procedure PackLong(P: PCChar; L: Longint);
+    function CheckSum(Data: PCChar; Length: Cardinal): Longint;
   public
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); override;
-    procedure Add(Data: PSignedAnsiChar; Length: Cardinal); override;
-    procedure Copy(NewBuf: PSignedAnsiCharArray; NewPos: Cardinal;
-      OldPos: Cardinal; Length: Cardinal); override;
+    procedure Header(const OldFile, NewFile: TFileData); override;
+    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
+      Length: Cardinal); override;
   end;
 
   TTextPatchWriter = class(TPatchWriter)
@@ -57,28 +55,27 @@ type
     { Checks if an ANSI character is a printable ASCII character. }
     class function IsPrint(const Ch: AnsiChar): Boolean;
     procedure CopyHeader(NewPos: Cardinal; OldPos: Cardinal; Length: Cardinal);
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); override;
+    procedure Header(const OldFile, NewFile: TFileData); override;
   end;
 
   TQuotedPatchWriter = class(TTextPatchWriter)
   private
-    procedure QuotedData(Data: PSignedAnsiChar; Length: Cardinal);
+    procedure QuotedData(Data: PCChar; Length: Cardinal);
     { Returns octal representation of given value as a 3 digit string. }
     class function ByteToOct(const Value: Byte): string;
   public
-    procedure Add(Data: PSignedAnsiChar; Length: Cardinal); override;
-    procedure Copy(NewBuf: PSignedAnsiCharArray; NewPos: Cardinal;
-      OldPos: Cardinal; Length: Cardinal); override;
+    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
+      Length: Cardinal); override;
   end;
 
   TFilteredPatchWriter = class(TTextPatchWriter)
   private
-    procedure FilteredData(Data: PSignedAnsiChar; Length: Cardinal);
+    procedure FilteredData(Data: PCChar; Length: Cardinal);
   public
-    procedure Add(Data: PSignedAnsiChar; Length: Cardinal); override;
-    procedure Copy(NewBuf: PSignedAnsiCharArray; NewPos: Cardinal;
-      OldPos: Cardinal; Length: Cardinal); override;
+    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
+      Length: Cardinal); override;
   end;
 
 { TPatchWriterFactory }
@@ -96,10 +93,10 @@ end;
 
 { TBinaryPatchWriter }
 
-procedure TBinaryPatchWriter.Add(Data: PSignedAnsiChar; Length: Cardinal);
+procedure TBinaryPatchWriter.Add(Data: PCChar; Length: Cardinal);
 var
   Rec: packed record
-    DataLength: array[0..3] of SignedAnsiChar;  // length of added adata
+    DataLength: array[0..3] of TCChar;  // length of added adata
   end;
 const
   cPlusSign: AnsiChar = '+';                // flags added data
@@ -111,26 +108,26 @@ begin
 end;
 
 { Compute simple checksum }
-function TBinaryPatchWriter.CheckSum(Data: PSignedAnsiChar;
-  Length: Cardinal): Longint;
+function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Cardinal): Longint;
+var
+  CS: TCheckSum;
 begin
-  Result := 0;
-  while Length <> 0 do
-  begin
-    Dec(Length);
-    Result := ((Result shr 30) and 3) or (Result shl 2);
-    Result := Result xor Ord(Data^);
-    Inc(Data);
+  CS := TCheckSum.Create(0);
+  try
+    CS.AddBuffer(PInt8(Data), Length);
+    Result := CS.CheckSum;
+  finally
+    CS.Free;
   end;
 end;
 
-procedure TBinaryPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos, OldPos,
+procedure TBinaryPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
   Length: Cardinal);
 var
   Rec: packed record
-    CopyStart: array[0..3] of SignedAnsiChar;   // starting pos of copied data
-    CopyLength: array[0..3] of SignedAnsiChar;  // length copied data
-    CheckSum: array[0..3] of SignedAnsiChar;    // validates copied data
+    CopyStart: array[0..3] of TCChar;   // starting pos of copied data
+    CopyLength: array[0..3] of TCChar;  // length copied data
+    CheckSum: array[0..3] of TCChar;    // validates copied data
   end;
 const
   cAtSign: AnsiChar = '@';                  // flags command data in both file
@@ -142,13 +139,12 @@ begin
   TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
 end;
 
-procedure TBinaryPatchWriter.Header(const OldFileName, NewFileName: string;
-  const OldFileSize, NewFileSize: Cardinal);
+procedure TBinaryPatchWriter.Header(const OldFile, NewFile: TFileData);
 var
   Head: packed record
-    Signature: array[0..7] of SignedAnsiChar;     // file signature
-    OldDataSize: array[0..3] of SignedAnsiChar;   // size of old data file
-    NewDataSize: array[0..3] of SignedAnsiChar;   // size of new data file
+    Signature: array[0..7] of TCChar;   // file signature
+    OldDataSize: array[0..3] of TCChar; // size of old data file
+    NewDataSize: array[0..3] of TCChar; // size of new data file
   end;
 const
   // File signature. Must be 8 bytes. Format is 'bdiff' + file-version + #$1A
@@ -158,14 +154,14 @@ const
 begin
   Assert(Length(cFileSignature) = 8);
   Move(cFileSignature, Head.Signature[0], Length(cFileSignature));
-  PackLong(@Head.OldDataSize, OldFileSize);
-  PackLong(@Head.NewDataSize, NewFileSize);
+  PackLong(@Head.OldDataSize, OldFile.Size);
+  PackLong(@Head.NewDataSize, NewFile.Size);
   TIO.WriteRaw(TIO.StdOut, @Head, SizeOf(Head));
 end;
 
 { Pack long in little-endian format to P }
 { NOTE: P must point to a block of at least 4 bytes }
-procedure TBinaryPatchWriter.PackLong(P: PSignedAnsiChar; L: Integer);
+procedure TBinaryPatchWriter.PackLong(P: PCChar; L: Integer);
 begin
   P^ := L and $FF;
   Inc(P);
@@ -187,13 +183,12 @@ begin
   );
 end;
 
-procedure TTextPatchWriter.Header(const OldFileName, NewFileName: string;
-  const OldFileSize, NewFileSize: Cardinal);
+procedure TTextPatchWriter.Header(const OldFile, NewFile: TFileData);
 begin
   TIO.WriteStrFmt(
     TIO.StdOut,
     '%% --- %s (%d bytes)'#13#10'%% +++ %s (%d bytes)'#13#10,
-    [OldFileName, OldFileSize, NewFileName, NewFileSize]
+    [OldFile.Name, OldFile.Size, NewFile.Name, NewFile.Size]
   );
 end;
 
@@ -204,7 +199,7 @@ end;
 
 { TQuotedPatchWriter }
 
-procedure TQuotedPatchWriter.Add(Data: PSignedAnsiChar; Length: Cardinal);
+procedure TQuotedPatchWriter.Add(Data: PCChar; Length: Cardinal);
 begin
   TIO.WriteStr(TIO.StdOut, '+');
   QuotedData(Data, Length);
@@ -227,7 +222,7 @@ begin
   end;
 end;
 
-procedure TQuotedPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos, OldPos,
+procedure TQuotedPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
   Length: Cardinal);
 begin
   CopyHeader(NewPos, OldPos, Length);
@@ -235,8 +230,7 @@ begin
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-procedure TQuotedPatchWriter.QuotedData(Data: PSignedAnsiChar;
-  Length: Cardinal);
+procedure TQuotedPatchWriter.QuotedData(Data: PCChar; Length: Cardinal);
 begin
   while (Length <> 0) do
   begin
@@ -251,23 +245,22 @@ end;
 
 { TFilteredPatchWriter }
 
-procedure TFilteredPatchWriter.Add(Data: PSignedAnsiChar; Length: Cardinal);
+procedure TFilteredPatchWriter.Add(Data: PCChar; Length: Cardinal);
 begin
   TIO.WriteStr(TIO.StdOut, '+');
   FilteredData(Data, Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-procedure TFilteredPatchWriter.Copy(NewBuf: PSignedAnsiCharArray; NewPos,
-  OldPos, Length: Cardinal);
+procedure TFilteredPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
+  Length: Cardinal);
 begin
   CopyHeader(NewPos, OldPos, Length);
   FilteredData(@NewBuf[NewPos], Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-procedure TFilteredPatchWriter.FilteredData(Data: PSignedAnsiChar;
-  Length: Cardinal);
+procedure TFilteredPatchWriter.FilteredData(Data: PCChar; Length: Cardinal);
 begin
   while Length <> 0  do
   begin

@@ -28,7 +28,7 @@ type
       @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
         False when SourceFileHandle is source file.
     }
-    class procedure CopyData(const SourceFileHandle, DestFileHandle: Integer;
+    class procedure CopyData(const SourceFileHandle, DestFileHandle: THandle;
       Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
     { Creates a temporary file in user's temp directory and returns its name }
     class function GetTempFileName: string;
@@ -47,7 +47,7 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchInfoWriter, UBPatchParams, UBPatchUtils, UErrors;
+  UAppInfo, UBPatchInfoWriter, UBPatchParams, UCheckSum, UBPatchIO, UErrors;
 
 
 const
@@ -59,8 +59,8 @@ const
 
 class procedure TPatcher.Apply(const SourceFileName, DestFileName: string);
 var
-  SourceFileHandle: Integer;        // source file handle
-  DestFileHandle: Integer;          // destination file handle
+  SourceFileHandle: THandle;        // source file handle
+  DestFileHandle: THandle;          // destination file handle
   TempFileName: string;             // temporary file name
   Header: array[0..15] of AnsiChar; // patch file header
   SourceLen: Longint;               // expected length of source file
@@ -85,7 +85,7 @@ begin
     // open source file
     SourceFileHandle := FileOpen(SourceFileName, fmOpenRead + fmShareDenyNone);
     try
-      if SourceFileHandle <= 0 then
+      if NativeInt(SourceFileHandle) <= 0 then
         OSError;
 
       // check destination file name
@@ -95,7 +95,7 @@ begin
       // create temporary file
       TempFileName := GetTempFileName;
       DestFileHandle := FileCreate(TempFileName);
-      if DestFileHandle <= 0 then
+      if NativeInt(DestFileHandle) <= 0 then
         Error('Can''t create temporary file');
 
       { apply patch }
@@ -166,19 +166,20 @@ end;
 
 class function TPatcher.CheckSum(Data: PAnsiChar; DataSize: Cardinal;
   const BFCheckSum: Integer): Longint;
+var
+  CS: TCheckSum;
 begin
-  Result := BFCheckSum;
-  while DataSize <> 0 do
-  begin
-    Dec(DataSize);
-    Result := ((Result shr 30) and 3) or (Result shl 2);
-    Result := Result xor PShortInt(Data)^;
-    Inc(Data);
+  CS := TCheckSum.Create(BFCheckSum);
+  try
+    CS.AddBuffer(PInt8(Data), DataSize);
+    Result := CS.CheckSum;
+  finally
+    CS.Free;
   end;
 end;
 
 class procedure TPatcher.CopyData(const SourceFileHandle,
-  DestFileHandle: Integer; Count, SourceCheckSum: Integer;
+  DestFileHandle: THandle; Count, SourceCheckSum: Integer;
   const SourceIsPatch: Boolean);
 var
   DestCheckSum: Longint;

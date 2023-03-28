@@ -21,7 +21,7 @@ implementation
 
 uses
   SysUtils,
-  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchUtils, UErrors;
+  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchIO, UErrors;
 
 { TMain }
 
@@ -37,10 +37,10 @@ end;
 
 class procedure TMain.RedirectStdIn(const FileName: string);
 var
-  PatchFileHandle: Integer;
+  PatchFileHandle: THandle;
 begin
   PatchFileHandle := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
-  if PatchFileHandle <= 0 then
+  if NativeInt(PatchFileHandle) <= 0 then
     OSError;
   TIO.RedirectStdIn(PatchFileHandle);
 end;

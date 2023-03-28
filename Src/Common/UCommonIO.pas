@@ -3,7 +3,7 @@
 }
 
 
-unit UUtils;
+unit UCommonIO;
 
 interface
 
@@ -11,11 +11,11 @@ type
   TCommonIO = class(TObject)
   public
     { Returns Windows standard input handle }
-    class function StdIn: Integer;
+    class function StdIn: THandle;
     { Returns Windows standard output handle }
-    class function StdOut: Integer;
+    class function StdOut: THandle;
     { Returns Windows standard error handle }
-    class function StdErr: Integer;
+    class function StdErr: THandle;
     { Writes binary data to a file }
     class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
     { Writes a string to a file }
@@ -34,19 +34,19 @@ uses
 
 { TCommonIO }
 
-class function TCommonIO.StdErr: Integer;
+class function TCommonIO.StdErr: THandle;
 begin
-  Result := Integer(Windows.GetStdHandle(STD_ERROR_HANDLE));
+  Result := Windows.GetStdHandle(STD_ERROR_HANDLE);
 end;
 
-class function TCommonIO.StdIn: Integer;
+class function TCommonIO.StdIn: THandle;
 begin
-  Result := Integer(Windows.GetStdHandle(STD_INPUT_HANDLE));
+  Result := Windows.GetStdHandle(STD_INPUT_HANDLE);
 end;
 
-class function TCommonIO.StdOut: Integer;
+class function TCommonIO.StdOut: THandle;
 begin
-  Result := Integer(Windows.GetStdHandle(STD_OUTPUT_HANDLE));
+  Result := Windows.GetStdHandle(STD_OUTPUT_HANDLE);
 end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;

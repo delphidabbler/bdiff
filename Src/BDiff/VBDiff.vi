@@ -3,14 +3,14 @@
 ;
 ; Usage:
 ;   1) Generate a .rc resource source file from this file using DelphiDabbler
-;      Version Information Editor (http://www.delphidabbler.com/vied).
+;      Version Information Editor (https://delphidabbler.com/software/vied).
 ;   2) Use the Borland BRCC32 resource compiler to compile the .rc file.
 ;-------------------------------------------------------------------------------
 
 
 [Fixed File Info]
-File Version #=0, 2, 8, 9
-Product Version #=0, 2, 8, 0
+File Version #=0, 2, 9, 10
+Product Version #=0, 2, 9, 0
 File OS=4
 File Type=1
 File Sub-Type=0
@@ -27,7 +27,7 @@ Company Name=
 File Description=Windows console application that outputs the difference of two binary files.
 File Version=v<#F1>.<#F2>.<#F3> Build <#F4>
 Internal Name=<SHORTFNAME>
-Legal Copyright=Original code copyright © 1999 by Stefan Reuther <Streu@gmx.de>. Portions copyright © 2003-<YEAR> by Peter Johnson (www.delphidabbler.com).
+Legal Copyright=Original code copyright (C) 1999 by Stefan Reuther <Streu@gmx.de>. Portions copyright (C) 2003-<YEAR> by Peter Johnson (www.delphidabbler.com).
 Legal Trademark=
 Original File Name=BDiff.exe
 Private Build=
@@ -39,4 +39,3 @@ Special Build=
 Identifier=
 NumRCComments=0
 ResOutputDir=
-

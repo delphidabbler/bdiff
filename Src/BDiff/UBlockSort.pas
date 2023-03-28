@@ -19,11 +19,11 @@ uses
 type
   TBlockSort = class(TObject)
   private
-    class function Compare(A: Cardinal; B: Cardinal; Data: PSignedAnsiCharArray;
+    class function Compare(A: Cardinal; B: Cardinal; Data: PCCharArray;
       DataSize: Cardinal): Integer;
     { The 'sink element' part of heapsort }
-    class procedure Sink(Left: Cardinal; Right: Cardinal; Block: PBlock; 
-      Data: PSignedAnsiCharArray; DataSize: Cardinal);
+    class procedure Sink(Left: Cardinal; Right: Cardinal; Block: PBlock;
+      Data: PCCharArray; DataSize: Cardinal);
   public
     { Returns array of offsets into data, sorted by position.
       @param Data [in] Data to be sorted. Must not be nil.
@@ -31,8 +31,7 @@ type
       @return Pointer to block of sorted indices into Data. Caller must free.
       @except raises EOutOfMemory if can't allocate sorted data block.
     }
-    class function Execute(Data: PSignedAnsiCharArray; DataSize: Cardinal):
-      PBlock;
+    class function Execute(Data: PCCharArray; DataSize: Cardinal): PBlock;
   end;
 
 
@@ -65,11 +64,11 @@ implementation
 
 { TBlockSort }
 
-class function TBlockSort.Compare(A, B: Cardinal;
-  Data: PSignedAnsiCharArray; DataSize: Cardinal): Integer;
+class function TBlockSort.Compare(A, B: Cardinal; Data: PCCharArray;
+  DataSize: Cardinal): Integer;
 var
-  PA: PSignedAnsiChar;
-  PB: PSignedAnsiChar;
+  PA: PCChar;
+  PB: PCChar;
   Len: Cardinal;
 begin
   PA := @Data[A];
@@ -91,8 +90,8 @@ begin
   Result := PA^ - PB^;
 end;
 
-class function TBlockSort.Execute(Data: PSignedAnsiCharArray;
-  DataSize: Cardinal): PBlock;
+class function TBlockSort.Execute(Data: PCCharArray; DataSize: Cardinal):
+  PBlock;
 var
   I, Temp, Left, Right: Cardinal;
 begin
@@ -127,7 +126,7 @@ begin
 end;
 
 class procedure TBlockSort.Sink(Left, Right: Cardinal; Block: PBlock;
-  Data: PSignedAnsiCharArray; DataSize: Cardinal);
+  Data: PCCharArray; DataSize: Cardinal);
 var
   I, J, X: Cardinal;
 begin
