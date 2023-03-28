@@ -33,14 +33,14 @@
 			</DelphiCompile>
 			<DCCReference Include="UDiffer.pas"/>
 			<DCCReference Include="UBlockSort.pas"/>
-			<DCCReference Include="UBDiffUtils.pas"/>
+			<DCCReference Include="UBDiffIO.pas"/>
 			<DCCReference Include="UBDiffTypes.pas"/>
 			<DCCReference Include="..\Common\UAppInfo.pas"/>
 			<DCCReference Include="..\Common\UErrors.pas"/>
 			<DCCReference Include="UFileData.pas"/>
 			<DCCReference Include="UBDiffParams.pas"/>
 			<DCCReference Include="UPatchWriters.pas"/>
-			<DCCReference Include="..\Common\UUtils.pas"/>
+			<DCCReference Include="..\Common\UCommonIO.pas"/>
 			<DCCReference Include="..\Common\UBaseParams.pas"/>
 			<DCCReference Include="ULogger.pas"/>
 			<DCCReference Include="..\Common\UInfoWriter.pas"/>

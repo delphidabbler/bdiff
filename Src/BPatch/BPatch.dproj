@@ -33,11 +33,11 @@
 				<MainSource>MainSource</MainSource>
 			</DelphiCompile>
 			<DCCReference Include="UPatcher.pas"/>
-			<DCCReference Include="UBPatchUtils.pas"/>
+			<DCCReference Include="UBPatchIO.pas"/>
 			<DCCReference Include="..\Common\UAppInfo.pas"/>
 			<DCCReference Include="..\Common\UErrors.pas"/>
 			<DCCReference Include="UBPatchParams.pas"/>
-			<DCCReference Include="..\Common\UUtils.pas"/>
+			<DCCReference Include="..\Common\UCommonIO.pas"/>
 			<DCCReference Include="..\Common\UBaseParams.pas"/>
 			<DCCReference Include="UBPatchInfoWriter.pas"/>
 			<DCCReference Include="..\Common\UInfoWriter.pas"/>

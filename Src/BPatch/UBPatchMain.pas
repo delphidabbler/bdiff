@@ -21,7 +21,7 @@ implementation
 
 uses
   SysUtils,
-  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchUtils, UErrors;
+  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchIO, UErrors;
 
 { TMain }
 

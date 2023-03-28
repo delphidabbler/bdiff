@@ -23,7 +23,7 @@ type
 implementation
 
 uses
-  UAppInfo, UBDiffUtils;
+  UAppInfo, UBDiffIO;
 
 type
   TVerboseLogger = class(TLogger)

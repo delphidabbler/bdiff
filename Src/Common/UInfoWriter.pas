@@ -20,7 +20,7 @@ type
 implementation
 
 uses
-  UAppInfo, UUtils;
+  UAppInfo, UCommonIO;
 
 
 { TInfoWriter }

@@ -11,11 +11,11 @@ program BPatch;
 
 uses
   UPatcher in 'UPatcher.pas',
-  UBPatchUtils in 'UBPatchUtils.pas',
+  UBPatchIO in 'UBPatchIO.pas',
   UAppInfo in '..\Common\UAppInfo.pas',
   UErrors in '..\Common\UErrors.pas',
   UBPatchParams in 'UBPatchParams.pas',
-  UUtils in '..\Common\UUtils.pas',
+  UCommonIO in '..\Common\UCommonIO.pas',
   UBaseParams in '..\Common\UBaseParams.pas',
   UBPatchInfoWriter in 'UBPatchInfoWriter.pas',
   UInfoWriter in '..\Common\UInfoWriter.pas',
