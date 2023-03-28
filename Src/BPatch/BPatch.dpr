@@ -19,7 +19,8 @@ uses
   UBaseParams in '..\Common\UBaseParams.pas',
   UBPatchInfoWriter in 'UBPatchInfoWriter.pas',
   UInfoWriter in '..\Common\UInfoWriter.pas',
-  UBPatchMain in 'UBPatchMain.pas';
+  UBPatchMain in 'UBPatchMain.pas',
+  UCheckSum in '..\Common\UCheckSum.pas';
 
 {$Resource VBPatch.res}     // version information
 {$Resource BPatch.res}      // other resources

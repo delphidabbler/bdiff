@@ -23,7 +23,8 @@ uses
   ULogger in 'ULogger.pas',
   UInfoWriter in '..\Common\UInfoWriter.pas',
   UBDiffInfoWriter in 'UBDiffInfoWriter.pas',
-  UBDiffMain in 'UBDiffMain.pas';
+  UBDiffMain in 'UBDiffMain.pas',
+  UCheckSum in '..\Common\UCheckSum.pas';
 
 {$Resource VBDiff.res}    // version information
 {$Resource BDiff.res}     // general resources

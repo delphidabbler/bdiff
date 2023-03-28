@@ -46,6 +46,7 @@
 			<DCCReference Include="..\Common\UInfoWriter.pas"/>
 			<DCCReference Include="UBDiffInfoWriter.pas"/>
 			<DCCReference Include="UBDiffMain.pas"/>
+			<DCCReference Include="..\Common\UCheckSum.pas"/>
 			<BuildConfiguration Include="Base">
 				<Key>Base</Key>
 			</BuildConfiguration>
