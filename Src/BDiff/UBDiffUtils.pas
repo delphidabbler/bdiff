@@ -16,7 +16,7 @@ type
   TIO = class(TCommonIO)
   public
     { Redirects standard output to a given file handle }
-    class procedure RedirectStdOut(const Handle: Integer);
+    class procedure RedirectStdOut(const Handle: THandle);
   end;
 
 implementation
@@ -27,9 +27,9 @@ uses
 
 { TIO }
 
-class procedure TIO.RedirectStdOut(const Handle: Integer);
+class procedure TIO.RedirectStdOut(const Handle: THandle);
 begin
-  Windows.SetStdHandle(STD_OUTPUT_HANDLE, Cardinal(Handle));
+  Windows.SetStdHandle(STD_OUTPUT_HANDLE, Handle);
 end;
 
 end.

@@ -24,16 +24,16 @@ type
   TIO = class(TCommonIO)
   public
     { Redirects standard input from a given file handle }
-    class procedure RedirectStdIn(const Handle: Integer);
+    class procedure RedirectStdIn(const Handle: THandle);
     { Seeks to given offset from given origin in file specified by Handle.
       Returns True on success, false on failure. }
-    class function Seek(Handle: Integer; Offset: Longint; Origin: Integer):
+    class function Seek(Handle: THandle; Offset: Longint; Origin: Integer):
       Boolean;
     { Checks if given file handle is at end of file. }
-    class function AtEOF(Handle: Integer): Boolean;
+    class function AtEOF(Handle: THandle): Boolean;
     { Gets a single ANSI character from file specified by Handle and returns it,
       or EOF. }
-    class function GetCh(Handle: Integer): Integer;
+    class function GetCh(Handle: THandle): Integer;
   end;
 
 implementation
@@ -44,7 +44,7 @@ uses
 
 { TIO }
 
-class function TIO.AtEOF(Handle: Integer): Boolean;
+class function TIO.AtEOF(Handle: THandle): Boolean;
 var
   CurPos: Integer;
   Size: Integer;
@@ -54,7 +54,7 @@ begin
   Result := CurPos = Size;
 end;
 
-class function TIO.GetCh(Handle: Integer): Integer;
+class function TIO.GetCh(Handle: THandle): Integer;
 var
   Ch: AnsiChar;
 begin
@@ -67,12 +67,12 @@ begin
   end;
 end;
 
-class procedure TIO.RedirectStdIn(const Handle: Integer);
+class procedure TIO.RedirectStdIn(const Handle: THandle);
 begin
   Windows.SetStdHandle(STD_INPUT_HANDLE, Cardinal(Handle));
 end;
 
-class function TIO.Seek(Handle, Offset, Origin: Integer): Boolean;
+class function TIO.Seek(Handle: THandle; Offset, Origin: Integer): Boolean;
 begin
   Result := SysUtils.FileSeek(Handle, Offset, Origin) >= 0;
 end;
