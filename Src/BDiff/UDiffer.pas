@@ -201,7 +201,7 @@ begin
     if not Assigned(SortedOldData) then
       Error('virtual memory exhausted');
     Logger.Log('generating patch');
-    PatchWriter.Header(OldFile.Name, NewFile.Name, OldFile.Size, NewFile.Size);
+    PatchWriter.Header(OldFile, NewFile);
     { main loop }
     ToDo := NewFile.Size;
     NewOffset := 0;

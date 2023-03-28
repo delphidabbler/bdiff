@@ -13,14 +13,13 @@ interface
 
 uses
   // Project
-  UBDiffTypes;
+  UBDiffTypes, UFileData;
 
 type
 
   TPatchWriter = class(TObject)
   public
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); virtual; abstract;
+    procedure Header(const OldFile, NewFile: TFileData); virtual; abstract;
     procedure Add(Data: PCChar; Length: Cardinal); virtual; abstract;
     procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
       Length: Cardinal); virtual; abstract;
@@ -45,8 +44,7 @@ type
     procedure PackLong(P: PCChar; L: Longint);
     function CheckSum(Data: PCChar; Length: Cardinal): Longint;
   public
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); override;
+    procedure Header(const OldFile, NewFile: TFileData); override;
     procedure Add(Data: PCChar; Length: Cardinal); override;
     procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
       Length: Cardinal); override;
@@ -57,8 +55,7 @@ type
     { Checks if an ANSI character is a printable ASCII character. }
     class function IsPrint(const Ch: AnsiChar): Boolean;
     procedure CopyHeader(NewPos: Cardinal; OldPos: Cardinal; Length: Cardinal);
-    procedure Header(const OldFileName, NewFileName: string;
-      const OldFileSize, NewFileSize: Cardinal); override;
+    procedure Header(const OldFile, NewFile: TFileData); override;
   end;
 
   TQuotedPatchWriter = class(TTextPatchWriter)
@@ -142,8 +139,7 @@ begin
   TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
 end;
 
-procedure TBinaryPatchWriter.Header(const OldFileName, NewFileName: string;
-  const OldFileSize, NewFileSize: Cardinal);
+procedure TBinaryPatchWriter.Header(const OldFile, NewFile: TFileData);
 var
   Head: packed record
     Signature: array[0..7] of TCChar;   // file signature
@@ -158,8 +154,8 @@ const
 begin
   Assert(Length(cFileSignature) = 8);
   Move(cFileSignature, Head.Signature[0], Length(cFileSignature));
-  PackLong(@Head.OldDataSize, OldFileSize);
-  PackLong(@Head.NewDataSize, NewFileSize);
+  PackLong(@Head.OldDataSize, OldFile.Size);
+  PackLong(@Head.NewDataSize, NewFile.Size);
   TIO.WriteRaw(TIO.StdOut, @Head, SizeOf(Head));
 end;
 
@@ -187,13 +183,12 @@ begin
   );
 end;
 
-procedure TTextPatchWriter.Header(const OldFileName, NewFileName: string;
-  const OldFileSize, NewFileSize: Cardinal);
+procedure TTextPatchWriter.Header(const OldFile, NewFile: TFileData);
 begin
   TIO.WriteStrFmt(
     TIO.StdOut,
     '%% --- %s (%d bytes)'#13#10'%% +++ %s (%d bytes)'#13#10,
-    [OldFileName, OldFileSize, NewFileName, NewFileSize]
+    [OldFile.Name, OldFile.Size, NewFile.Name, NewFile.Size]
   );
 end;
 
