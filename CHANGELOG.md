@@ -1,5 +1,18 @@
 # BDiff / BPatch Change Log
 
+## v0.2.9 - 2023-03-28
+
+_BDiff_ v0.2.9 (build 10) & _BPatch_ v0.2.9 (build 10)
+
+* `--version` command of both _BDiff_ and _BPatch_ now display compilation date in international date format.
+* Update Makefiles re changes in documentation file names.
+* Some refactoring of type and unit names, method signatures and reducing code duplication.
+* Standardised type used for Windows handles.
+* Updated manifest files to include program compatibility information.
+* Documentation:
+  * Converted several documents to Markdown format & add some text formatting.
+  * Some corrections and revisions.
+
 ## v0.2.8 - 2016-09-19
 
 _BDiff_ v0.2.8 (build 9) & _BPatch_ v0.2.8 (build 9)
