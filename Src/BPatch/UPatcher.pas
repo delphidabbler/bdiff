@@ -47,7 +47,7 @@ uses
   // Delphi
   Windows, SysUtils,
   // Project
-  UAppInfo, UBPatchInfoWriter, UBPatchParams, UBPatchIO, UErrors;
+  UAppInfo, UBPatchInfoWriter, UBPatchParams, UCheckSum, UBPatchIO, UErrors;
 
 
 const
@@ -166,14 +166,15 @@ end;
 
 class function TPatcher.CheckSum(Data: PAnsiChar; DataSize: Cardinal;
   const BFCheckSum: Integer): Longint;
+var
+  CS: TCheckSum;
 begin
-  Result := BFCheckSum;
-  while DataSize <> 0 do
-  begin
-    Dec(DataSize);
-    Result := ((Result shr 30) and 3) or (Result shl 2);
-    Result := Result xor PShortInt(Data)^;
-    Inc(Data);
+  CS := TCheckSum.Create(BFCheckSum);
+  try
+    CS.AddBuffer(PInt8(Data), DataSize);
+    Result := CS.CheckSum;
+  finally
+    CS.Free;
   end;
 end;
 

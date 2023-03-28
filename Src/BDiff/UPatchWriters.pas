@@ -37,7 +37,7 @@ uses
   // Delphi
   SysUtils,
   // Project
-  UBDiffIO;
+  UCheckSum, UBDiffIO;
 
 type
   TBinaryPatchWriter = class(TPatchWriter)
@@ -112,14 +112,15 @@ end;
 
 { Compute simple checksum }
 function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Cardinal): Longint;
+var
+  CS: TCheckSum;
 begin
-  Result := 0;
-  while Length <> 0 do
-  begin
-    Dec(Length);
-    Result := ((Result shr 30) and 3) or (Result shl 2);
-    Result := Result xor Ord(Data^);
-    Inc(Data);
+  CS := TCheckSum.Create(0);
+  try
+    CS.AddBuffer(PInt8(Data), Length);
+    Result := CS.CheckSum;
+  finally
+    CS.Free;
   end;
 end;
 
