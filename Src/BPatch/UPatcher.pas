@@ -45,7 +45,7 @@ implementation
 
 uses
   // Delphi
-  Windows, SysUtils,
+  Winapi.Windows, System.SysUtils, System.AnsiStrings,
   // Project
   UAppInfo, UBPatchInfoWriter, UBPatchParams, UCheckSum, UBPatchIO, UErrors;
 
@@ -75,7 +75,9 @@ begin
     // read header from patch file on standard input
     if FileRead(TIO.StdIn, Header, 16) <> 16 then
       Error('Patch not in BINARY format');
-    if StrLComp(Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8) <> 0 then
+    if System.AnsiStrings.StrLComp(
+      Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8
+    ) <> 0 then
       Error('Patch not in BINARY format');
     // get length of source and destination files from header
     SourceLen := GetLong(@Header[8]);
@@ -152,13 +154,13 @@ begin
       FileClose(DestFileHandle);
     end;
     // create destination file: overwrites any existing dest file with same name
-    SysUtils.DeleteFile(DestFileName);
+    System.SysUtils.DeleteFile(DestFileName);
     if not RenameFile(TempFileName, DestFileName) then
       Error('Can''t rename temporary file');
   except
     on E: Exception do
     begin
-      SysUtils.DeleteFile(TempFileName);
+      System.SysUtils.DeleteFile(TempFileName);
       raise;
     end;
   end;
@@ -242,10 +244,10 @@ end;
 class function TPatcher.GetTempFileName: string;
 begin
   // Get temporary folder
-  SetLength(Result, Windows.MAX_PATH);
-  Windows.GetTempPath(Windows.MAX_PATH, PChar(Result));
+  SetLength(Result, Winapi.Windows.MAX_PATH);
+  Winapi.Windows.GetTempPath(Winapi.Windows.MAX_PATH, PChar(Result));
   // Get unique temporary file name (it is created as side effect of this call)
-  if Windows.GetTempFileName(
+  if Winapi.Windows.GetTempFileName(
     PChar(Result), '', 0, PChar(Result)
   ) = 0 then
     Error('Can''t create temporary file');

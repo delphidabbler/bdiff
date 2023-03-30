@@ -20,7 +20,7 @@ type
 implementation
 
 uses
-  SysUtils,
+  System.SysUtils,
   UAppInfo;
 
 { TBDiffInfoWriter }

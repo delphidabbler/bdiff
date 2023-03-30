@@ -9,7 +9,7 @@ interface
 
 uses
   // Delphi
-  SysUtils;
+  System.SysUtils;
 
 type
 
@@ -42,7 +42,7 @@ implementation
 
 uses
   // Delphi
-  StrUtils,
+  System.StrUtils,
   // Project
   UErrors;
 

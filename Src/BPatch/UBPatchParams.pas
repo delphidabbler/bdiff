@@ -38,7 +38,7 @@ implementation
 
 uses
   // Delphi
-  StrUtils;
+  System.StrUtils;
 
 { TParams }
 

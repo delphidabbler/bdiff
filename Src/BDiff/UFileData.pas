@@ -31,7 +31,7 @@ implementation
 
 uses
   // Delphi
-  SysUtils, Windows,
+  System.SysUtils, Winapi.Windows,
   // Project
   UErrors;
 

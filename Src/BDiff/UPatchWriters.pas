@@ -34,7 +34,7 @@ implementation
 
 uses
   // Delphi
-  SysUtils,
+  System.SysUtils,
   // Project
   UCheckSum, UBDiffIO;
 

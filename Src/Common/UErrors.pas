@@ -25,7 +25,7 @@ implementation
 
 uses
   // Project
-  Sysutils;
+  System.Sysutils;
 
 
 { Raises an exception with given message }

@@ -40,7 +40,7 @@ implementation
 
 uses
   // Delphi
-  SysUtils, Windows;
+  System.SysUtils, Winapi.Windows;
 
 { TIO }
 
@@ -49,8 +49,8 @@ var
   CurPos: Integer;
   Size: Integer;
 begin
-  CurPos := SysUtils.FileSeek(Handle, 0, 1);
-  Size := Windows.GetFileSize(Handle, nil);
+  CurPos := System.SysUtils.FileSeek(Handle, 0, 1);
+  Size := Winapi.Windows.GetFileSize(Handle, nil);
   Result := CurPos = Size;
 end;
 
@@ -62,19 +62,21 @@ begin
     Result := EOF
   else
   begin
-    SysUtils.FileRead(Handle, Ch, SizeOf(Ch));
+    System.SysUtils.FileRead(Handle, Ch, SizeOf(Ch));
     Result := Integer(Ch);
   end;
 end;
 
 class procedure TIO.RedirectStdIn(const Handle: THandle);
 begin
-  Windows.SetStdHandle(STD_INPUT_HANDLE, Cardinal(Handle));
+  Winapi.Windows.SetStdHandle(
+    Winapi.Windows.STD_INPUT_HANDLE, Cardinal(Handle)
+  );
 end;
 
 class function TIO.Seek(Handle: THandle; Offset, Origin: Integer): Boolean;
 begin
-  Result := SysUtils.FileSeek(Handle, Offset, Origin) >= 0;
+  Result := System.SysUtils.FileSeek(Handle, Offset, Origin) >= 0;
 end;
 
 end.

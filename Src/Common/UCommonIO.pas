@@ -30,23 +30,23 @@ implementation
 
 uses
   // Delphi
-  SysUtils, Windows;
+  System.SysUtils, Winapi.Windows;
 
 { TCommonIO }
 
 class function TCommonIO.StdErr: THandle;
 begin
-  Result := Windows.GetStdHandle(STD_ERROR_HANDLE);
+  Result := Winapi.Windows.GetStdHandle(Winapi.Windows.STD_ERROR_HANDLE);
 end;
 
 class function TCommonIO.StdIn: THandle;
 begin
-  Result := Windows.GetStdHandle(STD_INPUT_HANDLE);
+  Result := Winapi.Windows.GetStdHandle(Winapi.Windows.STD_INPUT_HANDLE);
 end;
 
 class function TCommonIO.StdOut: THandle;
 begin
-  Result := Windows.GetStdHandle(STD_OUTPUT_HANDLE);
+  Result := Winapi.Windows.GetStdHandle(Winapi.Windows.STD_OUTPUT_HANDLE);
 end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
@@ -56,7 +56,7 @@ var
 begin
   if Size <= 0 then
     Exit;
-  Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
+  Winapi.Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
 class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);
