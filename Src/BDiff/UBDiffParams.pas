@@ -46,7 +46,7 @@ implementation
 
 uses
   // Delphi
-  SysUtils, StrUtils;
+  System.SysUtils, System.StrUtils;
 
 { TParams }
 

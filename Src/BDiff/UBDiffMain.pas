@@ -24,7 +24,7 @@ type
 implementation
 
 uses
-  SysUtils,
+  System.SysUtils,
   UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffIO, UErrors, ULogger;
 
 { TMain }

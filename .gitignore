@@ -2,6 +2,7 @@
 
 *.cfg
 *.dsk
+*.res
 *.identcache
 *.local
 *.projdata

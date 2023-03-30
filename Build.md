@@ -2,7 +2,7 @@
 
 ## Introduction
 
-_BDiff / BPatch_ is written in Object Pascal and is targeted at Delphi XE. The Delphi IDE can be used to modify the source and to perform test builds. Final builds should be built using the provided `Makefile`, but you can get away with building from the IDE if you don't change any resources.
+_BDiff / BPatch_ is written in Object Pascal and is targeted at Delphi 11 Alexandria. The Delphi IDE can be used to modify the source and to perform test builds. Final builds should be built using the provided `Makefile`, but you can get away with building from the IDE if you don't change any resources.
 
 These instructions only apply to building the current release of _BDiff / BPatch_. Earlier releases back to v0.2.6a will have their own versions of this file.
 
@@ -12,11 +12,11 @@ You need the following tools to perform a full build and release of _BDiff / BPa
 
 ### Delphi Command Line compiler (`DCC32`)
 
-The preferred version is Delphi XE. If you have this compiler please use it. The `DELPHIROOT` environment variable must be set to the install path of the version Delphi you are using. `DCC32.exe` must be present in the `Bin` sub-directory of the path specified by `DELPHIROOT`. If `DELPHIROOT` is not set then a make will fail.
+The preferred version is Delphi 11 Alexandria. If you have this compiler please use it. The `DELPHIROOT` environment variable must be set to the install path of the version Delphi you are using. `DCC32.exe` must be present in the `Bin` sub-directory of the path specified by `DELPHIROOT`. If `DELPHIROOT` is not set then a make will fail.
 
 Alternatives:
 
-* Unicode versions of Delphi other than XE may work, but haven't been tested. Non Unicode compilers will fail to compile the code.
+* Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names.
 
 * Only versions of Delphi that ship with the `DCC32` command line compiler can be used with the make files.
 
@@ -154,6 +154,6 @@ At any time you can tidy up temporary files by doing:
 
     > Make clean
 
-If you also want to remove the `.cfg` files generated from `.cfg.tplt` files along with the entire `Build` directory you can do:
+If you also want to remove the `.cfg` (generated from `.cfg.tplt`) and some unnecessary `.res` files along with the entire `Build` directory you can do:
 
     > Make deepclean

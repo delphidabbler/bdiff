@@ -28,7 +28,7 @@ exe: res pascal
 pas: pascal
 
 # Build resources and delete intermediate file created by VIED
-res: BPatch.res VBPatch.res
+res: BPatchAssets.res VBPatch.res
   -@del VBPatch.rc
 
 # Build pascal source and link in resources

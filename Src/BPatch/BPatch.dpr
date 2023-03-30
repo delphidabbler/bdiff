@@ -23,7 +23,7 @@ uses
   UCheckSum in '..\Common\UCheckSum.pas';
 
 {$Resource VBPatch.res}     // version information
-{$Resource BPatch.res}      // other resources
+{$Resource BPatchAssets.res}      // other resources
 
 begin
   TMain.Run;

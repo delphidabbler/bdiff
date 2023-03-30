@@ -23,13 +23,13 @@ implementation
 
 uses
   // Delphi
-  Windows;
+  Winapi.Windows;
 
 { TIO }
 
 class procedure TIO.RedirectStdOut(const Handle: THandle);
 begin
-  Windows.SetStdHandle(STD_OUTPUT_HANDLE, Handle);
+  Winapi.Windows.SetStdHandle(Winapi.Windows.STD_OUTPUT_HANDLE, Handle);
 end;
 
 end.
