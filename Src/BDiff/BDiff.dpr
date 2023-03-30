@@ -27,7 +27,7 @@ uses
   UCheckSum in '..\Common\UCheckSum.pas';
 
 {$Resource VBDiff.res}    // version information
-{$Resource BDiff.res}     // general resources
+{$Resource BDiffAssets.res}     // general resources
 
 begin
   TMain.Run;

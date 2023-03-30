@@ -28,7 +28,7 @@ exe: res pascal
 pas: pascal
 
 # Build resources and delete intermediate file created by VIED
-res : BDiff.res VBDiff.res
+res : BDiffAssets.res VBDiff.res
   -@del VBDiff.rc
 
 # Build pascal source and link in resources
