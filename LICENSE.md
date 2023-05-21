@@ -1,18 +1,28 @@
-BDiff / BPatch License
-======================
+# BSD 3-Clause License
 
-_BDiff_ and _BPatch_ have been developed from a Pascal translation of original C source code by Stefan Reuther. The Pascal translation was created by Peter D Johnson.
+Copyright (c) 1999-2023, Stefan Reuther & Peter Johnson
 
-The original C source code was copyright (c) 1999 by Stefan Reuther (Streu@gmx.de). The Pascal translation and subsequent updates are copyright (c) 2003-2023 by Peter D Johnson (@delphidabbler).
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
 
-THIS SOFTWARE IS PROVIDED "AS-IS", WITHOUT ANY EXPRESS OR IMPLIED WARRANTY. IN NO EVENT WILL THE AUTHORS BE HELD LIABLE FOR ANY DAMAGES ARISING FROM THE USE OF THIS SOFTWARE.
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
 
-Permission is granted to anyone to use this software for any purpose and to alter it and redistribute it, subject to the following restrictions:
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
 
-1. The origin of this software must not be misrepresented; you must not claim that you wrote the original software. If you use this software in a product, an acknowledgement in the product documentation would be appreciated but is not required.
+3. Neither the name of the copyright holder nor the names of its
+   contributors may be used to endorse or promote products derived from
+   this software without specific prior written permission.
 
-2. All redistributions of source code files must retain any author, copyright and license notices that are currently in place in the source code files. An unchanged copy of this license must be included with the redistribution.
-
-3. All redistributions in binary form must contain all occurrences of the above copyright notices and any web site addresses that are currently in place (for example in help screens). A copy of this license must be included with the redistribution.
-
-4. Modified versions in source or binary form must be plainly marked as such, and must not be misrepresented as being the original software. Details of modification must be included in source code files. All original author, license and copyright statements must be retained unchanged.
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
