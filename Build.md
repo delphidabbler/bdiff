@@ -1,159 +1,115 @@
 # BDiff / BPatch Build Instructions
 
+These instructions only apply to building the current release of _BDiff / BPatch_.
+
 ## Introduction
 
-_BDiff / BPatch_ is written in Object Pascal and is targeted at Delphi 11 Alexandria. The Delphi IDE can be used to modify the source and to perform test builds. Final builds should be built using the provided `Makefile`, but you can get away with building from the IDE if you don't change any resources.
+_BDiff / BPatch_ are written in Object Pascal and are targeted at Delphi 11 Alexandria. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
 
-These instructions only apply to building the current release of _BDiff / BPatch_. Earlier releases back to v0.2.6a will have their own versions of this file.
+> Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names. This hasn't been tested.
 
-## Requirements
+Release builds are compiled and packaged using `Deploy.bat` run from the command line. This script calls `msbuild` to build the projects.
 
-You need the following tools to perform a full build and release of _BDiff / BPatch_.
+## Prerequisites
 
-### Delphi Command Line compiler (`DCC32`)
+### Compilation from the IDE
 
-The preferred version is Delphi 11 Alexandria. If you have this compiler please use it. The `DELPHIROOT` environment variable must be set to the install path of the version Delphi you are using. `DCC32.exe` must be present in the `Bin` sub-directory of the path specified by `DELPHIROOT`. If `DELPHIROOT` is not set then a make will fail.
+You need DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied) to be installed. The `VIEDROOT` environment variable must be set to the program's install directory.
 
-Alternatives:
+The environment variable can either be set in your global environment variables or from within the Delphi IDE by using the _IDE | Environment Variables_ page of Delphi's _Tools | Options_ dialogue box.
 
-* Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names.
+This program is required to convert the `.vi` files that specify version information into an intermediate `.rc` file that is compiled by `BRCC32`.
 
-* Only versions of Delphi that ship with the `DCC32` command line compiler can be used with the make files.
+## Building releases using `Deploy.bat`
 
-* As noted above, in some circumstances you can compile Pascal code from the Delphi IDE instead of running `DCC32`.
+Once again, DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied) must be installed.
 
-### `BRCC32` resource compiler
+In addition _InfoZip_ `zip.exe` is required. This can be downloaded from <https://delphidabbler.com/extras/info-zip>.
 
-`BRCC32` is distributed with Delphi. It is needed to compile resource files. `Makefile` expects to find `BRCC32` in the same directory as `DCC32`.
+The following environment variables are required:
 
-### `MAKE`
+* `msbuild` requires certain environment variables to be set. These can be set by running `Bin\rsvars.bat` that is located in the Delphi installation directory.
 
-This is the make tool that ships with Delphi. You can use any version that works. I've tested only the version that ships with Delphi XE.
+* `BDSBIN` must be set to `%BDS%\bin`. (`BDS` is set in the previous step.)
 
-### DelphiDabbler Version Information Editor (`VIEd`)
+* `VIEdRoot` must be set to the directory where _Version Information Editor_ was installed.
 
-This program is required to convert the `.vi` files that specify version information into an intermediate `.rc` file that is compiled by `BRCC32`. `VIEd` is expected to be on the system path unless the `VIEDROOT` environment variable is set to `VIEd`'s installation directory. You can get `VIEd` [here](https://github.com/delphidabbler/vied).
+* `ZipRoot` must be set to the directory where `zip.exe` was installed.
 
-### `Zip.exe`
-
-This program is required to create the release zip file. Again it is assumed to be on the path unless the `ZIPROOT` environment variable is set to its install directory. You can get a Windows version [here](http://stahlforce.com/dev/index.php?tool=zipunzip).
-
-## Dependencies
-
-The source depends only on the Delphi VCL, so provided you have Delphi installed, the source should compile without building any other libraries.
-
-## Preparations
-
-### Get the source code
+## Get the source code
 
 The source code of _BDiff / BPatch_ is maintained in the [`delphidabbler/bdiff`](https://github.com/delphidabbler/bdiff) Git repository on GitHub.
 
-Each release from v0.2.5 onwards is available from GitHub. You can download an archive containing the required release. Note that releases prior to v0.2.7 were originally maintained in a Subversion repository and therefore their documentation will refer to Subversion rather than Git.
+You can get the source code of the latest release by using Git to clone `https://github.com/delphidabbler/bdiff.git`. Switch to the `master` branch. If you want the latest development code make sure to pull the `develop` branch and switch to that.
 
-Once the source is cloned or forked you should end up with a folder structure like this:
+Alternatively you can download a source code archive from [GitHub](https://github.com/delphidabbler/bdiff/releases). Ensure you download the latest release and unzip it with the directory structure preserved.
 
-```
-  +--+                { root: .gitignore, this file, and some documentation}
-     |
-     +-- Docs         { documentation files }
-     |
-     +-- Src          { project group and master make files }
-     |   |
-     |   +-- BDiff    { source and makefile for BDiff }
-     |   |
-     |   +-- BPatch   { source and makefile for BPatch }
-     |   |
-     |   +-- Common   { code common to both programs }
-     |
-     +-- Test         { test scripts }
-```
-
-If, by chance you also have a `Build` directory and sub-directories don't worry. Git users will also see the usual `.git` hidden directory.
-
-### Configure the source tree
-
-Before you can get hacking, you need to prepare the code. Open a command console, navigate into the `Src` sub-folder and do:
-
-    > Make config
-
-You may need to replace `Make` above with the full path to `Make` if it isn't on the path, or if the `Make` that runs isn't the Borland / CodeGear  / Embarcadero version.
-
-Once `Make config` has completed your folder structure should have changed to:
+Once you have the source code you should have a folder structure like this:
 
 ```
-  +--+
-     |
-     +-- Build           { contains files created in build process }
-     |   |
-     |   +-- Bin         { parent of binary folders }
-     |   |   |
-     |   |   +-- BDiff   { receives binary files for BDiff (.dcu and .res) }
-     |   |   |
-     |   |   +-- BPatch  { receives binary files for BPatch (.dcu and .res) }
-     |   |
-     |   +-- Exe         { receives executable files }
-     |   |
-     |   +-- Release     { receives release zip file }
-     |
-     +-- Docs
-     |
-     +-- Src
-     |   |
-     |   +-- BDiff
-     |   |
-     |   +-- BPatch
-     |
-     +-- Test
++--+                { root: .gitignore, docs & Deploy.bat }
+   |
+   +-- Docs         { documentation files }
+   |
+   +-- Src          { project group and master make files }
+   |   |
+   |   +-- BDiff    { source for BDiff }
+   |   |
+   |   +-- BPatch   { source for BPatch }
+   |   |
+   |   +-- Common   { code common to both programs }
+   |
+   +-- Test         { test scripts }
 ```
 
-Git has been configured to ignore the `Build` folder and its contents. In addition `Make` will have created `.cfg` files from templates. These files are needed for `DCC32` to run correctly. The `.cfg` files will be ignored by Git.
-
-If you are intending to use the Delphi IDE to compile code, you should also do:
-
-    > Make res
-
-This compiles the resource files that the IDE needs to link into compiled executables.
-
-### Modify the source
+## Modify the source
 
 If you plan to modify the source, you can do it now.
 
 If you are using the Delphi IDE you should load the `BDiff.groupproj` project group file from the `Src` folder into the IDE - this contains both the _BDiff_ and _BPatch_ targets.
 
-### Compile
+## Compile
 
-Compile the code by doing
+Compile the code from the Delphi IDE.
 
-    > Make exe
+Delphi uses pre-build events to compile the custom `.rc` files and the `.vi` (version information) files.
 
-This builds the resources then builds the whole of the Pascal source using the `DCC32` command line compiler.
+Post-build events are used to tidy up unwanted files generated by the build.
 
-Even if you have built the code in the IDE you advised to run `Make exe`.
+All binary output from the compilation will be written to the `_build` directory, with the following structure:
 
-At any time you can rebuild the resources using `Make res` or rebuild the pascal code, without also building resources, by using `Make pascal`.
+```
++-- _build
+|   |
+|   +-- bin
+|   |   |
+|   |   +-- bdiff   {.dcu & .res files for BDiff }
+|   |   |
+|   |   +-- bpatch  {.dcu & .res files for BPatch }
+|   |
+|   +-- exe         { BDiff.exe and BPatch.exe }
+.
+.                   { remainder of source tree }
+.
+```
 
-### Testing
+## Testing
 
-Some simple tests can be run to check that _BDiff_ and _BPatch_ are working correctly. For details see `ReadMe.md` in the `Test` folder.
+Some simple tests can be run to check that _BDiff_ and _BPatch_ are working correctly. For details see `Test/ReadMe.md`.
 
-### Prepare the executable release file
+## Create a release
 
-If you want to create a zip file containing the executable programs and required documentation do:
+If you want to create a zip file containing the executable programs and associated documentation do the following:
 
-    > Make release
+* open a terminal
+* switch to the root of the source tree
+* set up the necessary environment variables
+* do
 
-This deletes any temporary files then creates the required zip file. You can change the default name of the zip file by defining the `RELEASEFILENAME` environment variable with the required name (excluding extension). For example, to generate a release file named `my-file.zip` define `RELEASEFILENAME` as `my-file` or do:
+    `> Deploy x.y.z`
 
-    > Make -DRELEASEFILENAME=myfile release
+    where `x.y.z` are the major, minor and patch versions for the release.
 
-If you issue a `Make` with no target it will re-run config, build the executable code and create the release.
+This will build both `BDiff.exe` and `BPatch.exe` and then package them both, with documentation, in a zip file named `bdiff-exe-x.y.z.zip`.
 
-### Tidy up
-
-At any time you can tidy up temporary files by doing:
-
-    > Make clean
-
-If you also want to remove the `.cfg` (generated from `.cfg.tplt`) and some unnecessary `.res` files along with the entire `Build` directory you can do:
-
-    > Make deepclean
+All files generated during the build process will be created in the `_build` directory, as described in the _Compile_ section above. The zip file will be located in the `_build/release` directory.
