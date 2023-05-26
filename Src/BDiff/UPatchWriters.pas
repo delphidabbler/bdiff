@@ -36,7 +36,7 @@ uses
   // Delphi
   System.SysUtils,
   // Project
-  UCheckSum, UBDiffIO;
+  UAppInfo, UCheckSum, UBDiffIO;
 
 type
   TBinaryPatchWriter = class(TPatchWriter)
@@ -152,8 +152,12 @@ const
   // If file format is changed then increment the file version
   cFileSignature: array[0..7] of AnsiChar = 'bdiff02'#$1A;
 begin
-  Assert(Length(cFileSignature) = 8);
-  Move(cFileSignature, Head.Signature[0], Length(cFileSignature));
+  Assert(Length(TAppInfo.PatchFileSignature) = 8);
+  Move(
+    TAppInfo.PatchFileSignature,
+    Head.Signature[0],
+    Length(TAppInfo.PatchFileSignature)
+  );
   PackLong(@Head.OldDataSize, OldFile.Size);
   PackLong(@Head.NewDataSize, NewFile.Size);
   TIO.WriteRaw(TIO.StdOut, @Head, SizeOf(Head));

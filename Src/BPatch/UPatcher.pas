@@ -51,7 +51,6 @@ uses
 
 
 const
-  FORMAT_VERSION = '02';  // binary diff file format version
   BUFFER_SIZE = 4096;     // size of buffer used to read files
 
 
@@ -73,10 +72,10 @@ const
 begin
   try
     // read header from patch file on standard input
-    if FileRead(TIO.StdIn, Header, 16) <> 16 then
+    if FileRead(TIO.StdIn, Header, Length(Header)) <> Length(Header) then
       Error('Patch not in BINARY format');
     if System.AnsiStrings.StrLComp(
-      Header, PAnsiChar('bdiff' + FORMAT_VERSION + #$1A), 8
+      Header, TAppInfo.PatchFileSignature, Length(TAppInfo.PatchFileSignature)
     ) <> 0 then
       Error('Patch not in BINARY format');
     // get length of source and destination files from header

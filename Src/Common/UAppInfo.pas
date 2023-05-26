@@ -10,11 +10,19 @@ unit UAppInfo;
 interface
 
 type
+  TPatchFileSignature = array[0..7] of AnsiChar;
+
   TAppInfo = class(TObject)
   private
     { Fully specified file name of program, with absolute path }
     class function ProgramPath: string;
   public
+    const
+      // Patch file signature. Must be 8 bytes.
+      // Format is 'bdiff' + file-version + Ctrl+Z.
+      // where file-version is a two char string, here '02'.
+      // If file format is changed then increment the file version.
+      PatchFileSignature: TPatchFileSignature = 'bdiff02'#$1A;
     { Name of program's executable file, without path }
     class function ProgramFileName: string;
     { Name of program, without file extension }
