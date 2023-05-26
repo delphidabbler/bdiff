@@ -9,4 +9,5 @@
 *.tvsconfig
 *.~*
 __history/
-Build/
+__recovery/
+_build/
