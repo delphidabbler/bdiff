@@ -30,12 +30,12 @@
         <Base>true</Base>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base)'!=''">
-        <DCC_UnitSearchPath>..\..\Build\Bin\BDiff;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
+        <DCC_UnitSearchPath>..\..\_build\bin\bdiff;$(DCC_UnitSearchPath)</DCC_UnitSearchPath>
         <DCC_ConsoleTarget>true</DCC_ConsoleTarget>
-        <DCC_ExeOutput>..\..\Build\Exe</DCC_ExeOutput>
+        <DCC_ExeOutput>..\..\_build\exe</DCC_ExeOutput>
         <DCC_SYMBOL_PLATFORM>false</DCC_SYMBOL_PLATFORM>
         <DCC_EXPLICIT_STRING_CAST_LOSS>true</DCC_EXPLICIT_STRING_CAST_LOSS>
-        <DCC_DcuOutput>..\..\Build\Bin\BDiff</DCC_DcuOutput>
+        <DCC_DcuOutput>..\..\_build\bin\bdiff</DCC_DcuOutput>
         <DCC_E>false</DCC_E>
         <DCC_ImageBase>00400000</DCC_ImageBase>
         <DCC_F>false</DCC_F>
@@ -47,6 +47,14 @@
         <VerInfo_Keys>CompanyName=;FileDescription=;FileVersion=1.0.0.0;InternalName=;LegalCopyright=;LegalTrademarks=;OriginalFilename=;ProductName=;ProductVersion=1.0.0.0;Comments=</VerInfo_Keys>
         <Icon_MainIcon>$(BDS)\bin\delphi_PROJECTICON.ico</Icon_MainIcon>
         <Icns_MainIcns>$(BDS)\bin\delphi_PROJECTICNS.icns</Icns_MainIcns>
+        <PreBuildEvent><![CDATA["$(VIEDROOT)\VIEd.exe" -makerc  .\VBDiff.vi .\VBDiff.virc
+"$(BDSBIN)\BRCC32" -fo "..\..\_build\bin\bdiff\VBDiff.res" .\VBDiff.virc
+"$(BDSBIN)\BRCC32" -fo "..\..\_build\bin\bdiff\BDiffAssets.res" .\BDiffAssets.rc
+$(PreBuildEvent)]]></PreBuildEvent>
+        <BRCC_OutputDir>..\..\_build\bin\bdiff</BRCC_OutputDir>
+        <PostBuildEvent><![CDATA[DEL ..\..\_build\bin\bdiff\BDiff.res"
+DEL .\VBDiff.virc
+$(PostBuildEvent)]]></PostBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition="'$(Base_Android)'!=''">
         <VerInfo_Keys>package=com.embarcadero.$(MSBuildProjectName);label=$(MSBuildProjectName);versionCode=1;versionName=1.0.0;persistent=False;restoreAnyVersion=False;installLocation=auto;largeHeap=False;theme=TitleBar;hardwareAccelerated=true;apiKey=</VerInfo_Keys>
