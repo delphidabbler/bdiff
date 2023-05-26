@@ -3,13 +3,13 @@
 }
 
 
-unit UFileData;
+unit BDiff.FileData;
 
 interface
 
 uses
   // Project
-  UBDiffTypes;
+  BDiff.Types;
 
 type
 
@@ -33,7 +33,7 @@ uses
   // Delphi
   System.SysUtils, Winapi.Windows,
   // Project
-  UErrors;
+  Common.Errors;
 
 { TFileData }
 

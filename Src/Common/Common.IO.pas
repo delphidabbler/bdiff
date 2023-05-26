@@ -2,8 +2,7 @@
  * Contains utility functions used by both BDiff and BPatch.
 }
 
-
-unit UCommonIO;
+unit Common.IO;
 
 interface
 

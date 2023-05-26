@@ -3,7 +3,7 @@
 }
 
 
-unit UBaseParams;
+unit Common.Params;
 
 interface
 
@@ -44,7 +44,7 @@ uses
   // Delphi
   System.StrUtils,
   // Project
-  UErrors;
+  Common.Errors;
 
 { TBaseParams }
 

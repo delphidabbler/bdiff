@@ -4,12 +4,12 @@
 }
 
 
-unit UBDiffInfoWriter;
+unit BDiff.InfoWriter;
 
 interface
 
 uses
-  UInfoWriter;
+  Common.InfoWriter;
 
 type
   TBDiffInfoWriter = class(TInfoWriter)
@@ -21,7 +21,7 @@ implementation
 
 uses
   System.SysUtils,
-  UAppInfo;
+  Common.AppInfo;
 
 { TBDiffInfoWriter }
 

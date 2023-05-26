@@ -4,13 +4,13 @@
 }
 
 
-unit UBDiffIO;
+unit BDiff.IO;
 
 interface
 
 uses
   // Project
-  UCommonIO;
+  Common.IO;
 
 type
   TIO = class(TCommonIO)

@@ -7,13 +7,14 @@
 }
 
 
-unit UPatchWriters;
+unit BDiff.PatchWriters;
 
 interface
 
 uses
   // Project
-  UBDiffTypes, UFileData;
+  BDiff.Types,
+  BDiff.FileData;
 
 type
 
@@ -36,7 +37,9 @@ uses
   // Delphi
   System.SysUtils,
   // Project
-  UAppInfo, UCheckSum, UBDiffIO;
+  BDiff.IO,
+  Common.AppInfo,
+  Common.CheckSum;
 
 type
   TBinaryPatchWriter = class(TPatchWriter)

@@ -3,12 +3,12 @@
 }
 
 
-unit UBDiffMain;
+unit BDiff.Main;
 
 interface
 
 uses
-  UBDiffParams;
+  BDiff.Params;
 
 type
   TMain = class(TObject)
@@ -25,7 +25,12 @@ implementation
 
 uses
   System.SysUtils,
-  UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffIO, UErrors, ULogger;
+  Common.AppInfo,
+  Common.Errors,
+  BDiff.Differ,
+  BDiff.InfoWriter,
+  BDiff.IO,
+  BDiff.Logger;
 
 { TMain }
 

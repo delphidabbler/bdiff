@@ -77,22 +77,24 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UDiffer.pas"/>
-        <DCCReference Include="UBlockSort.pas"/>
-        <DCCReference Include="UBDiffIO.pas"/>
-        <DCCReference Include="UBDiffTypes.pas"/>
-        <DCCReference Include="..\Common\UAppInfo.pas"/>
-        <DCCReference Include="..\Common\UErrors.pas"/>
-        <DCCReference Include="UFileData.pas"/>
-        <DCCReference Include="UBDiffParams.pas"/>
-        <DCCReference Include="UPatchWriters.pas"/>
-        <DCCReference Include="..\Common\UCommonIO.pas"/>
-        <DCCReference Include="..\Common\UBaseParams.pas"/>
-        <DCCReference Include="ULogger.pas"/>
-        <DCCReference Include="..\Common\UInfoWriter.pas"/>
-        <DCCReference Include="UBDiffInfoWriter.pas"/>
-        <DCCReference Include="UBDiffMain.pas"/>
-        <DCCReference Include="..\Common\UCheckSum.pas"/>
+        <DCCReference Include="BDiff.BlockSort.pas"/>
+        <DCCReference Include="BDiff.Differ.pas"/>
+        <DCCReference Include="BDiff.FileData.pas"/>
+        <DCCReference Include="BDiff.InfoWriter.pas"/>
+        <DCCReference Include="BDiff.IO.pas"/>
+        <DCCReference Include="BDiff.Logger.pas"/>
+        <DCCReference Include="BDiff.Main.pas"/>
+        <DCCReference Include="BDiff.Params.pas"/>
+        <DCCReference Include="BDiff.PatchWriters.pas"/>
+        <DCCReference Include="BDiff.Types.pas"/>
+        <DCCReference Include="..\Common\Common.AppInfo.pas"/>
+        <DCCReference Include="..\Common\Common.Params.pas"/>
+        <DCCReference Include="..\Common\Common.CheckSum.pas"/>
+        <DCCReference Include="..\Common\Common.IO.pas"/>
+        <DCCReference Include="..\Common\Common.Errors.pas"/>
+        <DCCReference Include="..\Common\Common.InfoWriter.pas">
+            <Form>$Resource VBDiff.res</Form>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

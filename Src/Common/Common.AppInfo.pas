@@ -3,9 +3,7 @@
  * Common code used by both BDiff and BPatch.
 }
 
-
-unit UAppInfo;
-
+unit Common.AppInfo;
 
 interface
 

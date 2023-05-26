@@ -99,17 +99,19 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DelphiCompile Include="$(MainSource)">
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
-        <DCCReference Include="UPatcher.pas"/>
-        <DCCReference Include="UBPatchIO.pas"/>
-        <DCCReference Include="..\Common\UAppInfo.pas"/>
-        <DCCReference Include="..\Common\UErrors.pas"/>
-        <DCCReference Include="UBPatchParams.pas"/>
-        <DCCReference Include="..\Common\UCommonIO.pas"/>
-        <DCCReference Include="..\Common\UBaseParams.pas"/>
-        <DCCReference Include="UBPatchInfoWriter.pas"/>
-        <DCCReference Include="..\Common\UInfoWriter.pas"/>
-        <DCCReference Include="UBPatchMain.pas"/>
-        <DCCReference Include="..\Common\UCheckSum.pas"/>
+        <DCCReference Include="BPatch.InfoWriter.pas"/>
+        <DCCReference Include="BPatch.IO.pas"/>
+        <DCCReference Include="BPatch.Main.pas"/>
+        <DCCReference Include="BPatch.Params.pas"/>
+        <DCCReference Include="BPatch.Patcher.pas"/>
+        <DCCReference Include="..\Common\Common.AppInfo.pas"/>
+        <DCCReference Include="..\Common\Common.Params.pas"/>
+        <DCCReference Include="..\Common\Common.CheckSum.pas"/>
+        <DCCReference Include="..\Common\Common.IO.pas"/>
+        <DCCReference Include="..\Common\Common.Errors.pas"/>
+        <DCCReference Include="..\Common\Common.InfoWriter.pas">
+            <Form>$Resource VBPatch.res</Form>
+        </DCCReference>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

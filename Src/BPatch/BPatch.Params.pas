@@ -3,13 +3,13 @@
 }
 
 
-unit UBPatchParams;
+unit BPatch.Params;
 
 interface
 
 uses
   // Project
-  UBaseParams;
+  Common.Params;
 
 type
 

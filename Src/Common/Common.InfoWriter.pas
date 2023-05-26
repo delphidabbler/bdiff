@@ -3,8 +3,7 @@
  * screens on standard output.
 }
 
-
-unit UInfoWriter;
+unit Common.InfoWriter;
 
 interface
 
@@ -22,8 +21,7 @@ type
 implementation
 
 uses
-  UAppInfo, UCommonIO;
-
+  Common.AppInfo, Common.IO;
 
 { TInfoWriter }
 

@@ -5,7 +5,7 @@
   This class centralises previously duplicated checksum methods.
 }
 
-unit UCheckSum;
+unit Common.CheckSum;
 
 interface
 

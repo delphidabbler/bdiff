@@ -4,7 +4,7 @@
 }
 
 
-unit ULogger;
+unit BDiff.Logger;
 
 interface
 
@@ -23,7 +23,9 @@ type
 implementation
 
 uses
-  UAppInfo, UBDiffIO;
+  // Project
+  BDiff.IO,
+  Common.AppInfo;
 
 type
   TVerboseLogger = class(TLogger)

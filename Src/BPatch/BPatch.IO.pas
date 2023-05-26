@@ -4,7 +4,7 @@
 }
 
 
-unit UBPatchIO;
+unit BPatch.IO;
 
 
 interface
@@ -12,7 +12,7 @@ interface
 
 uses
   // Project
-  UCommonIO;
+  Common.IO;
 
 const
   // Value representing end of file (as returned from TIO.GetCh).

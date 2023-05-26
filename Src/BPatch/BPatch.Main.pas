@@ -3,7 +3,7 @@
 }
 
 
-unit UBPatchMain;
+unit BPatch.Main;
 
 interface
 
@@ -21,7 +21,13 @@ implementation
 
 uses
   System.SysUtils,
-  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchIO, UErrors;
+
+  BPatch.InfoWriter,
+  BPatch.IO,
+  BPatch.Patcher,
+  BPatch.Params,
+  Common.AppInfo,
+  Common.Errors;
 
 { TMain }
 

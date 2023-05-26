@@ -4,12 +4,12 @@
 }
 
 
-unit UBPatchInfoWriter;
+unit BPatch.InfoWriter;
 
 interface
 
 uses
-  UInfoWriter;
+  Common.InfoWriter;
 
 type
   TBPatchInfoWriter = class(TInfoWriter)
@@ -21,7 +21,7 @@ implementation
 
 uses
   System.SysUtils,
-  UAppInfo;
+  Common.AppInfo;
 
 { TBPatchInfoWriter }
 

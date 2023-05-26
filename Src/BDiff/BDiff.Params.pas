@@ -3,13 +3,14 @@
 }
 
 
-unit UBDiffParams;
+unit BDiff.Params;
 
 interface
 
 uses
   // Project
-  UBaseParams, UBDiffTypes;
+  Common.Params,
+  BDiff.Types;
 
 type
 
