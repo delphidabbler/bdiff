@@ -14,6 +14,7 @@ uses
   // Project
   Common.IO;
 
+
 const
   // Value representing end of file (as returned from TIO.GetCh).
   EOF: Integer = -1;
@@ -21,7 +22,7 @@ const
   SEEK_SET = 0;
 
 type
-  TIO = class(TCommonIO)
+  TIO = class sealed(TCommonIO)
   public
     { Redirects standard input from a given file handle }
     class procedure RedirectStdIn(const Handle: THandle);
@@ -36,32 +37,32 @@ type
     class function GetCh(Handle: THandle): Integer;
   end;
 
+
 implementation
+
 
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows;
+
 
 { TIO }
 
 class function TIO.AtEOF(Handle: THandle): Boolean;
-var
-  CurPos: Integer;
-  Size: Integer;
 begin
-  CurPos := System.SysUtils.FileSeek(Handle, 0, 1);
-  Size := Winapi.Windows.GetFileSize(Handle, nil);
+  var CurPos := System.SysUtils.FileSeek(Handle, Int64(0), 1);
+  var Size := Winapi.Windows.GetFileSize(Handle, nil);
   Result := CurPos = Size;
 end;
 
 class function TIO.GetCh(Handle: THandle): Integer;
-var
-  Ch: AnsiChar;
 begin
   if AtEOF(Handle) then
     Result := EOF
   else
   begin
+    var Ch: AnsiChar;
     System.SysUtils.FileRead(Handle, Ch, SizeOf(Ch));
     Result := Integer(Ch);
   end;

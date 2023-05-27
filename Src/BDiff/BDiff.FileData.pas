@@ -5,19 +5,23 @@
 
 unit BDiff.FileData;
 
+
 interface
+
 
 uses
   // Project
   BDiff.Types;
 
+
 type
 
   TFileData = class(TObject)
-  private
-    fData: PCCharArray;
-    fSize: Cardinal;
-    fName: string;
+  strict private
+    var
+      fData: PCCharArray;
+      fSize: Cardinal;
+      fName: string;
     procedure LoadFile;
   public
     constructor Create(const FileName: string);
@@ -27,13 +31,17 @@ type
     property Data: PCCharArray read fData;
   end;
 
+
 implementation
+
 
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows,
+  System.SysUtils,
+  Winapi.Windows,
   // Project
   Common.Errors;
+
 
 { TFileData }
 
@@ -52,11 +60,8 @@ begin
 end;
 
 procedure TFileData.LoadFile;
-var
-  FileHandle: Integer;
-  BytesRead: Integer;
 begin
-  FileHandle := FileOpen(fName, fmOpenRead or fmShareDenyWrite);
+  var FileHandle: Integer := FileOpen(fName, fmOpenRead or fmShareDenyWrite);
   try
     if FileHandle = -1 then
       Error('Cannot open file %s', [fName]);
@@ -67,7 +72,7 @@ begin
       Error('File %s is empty', [fName]);
     try
       GetMem(fData, fSize);
-      BytesRead := FileRead(FileHandle, fData^, fSize);
+      var BytesRead: Integer := FileRead(FileHandle, fData^, fSize);
       if BytesRead = -1 then
         Error('Cannot read from file %s', [fName]);
       if fSize <> Cardinal(BytesRead) then

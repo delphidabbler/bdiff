@@ -6,24 +6,30 @@
 
 unit BDiff.IO;
 
+
 interface
+
 
 uses
   // Project
   Common.IO;
 
+
 type
-  TIO = class(TCommonIO)
+  TIO = class sealed(TCommonIO)
   public
     { Redirects standard output to a given file handle }
     class procedure RedirectStdOut(const Handle: THandle);
   end;
 
+
 implementation
+
 
 uses
   // Delphi
   Winapi.Windows;
+
 
 { TIO }
 

@@ -5,19 +5,23 @@
 
 unit Common.Params;
 
+
 interface
+
 
 uses
   // Delphi
   System.SysUtils;
 
+
 type
 
-  TBaseParams = class(TObject)
-  private
-    fHelp: Boolean;
-    fVersion: Boolean;
-  protected
+  TBaseParams = class abstract(TObject)
+  strict private
+    var
+      fHelp: Boolean;
+      fVersion: Boolean;
+  strict protected
     class function StripLeadingChars(const S: string; const Count: Integer):
       string;
     procedure Error(const Msg: string); overload;
@@ -38,7 +42,9 @@ type
 type
   EParams = class(Exception);
 
+
 implementation
+
 
 uses
   // Delphi
@@ -46,12 +52,8 @@ uses
   // Project
   Common.Errors;
 
-{ TBaseParams }
 
-procedure TBaseParams.Error(const Msg: string);
-begin
-  raise EParams.Create(Msg);
-end;
+{ TBaseParams }
 
 constructor TBaseParams.Create;
 begin
@@ -60,24 +62,24 @@ begin
   fHelp := False;
 end;
 
+procedure TBaseParams.Error(const Msg: string);
+begin
+  raise EParams.Create(Msg);
+end;
+
 procedure TBaseParams.Error(const Fmt: string; const Args: array of const);
 begin
   raise EParams.CreateFmt(Fmt, Args);
 end;
 
 procedure TBaseParams.Parse;
-var
-  ParamIdx: Integer;
-  CharIdx: Integer;
-  Param: string;
-  Terminated: Boolean;
 begin
   // Parse command line
-  Terminated := False;
-  ParamIdx := 1;
+  var Terminated := False;
+  var ParamIdx: Integer := 1;
   while ParamIdx <= ParamCount do
   begin
-    Param := ParamStr(ParamIdx);
+    var Param := ParamStr(ParamIdx);
     if AnsiStartsStr('-', Param) then
     begin
       if AnsiStartsStr('--', Param) then
@@ -91,7 +93,7 @@ begin
       else
       begin
         // short options
-        for CharIdx := 2 to Length(Param) do
+        for var CharIdx := 2 to Length(Param) do
         begin
           if not ParseShortOption(Param, CharIdx, ParamIdx, Terminated) then
             Error('unknown option ''-%s''', [Param[CharIdx]]);
@@ -158,3 +160,4 @@ begin
 end;
 
 end.
+

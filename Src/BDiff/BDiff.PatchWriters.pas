@@ -9,16 +9,19 @@
 
 unit BDiff.PatchWriters;
 
+
 interface
+
 
 uses
   // Project
   BDiff.Types,
   BDiff.FileData;
 
+
 type
 
-  TPatchWriter = class(TObject)
+  TPatchWriter = class abstract(TObject)
   public
     procedure Header(const OldFile, NewFile: TFileData); virtual; abstract;
     procedure Add(Data: PCChar; Length: Cardinal); virtual; abstract;
@@ -31,7 +34,9 @@ type
     class function Instance(const Format: TFormat): TPatchWriter;
   end;
 
+
 implementation
+
 
 uses
   // Delphi
@@ -41,9 +46,25 @@ uses
   Common.AppInfo,
   Common.CheckSum;
 
+
 type
-  TBinaryPatchWriter = class(TPatchWriter)
-  private
+  TBinaryPatchWriter = class sealed(TPatchWriter)
+  strict private
+    type
+      TPackedLong = packed array[0..3] of TCChar;
+      TAddDataHeader = packed record
+        DataLength: TPackedLong;
+      end;
+      TCopyDataHeader = packed record
+        CopyStart: TPackedLong;   // starting pos of copied data
+        CopyLength: TPackedLong;  // length copied data
+        CheckSum: TPackedLong;    // validates copied data
+      end;
+      TPatchHeader = packed record
+        Signature:  TPatchFileSignature;  // file signature
+        OldDataSize: TPackedLong;         // size of old data file
+        NewDataSize: TPackedLong;         // size of new data file
+      end;
     procedure PackLong(P: PCChar; L: Longint);
     function CheckSum(Data: PCChar; Length: Cardinal): Longint;
   public
@@ -53,16 +74,16 @@ type
       Length: Cardinal); override;
   end;
 
-  TTextPatchWriter = class(TPatchWriter)
-  protected
+  TTextPatchWriter = class abstract(TPatchWriter)
+  strict protected
     { Checks if an ANSI character is a printable ASCII character. }
     class function IsPrint(const Ch: AnsiChar): Boolean;
     procedure CopyHeader(NewPos: Cardinal; OldPos: Cardinal; Length: Cardinal);
     procedure Header(const OldFile, NewFile: TFileData); override;
   end;
 
-  TQuotedPatchWriter = class(TTextPatchWriter)
-  private
+  TQuotedPatchWriter = class sealed(TTextPatchWriter)
+  strict private
     procedure QuotedData(Data: PCChar; Length: Cardinal);
     { Returns octal representation of given value as a 3 digit string. }
     class function ByteToOct(const Value: Byte): string;
@@ -72,8 +93,8 @@ type
       Length: Cardinal); override;
   end;
 
-  TFilteredPatchWriter = class(TTextPatchWriter)
-  private
+  TFilteredPatchWriter = class sealed (TTextPatchWriter)
+  strict private
     procedure FilteredData(Data: PCChar; Length: Cardinal);
   public
     procedure Add(Data: PCChar; Length: Cardinal); override;
@@ -97,14 +118,11 @@ end;
 { TBinaryPatchWriter }
 
 procedure TBinaryPatchWriter.Add(Data: PCChar; Length: Cardinal);
-var
-  Rec: packed record
-    DataLength: array[0..3] of TCChar;  // length of added adata
-  end;
 const
   cPlusSign: AnsiChar = '+';                // flags added data
 begin
   TIO.WriteStr(TIO.StdOut, cPlusSign);
+  var Rec: TAddDataHeader;
   PackLong(@Rec.DataLength, Length);
   TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
   TIO.WriteRaw(TIO.StdOut, Data, Length);           // data added
@@ -112,10 +130,8 @@ end;
 
 { Compute simple checksum }
 function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Cardinal): Longint;
-var
-  CS: TCheckSum;
 begin
-  CS := TCheckSum.Create(0);
+  var CS := TCheckSum.Create(0);
   try
     CS.AddBuffer(PInt8(Data), Length);
     Result := CS.CheckSum;
@@ -126,16 +142,11 @@ end;
 
 procedure TBinaryPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
   Length: Cardinal);
-var
-  Rec: packed record
-    CopyStart: array[0..3] of TCChar;   // starting pos of copied data
-    CopyLength: array[0..3] of TCChar;  // length copied data
-    CheckSum: array[0..3] of TCChar;    // validates copied data
-  end;
 const
   cAtSign: AnsiChar = '@';                  // flags command data in both file
 begin
   TIO.WriteStr(TIO.StdOut, cAtSign);
+  var Rec: TCopyDataHeader;
   PackLong(@Rec.CopyStart, OldPos);
   PackLong(@Rec.CopyLength, Length);
   PackLong(@Rec.CheckSum, CheckSum(@NewBuf[NewPos], Length));
@@ -143,19 +154,9 @@ begin
 end;
 
 procedure TBinaryPatchWriter.Header(const OldFile, NewFile: TFileData);
-var
-  Head: packed record
-    Signature: array[0..7] of TCChar;   // file signature
-    OldDataSize: array[0..3] of TCChar; // size of old data file
-    NewDataSize: array[0..3] of TCChar; // size of new data file
-  end;
-const
-  // File signature. Must be 8 bytes. Format is 'bdiff' + file-version + #$1A
-  // where file-version is a two char string, here '02'.
-  // If file format is changed then increment the file version
-  cFileSignature: array[0..7] of AnsiChar = 'bdiff02'#$1A;
 begin
-  Assert(Length(TAppInfo.PatchFileSignature) = 8);
+  var Head: TPatchHeader;
+  Assert(Length(TAppInfo.PatchFileSignature) = Length(Head.Signature));
   Move(
     TAppInfo.PatchFileSignature,
     Head.Signature[0],
@@ -214,16 +215,12 @@ begin
 end;
 
 class function TQuotedPatchWriter.ByteToOct(const Value: Byte): string;
-var
-  Idx: Integer;
-  Digit: Byte;
-  Remainder: Byte;
 begin
   Result := '';
-  Remainder := Value;
-  for Idx := 1 to 3 do
+  var Remainder: Byte := Value;
+  for var Idx := 1 to 3 do
   begin
-    Digit := Remainder mod 8;
+    var Digit: Byte := Remainder mod 8;
     Remainder := Remainder div 8;
     Result := Chr(Digit + Ord('0')) + Result;
   end;

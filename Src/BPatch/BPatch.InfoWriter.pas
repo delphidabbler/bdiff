@@ -6,22 +6,29 @@
 
 unit BPatch.InfoWriter;
 
+
 interface
+
 
 uses
   Common.InfoWriter;
 
+
 type
-  TBPatchInfoWriter = class(TInfoWriter)
-  protected
+  TBPatchInfoWriter = class sealed(TInfoWriter)
+  strict protected
     class function HelpText: string; override;
   end;
 
+
 implementation
+
 
 uses
   System.SysUtils,
+
   Common.AppInfo;
+
 
 { TBPatchInfoWriter }
 
@@ -44,3 +51,4 @@ begin
 end;
 
 end.
+

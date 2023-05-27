@@ -5,26 +5,30 @@
 
 unit BDiff.Params;
 
+
 interface
+
 
 uses
   // Project
-  Common.Params,
-  BDiff.Types;
+  BDiff.Types,
+  Common.Params;
+
 
 type
 
-  TParams = class(TBaseParams)
-  private
-    fVerbose: Boolean;
-    fMinEqual: Integer;
-    fOldFileName: string;
-    fPatchFileName: string;
-    fNewFileName: string;
-    fFormat: TFormat;
+  TParams = class sealed(TBaseParams)
+  strict private
+    var
+      fVerbose: Boolean;
+      fMinEqual: Integer;
+      fOldFileName: string;
+      fPatchFileName: string;
+      fNewFileName: string;
+      fFormat: TFormat;
     procedure SetFormat(const Value: string);
     procedure SetMinEqual(const Value: string);
-  protected
+  strict protected
     function ParseLongOption(const Option: string; var ParamIdx: Integer;
       var Terminated: Boolean): Boolean; override;
     function ParseShortOption(const Options: string; const OptionIdx: Integer;
@@ -43,11 +47,14 @@ type
     property Format: TFormat read fFormat default FMT_QUOTED;
   end;
 
+
 implementation
+
 
 uses
   // Delphi
   System.SysUtils, System.StrUtils;
+
 
 { TParams }
 
@@ -170,11 +177,10 @@ begin
 end;
 
 procedure TParams.SetMinEqual(const Value: string);
-var
-  X: Int64; // number parsed from command line
 begin
   if Value = '' then
     Error('missing argument to ''--min-equal'' / ''-m''');
+  var X: Int64;
   if not TryStrToInt64(Value, X) or (X < 0) then
     Error('malformed number on command line');
   if (X = 0) or (X > $7FFF) then

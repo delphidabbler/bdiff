@@ -6,13 +6,16 @@
 
 unit BDiff.Logger;
 
+
 interface
 
+
 type
-  TLogger = class(TObject)
+  TLogger = class abstract(TObject)
   public
     procedure Log(const Msg: string); virtual; abstract;
   end;
+
 
 type
   TLoggerFactory = class(TObject)
@@ -20,24 +23,28 @@ type
     class function Instance(Verbose: Boolean): TLogger;
   end;
 
+
 implementation
+
 
 uses
   // Project
   BDiff.IO,
   Common.AppInfo;
 
+
 type
-  TVerboseLogger = class(TLogger)
+  TVerboseLogger = class sealed(TLogger)
   public
     procedure Log(const Msg: string); override;
   end;
 
 type
-  TSilentLogger = class(TLogger)
+  TSilentLogger = class sealed(TLogger)
   public
     procedure Log(const Msg: string); override;
   end;
+
 
 { TVerboseLogger }
 
@@ -64,3 +71,4 @@ begin
 end;
 
 end.
+

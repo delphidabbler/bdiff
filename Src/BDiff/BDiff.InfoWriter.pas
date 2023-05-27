@@ -6,22 +6,28 @@
 
 unit BDiff.InfoWriter;
 
+
 interface
+
 
 uses
   Common.InfoWriter;
 
+
 type
-  TBDiffInfoWriter = class(TInfoWriter)
-  protected
+  TBDiffInfoWriter = class sealed(TInfoWriter)
+  strict protected
     class function HelpText: string; override;
   end;
 
+
 implementation
+
 
 uses
   System.SysUtils,
   Common.AppInfo;
+
 
 { TBDiffInfoWriter }
 
@@ -49,3 +55,4 @@ begin
 end;
 
 end.
+

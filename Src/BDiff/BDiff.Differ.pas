@@ -11,24 +11,27 @@ unit BDiff.Differ;
 
 interface
 
+
 uses
-  BDiff.Types, BDiff.FileData, BDiff.Logger;
+  BDiff.FileData,
+  BDiff.Logger,
+  BDiff.Types;
 
-
-{ Structure for a matching block }
-type
-  TMatch = record
-    OldOffset: Cardinal;
-    NewOffset: Cardinal;
-    BlockLength: Cardinal;
-  end;
-  PMatch = ^TMatch;
 
 type
   TDiffer = class(TObject)
-  private
-    fMinMatchLength: Cardinal;
-    fFormat: TFormat;
+  strict private
+    { Structure for a matching block }
+    type
+      TMatch = record
+        OldOffset: Cardinal;
+        NewOffset: Cardinal;
+        BlockLength: Cardinal;
+      end;
+      PMatch = ^TMatch;
+    var
+      fMinMatchLength: Cardinal;
+      fFormat: TFormat;
     function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
       SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
     ///  <summary>Finds maximum length "sub-string" of CompareData that is in
@@ -50,7 +53,6 @@ type
       Cardinal;
   public
     constructor Create;
-    destructor Destroy; override;
     procedure MakeDiff(const OldFileName, NewFileName: string;
       const Logger: TLogger);
     property MinMatchLength: Cardinal
@@ -59,15 +61,18 @@ type
       read fFormat write fFormat default FMT_QUOTED;
   end;
 
+
 implementation
+
 
 {$IOCHECKS OFF}
 
+
 uses
   // Project
-  Common.Errors,
   BDiff.BlockSort,
-  BDiff.PatchWriters;
+  BDiff.PatchWriters,
+  Common.Errors;
 
 
 { TDiffer }
@@ -79,22 +84,15 @@ begin
   fFormat := FMT_QUOTED;   // default output format
 end;
 
-destructor TDiffer.Destroy;
-begin
-  inherited;
-end;
-
 function TDiffer.FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
   SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
-var
-  FoundPos: Cardinal;
-  FoundLen: Cardinal;
 begin
   Result.BlockLength := 0;  {no match}
   Result.NewOffset := 0;
   while (SearchTextLength <> 0) do
   begin
-    FoundLen := FindString(
+    var FoundPos: Cardinal;
+    var FoundLen := FindString(
       OldFile.Data,
       SortedOldData,
       OldFile.Size,
@@ -117,17 +115,9 @@ end;
 function TDiffer.FindString(Data: PCCharArray; Block: PBlock;
   DataSize: Cardinal; CompareData: PCChar; CompareDataSize: Cardinal;
   out FoundPos: Cardinal): Cardinal;
-var
-  First: Cardinal;      // first position in Data to search
-  Last: Cardinal;       // last position in Data to search
-  Mid: Cardinal;        // mid point of Data to search
-  FoundSize: Cardinal;  // size of matching "sub-string"
-  FoundMax: Cardinal;   // maximum size of matching "sub-string"
-  PData: PCChar;        // ptr to char in Data to be compared
-  PCompareData: PCChar; // ptr to char in CompareData to be compared
 begin
-  First := 0;
-  Last := DataSize - 1;
+  var First: Cardinal := 0;
+  var Last: Cardinal := DataSize - 1;
   Result := 0;
   FoundPos := 0;
 
@@ -135,17 +125,17 @@ begin
   while First <= Last do
   begin
     // Get mid point of (sorted) Data to search
-    Mid := (First + Last) div 2;
+    var Mid: Cardinal := (First + Last) div 2;
     // Set pointer to start of Data search string
-    PData := @Data[Block[Mid]];
+    var PData: PCChar := @Data[Block[Mid]];
     // Set pointer to start of CompareData
-    PCompareData := CompareData;
+    var PCompareData: PCChar := CompareData;
     // Calculate maximum possible size of matching substring
-    FoundMax := DataSize - Block[Mid];
+    var FoundMax: Cardinal := DataSize - Block[Mid];
     if FoundMax > CompareDataSize then
       FoundMax := CompareDataSize;
     // Find and count match chars from Data and CompareData
-    FoundSize := 0;
+    var FoundSize: Cardinal := 0;
     while (FoundSize < FoundMax) and (PData^ = PCompareData^) do
     begin
       Inc(FoundSize);
@@ -179,20 +169,12 @@ end;
 
 procedure TDiffer.MakeDiff(const OldFileName, NewFileName: string;
   const Logger: TLogger);
-var
-  OldFile: TFileData;
-  NewFile: TFileData;
-  NewOffset: Cardinal;
-  ToDo: Cardinal;
-  SortedOldData: PBlock;
-  Match: TMatch;
-  PatchWriter: TPatchWriter;
 begin
   { initialize }
-  OldFile := nil;
-  NewFile := nil;
-  SortedOldData := nil;
-  PatchWriter := TPatchWriterFactory.Instance(fFormat);
+  var OldFile: TFileData := nil;
+  var NewFile: TFileData := nil;
+  var SortedOldData: PBlock := nil;
+  var PatchWriter := TPatchWriterFactory.Instance(fFormat);
   try
     Logger.Log('loading old file');
     OldFile := TFileData.Create(OldFileName);
@@ -205,11 +187,11 @@ begin
     Logger.Log('generating patch');
     PatchWriter.Header(OldFile, NewFile);
     { main loop }
-    ToDo := NewFile.Size;
-    NewOffset := 0;
+    var ToDo := NewFile.Size;
+    var NewOffset: Cardinal := 0;
     while (ToDo <> 0) do
     begin
-      Match := FindMaxMatch(
+      var Match := FindMaxMatch(
         OldFile, SortedOldData, @NewFile.Data[NewOffset], ToDo
       );
       if Match.BlockLength <> 0 then

@@ -8,15 +8,18 @@
 
 unit BDiff.BlockSort;
 
+
 interface
+
 
 uses
   // Project
   BDiff.Types;
 
+
 type
   TBlockSort = class(TObject)
-  private
+  strict private
     class function Compare(A: Cardinal; B: Cardinal; Data: PCCharArray;
       DataSize: Cardinal): Integer;
     { The 'sink element' part of heapsort }
@@ -64,14 +67,10 @@ implementation
 
 class function TBlockSort.Compare(A, B: Cardinal; Data: PCCharArray;
   DataSize: Cardinal): Integer;
-var
-  PA: PCChar;
-  PB: PCChar;
-  Len: Cardinal;
 begin
-  PA := @Data[A];
-  PB := @Data[B];
-  Len := DataSize - A;
+  var PA: PCChar := @Data[A];
+  var PB: PCChar := @Data[B];
+  var Len: Cardinal := DataSize - A;
   if DataSize - B < Len then
     Len := DataSize - B;
   while (Len <> 0) and (PA^ = PB^) do
@@ -81,33 +80,25 @@ begin
     Dec(Len);
   end;
   if Len = 0 then
-  begin
-    Result := A - B;
-    Exit;
-  end;
+    Exit(A - B);
   Result := PA^ - PB^;
 end;
 
 class function TBlockSort.Execute(Data: PCCharArray; DataSize: Cardinal):
   PBlock;
-var
-  I, Temp, Left, Right: Cardinal;
 begin
   if DataSize = 0 then
-  begin
-    Result := nil;
-    Exit;
-  end;
+    Exit(nil);
 
   GetMem(Result, SizeOf(Cardinal) * DataSize);
 
   // initialize unsorted data
-  for I := 0 to Pred(DataSize) do
+  for var I := 0 to Pred(DataSize) do
     Result[I] := I;
 
   // heapsort
-  Left := DataSize div 2;
-  Right := DataSize;
+  var Left := DataSize div 2;
+  var Right := DataSize;
   while Left > 0 do
   begin
     Dec(Left);
@@ -115,7 +106,7 @@ begin
   end;
   while Right > 0 do
   begin
-    Temp := Result[Left];
+    var Temp := Result[Left];
     Result[Left] := Result[Right-1];
     Result[Right-1] := Temp;
     Dec(Right);
@@ -125,14 +116,12 @@ end;
 
 class procedure TBlockSort.Sink(Left, Right: Cardinal; Block: PBlock;
   Data: PCCharArray; DataSize: Cardinal);
-var
-  I, J, X: Cardinal;
 begin
-  I := Left;
-  X := Block[I];
+  var I := Left;
+  var X := Block[I];
   while True do
   begin
-    J := 2 * I + 1;
+    var J := 2 * I + 1;
     if J >= Right then
       Break;
     if J < Right - 1 then

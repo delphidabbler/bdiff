@@ -5,20 +5,24 @@
 
 unit BPatch.Params;
 
+
 interface
+
 
 uses
   // Project
   Common.Params;
 
+
 type
 
-  TParams = class(TBaseParams)
-  private
-    fOldFileName: string;
-    fNewFileName: string;
-    fPatchFileName: string;
-  protected
+  TParams = class sealed(TBaseParams)
+  strict private
+    var
+      fOldFileName: string;
+      fNewFileName: string;
+      fPatchFileName: string;
+  strict protected
     function ParseLongOption(const Option: string; var ParamIdx: Integer;
       var Terminated: Boolean): Boolean; override;
     function ParseShortOption(const Options: string; const OptionIdx: Integer;
@@ -34,11 +38,14 @@ type
     property Version;
   end;
 
+
 implementation
+
 
 uses
   // Delphi
   System.StrUtils;
+
 
 { TParams }
 

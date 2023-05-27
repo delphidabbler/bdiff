@@ -5,23 +5,29 @@
 
 unit Common.InfoWriter;
 
+
 interface
 
+
 type
-  TInfoWriter = class(TObject)
+  TInfoWriter = class abstract(TObject)
   strict private
     class function CopyrightHelpText: string;
-  protected
+  strict protected
     class function HelpText: string; virtual; abstract;
   public
     class procedure VersionInfo;
     class procedure HelpScreen;
   end;
 
+
 implementation
 
+
 uses
-  Common.AppInfo, Common.IO;
+  Common.AppInfo,
+  Common.IO;
+
 
 { TInfoWriter }
 
@@ -52,3 +58,4 @@ begin
 end;
 
 end.
+

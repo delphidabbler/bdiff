@@ -7,14 +7,17 @@
 
 unit Common.CheckSum;
 
+
 interface
+
 
 type
   PInt8 = ^Int8;
 
   TCheckSum = class(TObject)
-  private
-    fCheckSum: Longint;
+  strict private
+    var
+      fCheckSum: Int32;
   public
     constructor Create(Seed: Int32);
     procedure Add(Value: Int8);
@@ -22,7 +25,9 @@ type
     property CheckSum: Int32 read fCheckSum;
   end;
 
+
 implementation
+
 
 { TCheckSum }
 
@@ -49,3 +54,4 @@ begin
 end;
 
 end.
+

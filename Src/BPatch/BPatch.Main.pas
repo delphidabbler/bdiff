@@ -5,11 +5,13 @@
 
 unit BPatch.Main;
 
+
 interface
+
 
 type
   TMain = class(TObject)
-  private
+  strict private
     class procedure DisplayHelp;
     class procedure DisplayVersion;
     class procedure RedirectStdIn(const FileName: string);
@@ -17,7 +19,9 @@ type
     class procedure Run;
   end;
 
+
 implementation
+
 
 uses
   System.SysUtils,
@@ -28,6 +32,7 @@ uses
   BPatch.Params,
   Common.AppInfo,
   Common.Errors;
+
 
 { TMain }
 
@@ -42,21 +47,19 @@ begin
 end;
 
 class procedure TMain.RedirectStdIn(const FileName: string);
-var
-  PatchFileHandle: THandle;
 begin
-  PatchFileHandle := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
+  var PatchFileHandle: THandle := FileOpen(
+    FileName, fmOpenRead or fmShareDenyNone
+  );
   if NativeInt(PatchFileHandle) <= 0 then
     OSError;
   TIO.RedirectStdIn(PatchFileHandle);
 end;
 
 class procedure TMain.Run;
-var
-  Params: TParams;
 begin
   ExitCode := 0;
-  Params := TParams.Create;
+  var Params := TParams.Create;
   try
     try
       Params.Parse;
@@ -84,5 +87,5 @@ begin
   end;
 end;
 
-
 end.
+

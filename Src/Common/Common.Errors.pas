@@ -42,11 +42,9 @@ end;
 
 { Raises exception determined by last operating system error }
 procedure OSError;
-var
-  LastError: Integer;
-  Err: EOSError;
 begin
-  LastError := GetLastError;
+  var Err: EOSError;
+  var LastError := GetLastError;
   if LastError <> 0 then
     Err := EOSError.Create(SysErrorMessage(LastError))
   else
@@ -56,3 +54,4 @@ begin
 end;
 
 end.
+

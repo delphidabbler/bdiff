@@ -14,7 +14,12 @@ interface
 
 type
   TPatcher = class(TObject)
-  private
+  strict private
+    const
+      BUFFER_SIZE = 4096;     // size of buffer used to read files
+    type
+      TBuffer = array[0..Pred(BUFFER_SIZE)] of AnsiChar;
+      THeader = array[0..15] of AnsiChar;
     { Compute simple checksum }
     class function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
       const BFCheckSum: Longint): Longint;
@@ -41,42 +46,32 @@ type
 
 implementation
 
+
 {$IOCHECKS OFF}
+
 
 uses
   // Delphi
-  Winapi.Windows, System.SysUtils, System.AnsiStrings,
+  System.SysUtils,
+  System.AnsiStrings,
+  Winapi.Windows,
   // Project
-  Common.AppInfo,
-  Common.CheckSum,
-  Common.Errors,
   BPatch.InfoWriter,
   BPatch.IO,
-  BPatch.Params;
-
-
-const
-  BUFFER_SIZE = 4096;     // size of buffer used to read files
+  BPatch.Params,
+  Common.AppInfo,
+  Common.CheckSum,
+  Common.Errors;
 
 
 { TPatcher }
 
 class procedure TPatcher.Apply(const SourceFileName, DestFileName: string);
-var
-  SourceFileHandle: THandle;        // source file handle
-  DestFileHandle: THandle;          // destination file handle
-  TempFileName: string;             // temporary file name
-  Header: array[0..15] of AnsiChar; // patch file header
-  SourceLen: Longint;               // expected length of source file
-  DestLen: Longint;                 // expected length of destination file
-  DataSize: Longint;                // size of data to be copied to destination
-  SourceFilePos: Longint;           // position in source file
-  Ch: Integer;                      // next character from patch, or EOF
-const
-  ErrorMsg = 'Patch garbled - invalid section ''%''';
 begin
+  var TempFileName: string; // temporary file name
   try
     // read header from patch file on standard input
+    var Header: THeader;
     if FileRead(TIO.StdIn, Header, Length(Header)) <> Length(Header) then
       Error('Patch not in BINARY format');
     if System.AnsiStrings.StrLComp(
@@ -84,12 +79,14 @@ begin
     ) <> 0 then
       Error('Patch not in BINARY format');
     // get length of source and destination files from header
-    SourceLen := GetLong(@Header[8]);
-    DestLen := GetLong(@Header[12]);
+    var SourceLen := GetLong(@Header[8]);
+    var DestLen := GetLong(@Header[12]);
 
-    DestFileHandle := 0;
+    var DestFileHandle: THandle := 0;
     // open source file
-    SourceFileHandle := FileOpen(SourceFileName, fmOpenRead + fmShareDenyNone);
+    var SourceFileHandle: THandle := FileOpen(
+      SourceFileName, fmOpenRead + fmShareDenyNone
+    );
     try
       if NativeInt(SourceFileHandle) <= 0 then
         OSError;
@@ -107,7 +104,7 @@ begin
       { apply patch }
       while True do
       begin
-        Ch := TIO.GetCh(TIO.StdIn);
+        var Ch := TIO.GetCh(TIO.StdIn);
         if Ch = EOF then
           Break;
         case Ch of
@@ -116,8 +113,8 @@ begin
             // common block: copy from source
             if FileRead(TIO.StdIn, Header, 12) <> 12 then
               Error('Patch garbled - unexpected end of data');
-            DataSize := GetLong(@Header[4]);
-            SourceFilePos := GetLong(@Header[0]);
+            var DataSize := GetLong(@Header[4]);
+            var SourceFilePos := GetLong(@Header[0]);
             if (SourceFilePos < 0) or (DataSize <= 0)
               or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
               or (DataSize + SourceFilePos > SourceLen) then
@@ -138,7 +135,7 @@ begin
             // add data from patch file
             if FileRead(TIO.StdIn, Header, 4) <> 4 then
               Error('Patch garbled - unexpected end of data');
-            DataSize := GetLong(@Header[0]);
+            var DataSize := GetLong(@Header[0]);
             CopyData(TIO.StdIn, DestFileHandle, DataSize, 0, True);
             Dec(DestLen, DataSize);
           end;
@@ -172,10 +169,8 @@ end;
 
 class function TPatcher.CheckSum(Data: PAnsiChar; DataSize: Cardinal;
   const BFCheckSum: Integer): Longint;
-var
-  CS: TCheckSum;
 begin
-  CS := TCheckSum.Create(BFCheckSum);
+  var CS := TCheckSum.Create(BFCheckSum);
   try
     CS.AddBuffer(PInt8(Data), DataSize);
     Result := CS.CheckSum;
@@ -187,19 +182,18 @@ end;
 class procedure TPatcher.CopyData(const SourceFileHandle,
   DestFileHandle: THandle; Count, SourceCheckSum: Integer;
   const SourceIsPatch: Boolean);
-var
-  DestCheckSum: Longint;
-  Buffer: array[0..BUFFER_SIZE-1] of AnsiChar;
-  BytesToCopy: Cardinal;
 begin
-  DestCheckSum := 0;
+  var DestCheckSum: Longint := 0;
 
   while Count <> 0 do
   begin
+    var BytesToCopy: Cardinal;
     if Count > BUFFER_SIZE then
       BytesToCopy := BUFFER_SIZE
     else
       BytesToCopy := Count;
+
+    var Buffer: TBuffer;
     if FileRead(SourceFileHandle, Buffer, BytesToCopy)
       <> Integer(BytesToCopy) then
     begin
@@ -218,6 +212,7 @@ begin
           Error('Error reading source file');
       end;
     end;
+
     if DestFileHandle <> 0 then
       if FileWrite(DestFileHandle, Buffer, BytesToCopy)
         <> Integer(BytesToCopy) then
@@ -230,12 +225,9 @@ begin
 end;
 
 class function TPatcher.GetLong(PCh: PAnsiChar): Longint;
-var
-  PB: PByte;
-  LW: LongWord;
 begin
-  PB := PByte(PCh);
-  LW := PB^;
+  var PB := PByte(PCh);
+  var LW: LongWord := PB^;
   Inc(PB);
   LW := LW + 256 * PB^;
   Inc(PB);

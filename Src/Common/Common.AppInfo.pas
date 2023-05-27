@@ -5,13 +5,15 @@
 
 unit Common.AppInfo;
 
+
 interface
+
 
 type
   TPatchFileSignature = array[0..7] of AnsiChar;
 
   TAppInfo = class(TObject)
-  private
+  strict private
     { Fully specified file name of program, with absolute path }
     class function ProgramPath: string;
   public
@@ -34,9 +36,11 @@ type
 
 implementation
 
+
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows;
 
 
 { TAppInfo }
@@ -49,9 +53,8 @@ end;
 class function TAppInfo.ProgramExeDate: string;
 const
   InternationalDateFmtStr = 'yyyy"-"mm"-"dd';
-var
-  FileDate: TDateTime;  // date stamp of exe file
 begin
+  var FileDate: TDateTime;
   if FileAge(ProgramPath, FileDate) then
     // Use international date format
     Result := FormatDateTime(InternationalDateFmtStr, FileDate)
@@ -70,20 +73,16 @@ begin
 end;
 
 class function TAppInfo.ProgramVersion: string;
-var
-  Dummy: DWORD;           // unused variable required in API calls
-  VerInfoSize: Integer;   // size of version information data
-  VerInfoBuf: Pointer;    // buffer holding version information
-  ValPtr: Pointer;        // pointer to a version information value
-  FFI: TVSFixedFileInfo;  // fixed file information from version info
 begin
   Result := '';
   // Get fixed file info from program's version info
   // get size of version info
-  VerInfoSize := GetFileVersionInfoSize(PChar(ProgramPath), Dummy);
+  var Dummy: DWORD;
+  var VerInfoSize := GetFileVersionInfoSize(PChar(ProgramPath), Dummy);
   if VerInfoSize > 0 then
   begin
     // create buffer and read version info into it
+    var VerInfoBuf: Pointer;
     GetMem(VerInfoBuf, VerInfoSize);
     try
       if GetFileVersionInfo(
@@ -91,9 +90,10 @@ begin
       ) then
       begin
         // get fixed file info from version info (ValPtr points to it)
+        var ValPtr: Pointer;
         if VerQueryValue(VerInfoBuf, '\', ValPtr, Dummy) then
         begin
-          FFI := PVSFixedFileInfo(ValPtr)^;
+          var FFI := PVSFixedFileInfo(ValPtr)^;
           // Build version info string from product version field of FFI
           Result := Format(
             '%d.%d.%d',
@@ -112,3 +112,4 @@ begin
 end;
 
 end.
+

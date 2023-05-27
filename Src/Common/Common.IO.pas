@@ -4,7 +4,9 @@
 
 unit Common.IO;
 
+
 interface
+
 
 type
   TCommonIO = class(TObject)
@@ -25,11 +27,15 @@ type
       Args: array of const);
   end;
 
+
 implementation
+
 
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows;
+
 
 { TCommonIO }
 
@@ -50,19 +56,16 @@ end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
   Size: Integer);
-var
-  Dummy: DWORD;
 begin
   if Size <= 0 then
     Exit;
+  var Dummy: DWORD;
   Winapi.Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
 class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);
-var
-  Bytes: TBytes;
 begin
-  Bytes := TEncoding.Default.GetBytes(S);
+  var Bytes := TEncoding.Default.GetBytes(S);
   WriteRaw(Handle, Bytes, Length(S));
 end;
 
