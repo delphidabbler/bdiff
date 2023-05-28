@@ -1,8 +1,8 @@
-{
- * Class that emits BPatch's version information and help screen on standard
- * output.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Handles display of BPatch's version information and help screen.
+///  </summary>
+///  <remarks>Used by BPatch only.</remarks>
 
 unit BPatch.InfoWriter;
 
@@ -11,12 +11,17 @@ interface
 
 
 uses
+  // Project
   Common.InfoWriter;
 
 
 type
+
+  ///  <summary>Class that writes BPatch help text and version information to
+  ///  stdout.</summary>
   TBPatchInfoWriter = class sealed(TInfoWriter)
   strict protected
+    ///  <summary>Writes the main BPatch help text.</summary>
     class function HelpText: string; override;
   end;
 
@@ -25,8 +30,9 @@ implementation
 
 
 uses
+  // Delphi
   System.SysUtils,
-
+  // Project
   Common.AppInfo;
 
 

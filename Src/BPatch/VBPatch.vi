@@ -1,12 +1,6 @@
-;-------------------------------------------------------------------------------
-; Version information description file used to create VBPatch.res resource file.
+;! BSD 3-clause license: see LICENSE.md
 ;
-; Usage:
-;   1) Generate a .rc resource source file from this file using DelphiDabbler
-;      Version Information Editor (https://delphidabbler.com/software/vied).
-;   2) Use the Borland BRCC32 resource compiler to compile the .rc file.
-;-------------------------------------------------------------------------------
-
+;  BPatch version information description file.
 
 [Fixed File Info]
 File Version #=0, 2, 9, 10

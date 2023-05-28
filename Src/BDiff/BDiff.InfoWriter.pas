@@ -1,8 +1,8 @@
-{
- * Class that emits BDiff's version information and help screen on standard
- * output.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Handles display of BDiff's version information and help screen.
+///  </summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.InfoWriter;
 
@@ -11,12 +11,17 @@ interface
 
 
 uses
+  // Project
   Common.InfoWriter;
 
 
 type
+
+  ///  <summary>Class that writes BDiff help text and version information to
+  ///  stdout.</summary>
   TBDiffInfoWriter = class sealed(TInfoWriter)
   strict protected
+    ///  <summary>Writes the main BDiff help text.</summary>
     class function HelpText: string; override;
   end;
 
@@ -25,7 +30,9 @@ implementation
 
 
 uses
+  // Delphi
   System.SysUtils,
+  // Project
   Common.AppInfo;
 
 

@@ -1,7 +1,6 @@
-{*
- * Main project file for BDiff.exe.
- *}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Main BDiff project file.</summary>
 
 program BDiff;
 

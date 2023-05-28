@@ -1,10 +1,10 @@
-{
- * Implements block sort.
- *
- * Based on parts of blksort.c by Stefan Reuther, copyright (c) 1999 Stefan
- * Reuther <Streu@gmx.de>.
-}
+//!  BSD 3-clause license: see LICENSE.md
+//!  Based, in part, on `blksort.c` by Stefan Reuther, copyright (c) 1999 Stefan
+//!  Reuther <Streu@gmx.de>.
 
+///  <summary>Implements the block sort component of the diff generator.
+///  </summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.BlockSort;
 
@@ -18,20 +18,28 @@ uses
 
 
 type
+
+  ///  <summary>Class that implements the block sort part of the diff.</summary>
   TBlockSort = class(TObject)
   strict private
+    ///  <summary>Compares elements of array of <c>TCChar</c> characters
+    ///  starting from index <c>A</c>, with elements of same array starting at
+    ///  index <c>B</c>.</summary>
     class function Compare(A: Cardinal; B: Cardinal; Data: PCCharArray;
       DataSize: Cardinal): Integer;
-    { The 'sink element' part of heapsort }
+    ///  <summary>Heap sort sink.</summary>
     class procedure Sink(Left: Cardinal; Right: Cardinal; Block: PBlock;
       Data: PCCharArray; DataSize: Cardinal);
   public
-    { Returns array of offsets into data, sorted by position.
-      @param Data [in] Data to be sorted. Must not be nil.
-      @param DataSize [in] Size of data to be sorted, must be > 0.
-      @return Pointer to block of sorted indices into Data. Caller must free.
-      @except raises EOutOfMemory if can't allocate sorted data block.
-    }
+    ///  <summary>Returns array of offsets into data, sorted by position.
+    ///  </summary>
+    ///  <param name="Data">[in] Data to be sorted. Must not be nil.</param>
+    ///  <param name="DataSize"> [in] Size of data to be sorted, must be &gt; 0.
+    ///  </param>
+    ///  <returns><c>PBlock</c>. Pointer to block of sorted indices into Data.
+    ///  Caller must free.</returns>
+    ///  <exception>Raises <c>EOutOfMemory</c> if the reutned data block can't
+    ///  be allocated.</exception>
     class function Execute(Data: PCCharArray; DataSize: Cardinal): PBlock;
   end;
 
@@ -54,12 +62,6 @@ implementation
       area. Of course, we don't really generate these N*N/2 bytes of strings: we
       use an array of N size_t's indexing the data.
 
-  PASCAL IMPLEMENTATION NOTE (Peter Johnson)
-
-    The fact that C's (ansi) Char type is signed and Pascal's is unsigned is
-    relevant to the string sorting and accessing code described above. Thefore
-    we use a specially defined SignedAnsiChar to maintain the data buffer to
-    ensure that the the Pascal performs in the same way as the C code.
 }
 
 

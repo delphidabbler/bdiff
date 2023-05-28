@@ -1,6 +1,6 @@
-{
- * Main project file for BPatch.exe.
-}
+//!  BSD 3-clause license: see LICENSE.md
+
+///  <summary>Main BPatch project file.</summary>
 
 program BPatch;
 

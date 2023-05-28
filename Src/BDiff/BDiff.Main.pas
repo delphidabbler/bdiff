@@ -1,7 +1,7 @@
-{
- * Static class containing main program logic for BDiff program.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Main BDiff program logic.</summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.Main;
 
@@ -10,17 +10,30 @@ interface
 
 
 uses
+  // Project
   BDiff.Params;
 
 
 type
+
+  ///  <summary>Class containing main BDiff program logic.</summary>
   TMain = class(TObject)
   strict private
+    ///  <summary>Displays the program help screen.</summary>
     class procedure DisplayHelp;
+    ///  <summary>Displays the program version information.</summary>
     class procedure DisplayVersion;
+    ///  <summary>Creates and outputs the diff.</summary>
+    ///  <param name="Params">[in] Command line parameters object containing
+    ///  options used to customise diff output.</param>
     class procedure CreateDiff(Params: TParams);
+    ///  <summary>Redirects a file to standard output.</summary>
+    ///  <param name="FileName">[in] Name of file to redirect.</param>
+    ///  <exception>Raises <c>EOSError</c> if file can't be redirected.
+    ///  </exception>
     class procedure RedirectStdOut(const FileName: string);
   public
+    ///  <summary>Runs the program.</summary>
     class procedure Run;
   end;
 
@@ -29,8 +42,9 @@ implementation
 
 
 uses
+  // Delphi
   System.SysUtils,
-
+  // Project
   BDiff.Differ,
   BDiff.InfoWriter,
   BDiff.IO,
@@ -43,7 +57,6 @@ uses
 
 class procedure TMain.CreateDiff(Params: TParams);
 begin
-  // create the diff
   var Logger := TLoggerFactory.Instance(Params.Verbose);
   try
     var Differ := TDiffer.Create;
@@ -71,7 +84,6 @@ end;
 
 class procedure TMain.RedirectStdOut(const FileName: string);
 begin
-  // redirect standard output to patch file
   var PatchFileHandle: THandle := FileCreate(FileName);
   if NativeInt(PatchFileHandle) <= 0 then
     OSError;

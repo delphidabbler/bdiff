@@ -1,7 +1,8 @@
-{
- * Abstract base class for classes that emit version information and help
- * screens on standard output.
-}
+//!  BSD 3-clause license: see LICENSE.md
+
+///  <summary>Code for displaying help and version information to stdout that is
+///  common to both programs.</summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
 unit Common.InfoWriter;
 
@@ -10,13 +11,20 @@ interface
 
 
 type
+
+  ///  <summary>Abstract base class for classes that write help text and version
+  ///  information to stdout.</summary>
   TInfoWriter = class abstract(TObject)
   strict private
+    ///  <summary>Writes copyright portion of help text.</summary>
     class function CopyrightHelpText: string;
   strict protected
+    ///  <summary>Writes the main help text.</summary>
     class function HelpText: string; virtual; abstract;
   public
+    ///  <summary>Writes the program's version information to stdout.</summary>
     class procedure VersionInfo;
+    ///  <summary>Writes the program's help screen to stdout.</summary>
     class procedure HelpScreen;
   end;
 
@@ -25,6 +33,7 @@ implementation
 
 
 uses
+  // Project
   Common.AppInfo,
   Common.IO;
 

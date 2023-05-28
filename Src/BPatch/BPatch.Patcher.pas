@@ -1,10 +1,7 @@
-{
- * Class that applies patch to source file to re-create destination file.
- *
- * Based on bpatch.c by Stefan Reuther, copyright (c) 1999 Stefan Reuther
- * <Streu@gmx.de>.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Applies patch to file.</summary>
+///  <remarks>Used by BPatch only.</remarks>
 
 unit BPatch.Patcher;
 
@@ -13,34 +10,64 @@ interface
 
 
 type
+
+  ///  <summary>Class that recreates a new version of a file from the old file
+  ///  and binary patch.</summary>
   TPatcher = class(TObject)
   strict private
+
     const
-      BUFFER_SIZE = 4096;     // size of buffer used to read files
+      ///  <summary>Size of buffer used when reading files.</summary>
+      BUFFER_SIZE = 4096;
+
     type
+      ///  <summary>Buffer used when reading from a file.</summary>
       TBuffer = array[0..Pred(BUFFER_SIZE)] of AnsiChar;
+      ///  <summary>Buffer used to read patch file header into.</summary>
       THeader = array[0..15] of AnsiChar;
-    { Compute simple checksum }
+
+    ///  <summary>Computes simple checksum of a data buffer.</summary>
+    ///  <param name="Data">[in] Pointer to data to be checked.</param>
+    ///  <param name="DataSize">[in] Size of data in bytes.</param>
+    ///  <param name="BFCheckSum">[in] Checksum b/f from any previous call.
+    ///  </param>
+    ///  <returns><c>Longint</c>. Updated checksum.</returns>
     class function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
       const BFCheckSum: Longint): Longint;
-    { Get 32-bit quantity from char array }
+
+    ///  <summary>Extract long integer value packed into a 4 byte array of ANSI
+    ///  characters.</summary>
+    ///  <param name="PCh">[in] Points to array of ANSI characters. Must be at
+    ///  least 4 bytes long.</param>
+    ///  <returns><c>Longint</c>. Unpacked long integer.</returns>
     class function GetLong(PCh: PAnsiChar): Longint;
-    { Copy data from one stream to another, computing checksums
-      @param SourceFileHandle [in] Handle to file containing data to be copied.
-      @param DestFileHandle [in] Handle to file to receive copied data.
-      @param Count [in] Number of bytes to copy.
-      @param SourceCheckSum [in] Checksum for data to be copied
-      @param SourceIsPatch [in] Flag True when SourceFileHandle is patch file and
-        False when SourceFileHandle is source file.
-    }
+
+    ///  <summary>Copies data from one stream to another, computing checksums.
+    ///  </summary>
+    ///  <param name="SourceFileHandle">[in] Handle to file containing data to
+    ///  be copied.</param>
+    ///  <param name="DestFileHandle">[in] Handle to file to receive copied
+    ///  data.</param>
+    ///  <param name="Count">[in] Number of bytes to copy.</param>
+    ///  <param name="SourceCheckSum">[in] Checksum of data to be copied.
+    ///  </param>
+    ///  <param name="SourceIsPatch">[in] Flag indicating whether
+    ///  <c>SourceFileHandle</c> is a patch file (<c>True</c>) or a source file
+    ///  (<c>False</c>).</param>
     class procedure CopyData(const SourceFileHandle, DestFileHandle: THandle;
       Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
-    { Creates a temporary file in user's temp directory and returns its name }
+
+    ///  <summary>Creates a temporary file in the user's temp directory and
+    ///  returns its name.</summary>
     class function GetTempFileName: string;
+
   public
-    { Apply patch from standard input to SourceFileName and regenerate
-      DestFileName. }
+
+    ///  <summary>Applies patch from standard input to file
+    ///  <c>SourceFileName</c> and regenerates file <c>DestFileName</c>.
+    ///  </summary>
     class procedure Apply(const SourceFileName, DestFileName: string);
+
   end;
 
 
@@ -101,7 +128,7 @@ begin
       if NativeInt(DestFileHandle) <= 0 then
         Error('Can''t create temporary file');
 
-      { apply patch }
+      // apply patch
       while True do
       begin
         var Ch := TIO.GetCh(TIO.StdIn);

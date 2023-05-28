@@ -1,29 +1,31 @@
-:: Deploy script for BDiff/BPatch.
+::! BSD 3-clause license: see LICENSE.md
 ::
-:: This script compiles release versions BDiff, including BDiff & BPatch and
-:: places then into a single zip file ready for release.
+::  Deploy script for BDiff/BPatch.
 ::
-:: This script uses MSBuild and InfoZip's zip.exe. The MSBuild project also
-:: requires the DelphiDabbler Version Information Editor.
+::  This script compiles release versions BDiff, including BDiff & BPatch and
+::  places then into a single zip file ready for release.
 ::
-:: Get zip.exe from https://delphidabbler.com/extras/info-zip
-:: Get Version Information Editor from https://delphidabbler.com/software/vied
+::  This script uses MSBuild and InfoZip's zip.exe. The MSBuild project also
+::  requires the DelphiDabbler Version Information Editor.
+::
+::  Get zip.exe from https://delphidabbler.com/extras/info-zip
+::  Get Version Information Editor from https://delphidabbler.com/software/vied
 
-:: To use the script:
-::   1) Start the Embarcadero RAD Studio Command Prompt to set the required
-::      environment variables for MSBuild.
-::   2) Set the BDSBIN variable to %BDS%\bin (required by MSBuild/Delphi).
-::   3) Set the ZIPROOT environment variable to the directory where zip.exe is
-::      installed.
-::   4) Set the VIEDROOT environment variable to the directory where VIEd.exe is
-::      installed.
-::   5) Change directory to that where this script is located.
-::   6) Run the script.
+::  To use the script:
+::    1) Start the Embarcadero RAD Studio Command Prompt to set the required
+::       environment variables for MSBuild.
+::    2) Set the BDSBIN variable to %BDS%\bin (required by MSBuild/Delphi).
+::    3) Set the ZIPROOT environment variable to the directory where zip.exe is
+::       installed.
+::    4) Set the VIEDROOT environment variable to the directory where VIEd.exe 
+::       is installed.
+::    5) Change directory to that where this script is located.
+::    6) Run the script.
 ::
-:: Usage:
-::   Deploy <version>
-:: where
-::   <version> is the version number of the release, e.g. 0.5.3-beta or 1.2.0.
+::  Usage:
+::    Deploy <version>
+::  where
+::    <version> is the version number of the release, e.g. 0.5.3-beta or 1.2.0.
 
 @echo off
 

@@ -1,7 +1,7 @@
-{
- * Contains type declarations for BDiff.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>General type declarations specific to BDiff.</summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.Types;
 
@@ -10,28 +10,38 @@ interface
 
 
 type
-  { Some uses of *size_t in original C code actually reference an array of
-    size_t and are referenced using array[] notation. The following types are
-    declared to use in these circumstances to enable similar notation in
-    Pascal }
+
+  ///  <summary>Type that enables array <c>[]</c> notation to be used with
+  ///  pointers to blocks of <c>Cardinal</c>.</summary>
+  ///  <remarks>The original C code uses <c>*size_t</c> pointers that are
+  ///  accessed using array <c>[]</c> notation. <c>TBlock</c> enables this to be
+  ///  done in Pascal.</remarks>
   TBlock = array[0..0] of Cardinal;
+
+  ///  <summary>Pointer to a <c>TBlock</c> array.</summary>
   PBlock = ^TBlock;
 
-  {
-    Some of the original C code, for example the block sort algorithm and string
-    lookup functions, depended on the fact that the C char type is signed, with
-    range (-127..128). Therefore, where those assumptions hold, we replace char
-    with the Pascal Int8 type, which has the same range. Since the C code also
-    used char arrays and char pointers, the following types are defined to
-    enable the Pascal code to emulate this usage:
-  }
+  ///  <summary>Emulation of C's <c>char</c> type.</summary>
+  ///  <remarks>This type was defined since the original C code uses
+  ///  <c>char</c>, which is signed, while the Pascal <c>Char</c> type is
+  ///  unsigned. This type made translation of the C code easier.</remarks>
   TCChar = type Int8;
+
+  ///  <summary>Pointer to <c>TCChar</c>.</summary>
   PCChar = ^TCChar;
+
+  ///  <summary>Array of <c>TCChar</c>.</summary>
+  ///  <remarks>This class is provided to ease translation of the original C
+  ///  code, which used <c>char</c> array pointers access via the array
+  ///  <c>[]</c> operator.</remarks>
   TCCharArray = array[0..(MaxInt div SizeOf(TCChar) - 1)] of TCChar;
+
+  ///  <summary>Pointer to an array of <c>TCChar</c>.</summary>
   PCCharArray = ^TCCharArray;
 
-  { Output format to use }
+  ///  <summary>Enumeration of supported patch file formats.</summary>
   TFormat = (FMT_BINARY, FMT_FILTERED, FMT_QUOTED);
+
 
 implementation
 

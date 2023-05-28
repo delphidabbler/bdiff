@@ -1,4 +1,6 @@
-# .gitignore file for BDiff project
+#! BSD 3-clause license: see LICENSE.md
+
+#  .gitignore file for BDiff project
 
 *.cfg
 *.dsk

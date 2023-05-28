@@ -1,8 +1,8 @@
-{
- * Contains utility functions used for BDiff. Includes Pascal implementations
- * of, or alternatives for, some standard C library code.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Code to assist in working with stdin, stdout and stderr in BDiff.
+///  </summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.IO;
 
@@ -16,9 +16,13 @@ uses
 
 
 type
+
+  ///  <summary>Static class that provides IO functions required by BDiff to
+  ///  read/write from/to Windows handles.</summary>
   TIO = class sealed(TCommonIO)
   public
-    { Redirects standard output to a given file handle }
+    ///  <summary>Redirects standard output to file handle <c>Handle</c>.
+    ///  </summary>
     class procedure RedirectStdOut(const Handle: THandle);
   end;
 

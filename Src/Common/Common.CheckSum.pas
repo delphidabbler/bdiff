@@ -1,9 +1,8 @@
-{
-  Class that calculates check sum that is written to binary patch files by
-  BDiff and checked by BPatch when reading patch files.
+//!  BSD 3-clause license: see LICENSE.md
 
-  This class centralises previously duplicated checksum methods.
-}
+///  <summary>Code to calculate the check sum used to validate patch files.
+///  </summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
 unit Common.CheckSum;
 
@@ -12,16 +11,26 @@ interface
 
 
 type
+
+  ///  <summary>Pointer to <c>Int8</c> type.</summary>
   PInt8 = ^Int8;
 
+  ///  <summary>Checksum builder.</summary>
   TCheckSum = class(TObject)
   strict private
     var
+      // Property value
       fCheckSum: Int32;
   public
+    ///  <summary>Object constructor. Initialises checksum to <c>Seed</c>.
+    ///  </summary>
     constructor Create(Seed: Int32);
+    ///  <summary>Adds a given signed byte to the checksum.</summary>
     procedure Add(Value: Int8);
+    ///  <summary>Adds data from buffer of signed bytes pointed to by
+    ///  <c>Data</c>, where buffer contains <c>Length</c>.</summary>
     procedure AddBuffer(Data: PInt8; Length: UInt32);
+    ///  <summary>The current checksum.</summary>
     property CheckSum: Int32 read fCheckSum;
   end;
 

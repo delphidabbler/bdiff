@@ -1,8 +1,8 @@
-{
- * Contains utility functions used for BPatch. Includes Pascal implementations
- * of some standard C library code.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Code to assist in working with stdin, stdout and stderr in BPatch.
+///  </summary>
+///  <remarks>Used by BPatch only.</remarks>
 
 unit BPatch.IO;
 
@@ -16,24 +16,41 @@ uses
 
 
 const
-  // Value representing end of file (as returned from TIO.GetCh).
+
+  ///  <summary>Value representing end of file (as returned from
+  ///  <c>TIO.GetCh</c>).</summary>
   EOF: Integer = -1;
-  // seek flag used by TIO.Seek (other possible values not used in program).
+  ///  <summary>Seek flag used by <c>TIO.Seek</c> (other possible values not
+  ///  used in program).</summary>
   SEEK_SET = 0;
 
 type
+
+  ///  <summary>Static class that provides IO functions required by BPatch to
+  ///  read/write from/to Windows handles.</summary>
   TIO = class sealed(TCommonIO)
   public
-    { Redirects standard input from a given file handle }
+    ///  <summary>Redirects standard input from file handle <c>Handle</c>.
+    ///  </summary>
     class procedure RedirectStdIn(const Handle: THandle);
-    { Seeks to given offset from given origin in file specified by Handle.
-      Returns True on success, false on failure. }
+
+    ///  <summary>Seeks within a given file.</summary>
+    ///  <param name="Handle">[in] Handle of file.</param>
+    ///  <param name="Offset">[in] Seek offset within the file.</param>
+    ///  <param name="Origin">[in] Origin from which seek takes place.</param>
+    ///  <returns><c>True</c> on success or <c>False</c> on failure.</returns>
     class function Seek(Handle: THandle; Offset: Longint; Origin: Integer):
       Boolean;
-    { Checks if given file handle is at end of file. }
+
+    ///  <summary>Checks if the given file handle is at end of file.</summary>
     class function AtEOF(Handle: THandle): Boolean;
-    { Gets a single ANSI character from file specified by Handle and returns it,
-      or EOF. }
+
+    ///  <summary>Gets and returns a ASCII character from a file or stdin.
+    ///  </summary>
+    ///  <param name="Handle">[in] Handle from which character is to be read.
+    ///  </param>
+    ///  <returns><c>Integer</c>. Character read, cast to integer or <c>EOF</c>
+    ///  at end of file.</returns>
     class function GetCh(Handle: THandle): Integer;
   end;
 

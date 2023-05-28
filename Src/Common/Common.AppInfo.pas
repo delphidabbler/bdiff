@@ -1,7 +1,8 @@
-{
- * Provides information about program: file name, date and version info.
- * Common code used by both BDiff and BPatch.
-}
+//!  BSD 3-clause license: see LICENSE.md
+
+///  <summary>Provides various pieces of information about the currently running
+///  program.</summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
 unit Common.AppInfo;
 
@@ -10,26 +11,34 @@ interface
 
 
 type
+
+  ///  <summary>Defines 8 character array used to store patch file signature.
+  ///  </summary>
   TPatchFileSignature = array[0..7] of AnsiChar;
 
+  ///  <summary>Provides information about the program.</summary>
   TAppInfo = class(TObject)
   strict private
-    { Fully specified file name of program, with absolute path }
+    ///  <summary>Returns absolute path of program .exe file.</summary>
     class function ProgramPath: string;
   public
     const
-      // Patch file signature. Must be 8 bytes.
-      // Format is 'bdiff' + file-version + Ctrl+Z.
-      // where file-version is a two char string, here '02'.
-      // If file format is changed then increment the file version.
+      ///  <summary>Patch file signature.</summary>
+      ///  <remarks>
+      ///  <para>Format is <c>bdiff</c> + file-version + Ctrl+Z. Where
+      ///  file-version is a two character ANSI string, here <c>02</c>.</para>
+      ///  <para>If the file format is changed then increment the file version.
+      ///  Keep the length at 8 bytes.</para>
+      ///  </remarks>
       PatchFileSignature: TPatchFileSignature = 'bdiff02'#$1A;
-    { Name of program's executable file, without path }
+    ///  <summary>Name of program's executable file, without path.</summary>
     class function ProgramFileName: string;
-    { Name of program, without file extension }
+    ///  <summary>Name of program, without file extension.</summary>
     class function ProgramBaseName: string;
-    { Program's product version number }
+    ///  <summary>Program's product version number.</summary>
+    ///  <remarks>Read from version information resources.</remarks>
     class function ProgramVersion: string;
-    { Last modification date of program's executable file }
+    ///  <summary>Last modification date of program's executable file.</summary>
     class function ProgramExeDate: string;
   end;
 

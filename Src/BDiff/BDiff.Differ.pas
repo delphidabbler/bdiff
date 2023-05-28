@@ -1,10 +1,9 @@
-{
- * Class that generates a diff for two files, logging progress as required.
- *
- * Based on bdiff.c and part of blksort.c by Stefan Reuther, copyright (c) 1999
- * Stefan Reuther <Streu@gmx.de>.
-}
+//!  BSD 3-clause license: see LICENSE.md
+//!  Based on `bdiff.c` and part of `blksort.c` by Stefan Reuther, copyright (c)
+//!  1999 Stefan Reuther <Streu@gmx.de>.
 
+///  <summary>Main diff generation code.</summary>
+///  <remarks>Used by BDiff only.</remarks>
 
 unit BDiff.Differ;
 
@@ -13,50 +12,75 @@ interface
 
 
 uses
+  // Project
   BDiff.FileData,
   BDiff.Logger,
   BDiff.Types;
 
 
 type
+
+  ///  <summary>Class that generates the diff.</summary>
   TDiffer = class(TObject)
   strict private
-    { Structure for a matching block }
+
     type
+      ///  <summary>Structure for a matching block.</summary>
       TMatch = record
         OldOffset: Cardinal;
         NewOffset: Cardinal;
         BlockLength: Cardinal;
       end;
-      PMatch = ^TMatch;
+
     var
+      // Property values
       fMinMatchLength: Cardinal;
       fFormat: TFormat;
+
+    ///  <summary>Finds a maximum length match a given search string in the old
+    ///  file and returns a <c>TMatch</c> record that describes the match.
+    ///  </summary>
     function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
       SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
-    ///  <summary>Finds maximum length "sub-string" of CompareData that is in
-    ///  Data.</summary>
-    ///  <param name="Data">PSignedAnsiCharArray [in] Data to be searched for
-    ///  "sub-string".</param>
-    ///  <param name="Block">PBlock [in] Block of indexes into Data that sort
-    ///  sub-strings of Data.</param>
-    ///  <param name="DataSize">Cardinal [in] Size of Data.</param>
-    ///  <param name="CompareData">PSignedAnsiChar [in] Pointer to data to be
-    ///  compared to Data.</param>
-    ///  <param name="CompareDataSize">Cardinal [in] Size of data pointed to by
-    ///  CompareData.</param>
-    ///  <param name="FoundPos">Cardinal [out] Position in Data where
-    ///  "sub-string" was found.</param>
-    ///  <returns>Cardinal. Length of found "sub-string".</returns>
+
+    ///  <summary>Finds maximum length sub-string of <c>CompareData</c> that is
+    ///  in <c>Data</c>.</summary>
+    ///  <param name="Data">[in] Data to be searched for sub-string.</param>
+    ///  <param name="Block">[in] Block of indexes into <c>Data</c> that sort
+    ///  sub-strings of <c>Data</c>.</param>
+    ///  <param name="DataSize">[in] Size of <c>Data</c>.</param>
+    ///  <param name="CompareData">[in] Pointer to data to be compared to
+    ///  <c>Data</c>.</param>
+    ///  <param name="CompareDataSize">[in] Size of data pointed to by
+    ///  <c>CompareData</c>.</param>
+    ///  <param name="FoundPos">[out] Position in <c>Data</c> where sub-string
+    ///  was found.</param>
+    ///  <returns><c>Cardinal</c>. Length of found sub-string.</returns>
     function FindString(Data: PCCharArray; Block: PBlock; DataSize: Cardinal;
       CompareData: PCChar; CompareDataSize: Cardinal; out FoundPos: Cardinal):
       Cardinal;
+
   public
+
+    ///  <summary>Object constructor. Sets default property values.</summary>
     constructor Create;
+
+    ///  <summary>Generate diff in required format and write to patch file.
+    ///  </summary>
+    ///  <param name="OldFileName">[in] Name of old file.</param>
+    ///  <param name="NewFileName">[in] Name of new file to be compared to old
+    ///  file.</param>
+    ///  <param name="Logger">[in] Object to be used to log output information.
+    ///  </param>
     procedure MakeDiff(const OldFileName, NewFileName: string;
       const Logger: TLogger);
+
+    ///  <summary>Minimum length of data chunks that can be recognized as equal.
+    ///  </summary>
     property MinMatchLength: Cardinal
       read fMinMatchLength write fMinMatchLength default 24;
+
+    ///  <summary>Format of generated diff.</summary>
     property Format: TFormat
       read fFormat write fFormat default FMT_QUOTED;
   end;
@@ -170,7 +194,7 @@ end;
 procedure TDiffer.MakeDiff(const OldFileName, NewFileName: string;
   const Logger: TLogger);
 begin
-  { initialize }
+  // initialize
   var OldFile: TFileData := nil;
   var NewFile: TFileData := nil;
   var SortedOldData: PBlock := nil;
@@ -186,7 +210,7 @@ begin
       Error('virtual memory exhausted');
     Logger.Log('generating patch');
     PatchWriter.Header(OldFile, NewFile);
-    { main loop }
+    // main loop
     var ToDo := NewFile.Size;
     var NewOffset: Cardinal := 0;
     while (ToDo <> 0) do
@@ -196,9 +220,9 @@ begin
       );
       if Match.BlockLength <> 0 then
       begin
-        { found a match }
+        // found a match
         if Match.NewOffset <> 0 then
-          { preceded by a "copy" block }
+          // preceded by a "copy" block
           PatchWriter.Add(@NewFile.Data[NewOffset], Match.NewOffset);
         Inc(NewOffset, Match.NewOffset);
         Dec(ToDo, Match.NewOffset);
@@ -216,7 +240,6 @@ begin
     end;
     Logger.Log('done');
   finally
-    // finally section new to v1.1
     if Assigned(SortedOldData) then
       FreeMem(SortedOldData);
     OldFile.Free;
