@@ -117,7 +117,7 @@ begin
       SourceFileName, fmOpenRead + fmShareDenyNone
     );
     try
-      if NativeInt(SourceFileHandle) <= 0 then
+      if SourceFileHandle = INVALID_HANDLE_VALUE then
         OSError;
       // check destination file name
       if Length(DestFileName) = 0 then
@@ -125,7 +125,7 @@ begin
       // create temporary file
       TempFileName := GetTempFileName;
       DestFileHandle := FileCreate(TempFileName);
-      if NativeInt(DestFileHandle) <= 0 then
+      if DestFileHandle = INVALID_HANDLE_VALUE then
         Error('Can''t create temporary file');
       // apply patch
       while True do

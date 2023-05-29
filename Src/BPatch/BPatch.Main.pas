@@ -61,7 +61,7 @@ begin
   var PatchFileHandle: THandle := FileOpen(
     FileName, fmOpenRead or fmShareDenyNone
   );
-  if NativeInt(PatchFileHandle) <= 0 then
+  if PatchFileHandle = INVALID_HANDLE_VALUE then
     OSError;
   TIO.RedirectStdIn(PatchFileHandle);
 end;

@@ -75,9 +75,9 @@ end;
 
 procedure TFileData.LoadFile;
 begin
-  var FileHandle: Integer := FileOpen(fName, fmOpenRead or fmShareDenyWrite);
+  var FileHandle: THandle := FileOpen(fName, fmOpenRead or fmShareDenyWrite);
   try
-    if FileHandle = -1 then
+    if FileHandle = INVALID_HANDLE_VALUE then
       Error('Cannot open file %s', [fName]);
     fSize := GetFileSize(FileHandle, nil);
     if fSize = Cardinal(-1) then
@@ -97,7 +97,7 @@ begin
       raise;
     end;
   finally
-    if FileHandle <> -1 then
+    if FileHandle <> INVALID_HANDLE_VALUE then
       FileClose(FileHandle);
   end;
 end;

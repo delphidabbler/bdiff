@@ -85,7 +85,7 @@ end;
 class procedure TMain.RedirectStdOut(const FileName: string);
 begin
   var PatchFileHandle: THandle := FileCreate(FileName);
-  if NativeInt(PatchFileHandle) <= 0 then
+  if PatchFileHandle = INVALID_HANDLE_VALUE then
     OSError;
   TIO.RedirectStdOut(PatchFileHandle);
 end;
