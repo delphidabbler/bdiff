@@ -9,6 +9,11 @@ unit Common.Errors;
 interface
 
 
+uses
+  // Delphi
+  System.Sysutils;
+
+
 ///  <summary>Raises an exception with given message.</summary>
 procedure Error(const Msg: string); overload;
 
@@ -16,17 +21,15 @@ procedure Error(const Msg: string); overload;
 ///  values.</summary>
 procedure Error(const Fmt: string; const Args: array of const); overload;
 
+procedure Error(const Fmt: string; const Args: array of const;
+  const FmtSettings: TFormatSettings); overload;
+
 ///  <summary>Raises exception determined by last operating system error.
 ///  </summary>
 procedure OSError;
 
 
 implementation
-
-
-uses
-  // Delphi
-  System.Sysutils;
 
 
 procedure Error(const Msg: string);
@@ -37,6 +40,12 @@ end;
 procedure Error(const Fmt: string; const Args: array of const);
 begin
   raise Exception.CreateFmt(Fmt, Args);
+end;
+
+procedure Error(const Fmt: string; const Args: array of const;
+  const FmtSettings: TFormatSettings);
+begin
+  raise Exception.Create(Format(Fmt, Args, FmtSettings));
 end;
 
 procedure OSError;
