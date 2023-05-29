@@ -5,6 +5,8 @@
 program BPatch;
 
 {$APPTYPE CONSOLE}
+{$Resource VBPatch.res}       // version information
+{$Resource BPatchAssets.res}  // other resources
 
 uses
   BPatch.InfoWriter in 'BPatch.InfoWriter.pas',
@@ -19,9 +21,6 @@ uses
   Common.IO in '..\Common\Common.IO.pas',
   Common.Params in '..\Common\Common.Params.pas',
   Common.PatchHeaders in '..\Common\Common.PatchHeaders.pas';
-
-{$Resource VBPatch.res}     // version information
-{$Resource BPatchAssets.res}      // other resources
 
 begin
   TMain.Run;

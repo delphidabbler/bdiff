@@ -5,6 +5,8 @@
 program BDiff;
 
 {$APPTYPE CONSOLE}
+{$Resource VBDiff.res}        // version information
+{$Resource BDiffAssets.res}   // general resources
 
 uses
   BDiff.BlockSort in 'BDiff.BlockSort.pas',
@@ -24,9 +26,6 @@ uses
   Common.IO in '..\Common\Common.IO.pas',
   Common.Params in '..\Common\Common.Params.pas',
   Common.PatchHeaders in '..\Common\Common.PatchHeaders.pas';
-
-{$Resource VBDiff.res}    // version information
-{$Resource BDiffAssets.res}     // general resources
 
 begin
   TMain.Run;
