@@ -107,41 +107,33 @@ uses
 
 class procedure TPatcher.Apply(const SourceFileName, DestFileName: string);
 begin
-  var TempFileName: string; // temporary file name
+  var TempFileName: string := ''; // temporary file name
   try
-
     var SourceLen, DestLen: Int32;
     ReadHeader(SourceLen, DestLen);
-
     var DestFileHandle: THandle := 0;
     // open source file
-    var SourceFileHandle: THandle := FileOpen(
+    var SourceFileHandle: THandle := System.SysUtils.FileOpen(
       SourceFileName, fmOpenRead + fmShareDenyNone
     );
     try
       if NativeInt(SourceFileHandle) <= 0 then
         OSError;
-
       // check destination file name
       if Length(DestFileName) = 0 then
         Error('Empty destination file name');
-
       // create temporary file
       TempFileName := GetTempFileName;
       DestFileHandle := FileCreate(TempFileName);
       if NativeInt(DestFileHandle) <= 0 then
         Error('Can''t create temporary file');
-
       // apply patch
       while True do
       begin
-
         var Ch := TIO.GetCh(TIO.StdIn);
         if Ch = EOF then
           Break;
-
         case Ch of
-
           Integer(TPatchHeaders.CommonIndicator):
           begin
             // common block: copy from source
@@ -156,7 +148,6 @@ begin
             );
             Dec(DestLen, DataSize);
           end;
-
           Integer(TPatchHeaders.AddIndicator):
           begin
             // add data from patch file
@@ -175,19 +166,19 @@ begin
         Error(
           'Patch garbled - destination file shorter than announced in header'
         );
-
     finally
-      FileClose(SourceFileHandle);
-      FileClose(DestFileHandle);
+      System.SysUtils.FileClose(SourceFileHandle);
+      System.SysUtils.FileClose(DestFileHandle);
     end;
     // create destination file: overwrites any existing dest file with same name
     System.SysUtils.DeleteFile(DestFileName);
-    if not RenameFile(TempFileName, DestFileName) then
+    if not System.SysUtils.RenameFile(TempFileName, DestFileName) then
       Error('Can''t rename temporary file');
   except
     on E: Exception do
     begin
-      System.SysUtils.DeleteFile(TempFileName);
+      if (TempFileName = '') and System.SysUtils.FileExists(TempFileName) then
+        System.SysUtils.DeleteFile(TempFileName);
       raise;
     end;
   end;
