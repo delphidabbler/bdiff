@@ -63,8 +63,8 @@ uses
   System.SysUtils,
   // Project
   BDiff.IO,
-  Common.AppInfo,
-  Common.CheckSum;
+  Common.CheckSum,
+  Common.PatchHeaders;
 
 
 type
@@ -72,46 +72,6 @@ type
   ///  <summary>Class that writes a binary patch file.</summary>
   TBinaryPatchWriter = class sealed(TPatchWriter)
   strict private
-    type
-
-      ///  <summary>Type of array used to store a packed longint in LSB format.
-      ///  </summary>
-      TPackedLong = packed array[0..3] of TCChar;
-
-      ///  <summary>Header record written to an added data record.</summary>
-      TAddDataHeader = packed record
-        ///  <summary>Length of added data.</summary>
-        DataLength: TPackedLong;
-      end;
-
-      ///  <summary>Header record written to a common block record.</summary>
-      TCopyDataHeader = packed record
-        ///  <summary>Starting position of copied data.</summary>
-        CopyStart: TPackedLong;
-        ///  <summary>Length of copied data.</summary>
-        CopyLength: TPackedLong;
-        ///  <summary>Checksum used to validate copied data.</summary>
-        CheckSum: TPackedLong;
-      end;
-
-      ///  <summary>Patch file header record.</summary>
-      TPatchHeader = packed record
-        ///  <summary>File signature.</summary>
-        Signature:  TPatchFileSignature;
-        ///  <summary>Size of old file data.</summary>
-        OldDataSize: TPackedLong;
-        ///  <summary>Size of new file data.</summary>
-        NewDataSize: TPackedLong;
-      end;
-
-    ///  <summary>Packs a long integer in little-endian format into a
-    ///  <c>TCChar</c> array.</summary>
-    ///  <param name="P">[in] Pointer to an array of <c>TCChar</c> in which the
-    ///  long integer is to be packed.</param>
-    ///  <param name="L">[in] Long integer to be packed.</param>
-    ///  <remarks><c>P</c> must point to a block of memory of at least 4 bytes.
-    ///  </remarks>
-    procedure PackLong(P: PCChar; L: Longint);
 
     ///  <summary>Calcultes check sum of given data.</summary>
     ///  <param name="Data">[in] Pointer to memory containing data for which
@@ -235,12 +195,10 @@ end;
 { TBinaryPatchWriter }
 
 procedure TBinaryPatchWriter.Add(Data: PCChar; Length: Cardinal);
-const
-  cPlusSign: AnsiChar = '+';  // flags added data
 begin
-  TIO.WriteStr(TIO.StdOut, cPlusSign);
-  var Rec: TAddDataHeader;
-  PackLong(@Rec.DataLength, Length);
+  TIO.WriteStr(TIO.StdOut, TPatchHeaders.AddIndicator);
+  var Rec: TPatchHeaders.TAddedData;
+  Rec.DataLength.Pack(Length);
   TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
   TIO.WriteRaw(TIO.StdOut, Data, Length);
 end;
@@ -258,40 +216,22 @@ end;
 
 procedure TBinaryPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
   Length: Cardinal);
-const
-  cAtSign: AnsiChar = '@';    // flags common data in both file
 begin
-  TIO.WriteStr(TIO.StdOut, cAtSign);
-  var Rec: TCopyDataHeader;
-  PackLong(@Rec.CopyStart, OldPos);
-  PackLong(@Rec.CopyLength, Length);
-  PackLong(@Rec.CheckSum, CheckSum(@NewBuf[NewPos], Length));
+  TIO.WriteStr(TIO.StdOut, TPatchHeaders.CommonIndicator);
+  var Rec: TPatchHeaders.TCommonData;
+  Rec.CopyStart.Pack(OldPos);
+  Rec.CopyLength.Pack(Length);
+  Rec.CheckSum.Pack(CheckSum(@NewBuf[NewPos], Length));
   TIO.WriteRaw(TIO.StdOut, @Rec, SizeOf(Rec));
 end;
 
 procedure TBinaryPatchWriter.Header(const OldFile, NewFile: TFileData);
 begin
-  var Head: TPatchHeader;
-  Assert(Length(TAppInfo.PatchFileSignature) = Length(Head.Signature));
-  Move(
-    TAppInfo.PatchFileSignature,
-    Head.Signature[0],
-    Length(TAppInfo.PatchFileSignature)
-  );
-  PackLong(@Head.OldDataSize, OldFile.Size);
-  PackLong(@Head.NewDataSize, NewFile.Size);
+  var Head: TPatchHeaders.THeader;
+  Head.SetValidSignature;
+  Head.OldDataSize.Pack(OldFile.Size);
+  Head.NewDataSize.Pack(NewFile.Size);
   TIO.WriteRaw(TIO.StdOut, @Head, SizeOf(Head));
-end;
-
-procedure TBinaryPatchWriter.PackLong(P: PCChar; L: Integer);
-begin
-  P^ := L and $FF;
-  Inc(P);
-  P^ := (L shr 8) and $FF;
-  Inc(P);
-  P^ := (L shr 16) and $FF;
-  Inc(P);
-  P^ := (L shr 24) and $FF;
 end;
 
 { TTextPatchWriter }

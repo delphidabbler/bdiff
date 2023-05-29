@@ -23,8 +23,6 @@ type
     type
       ///  <summary>Buffer used when reading from a file.</summary>
       TBuffer = array[0..Pred(BUFFER_SIZE)] of AnsiChar;
-      ///  <summary>Buffer used to read patch file header into.</summary>
-      THeader = array[0..15] of AnsiChar;
 
     ///  <summary>Computes simple checksum of a data buffer.</summary>
     ///  <param name="Data">[in] Pointer to data to be checked.</param>
@@ -35,13 +33,6 @@ type
     class function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
       const BFCheckSum: Longint): Longint;
 
-    ///  <summary>Extract long integer value packed into a 4 byte array of ANSI
-    ///  characters.</summary>
-    ///  <param name="PCh">[in] Points to array of ANSI characters. Must be at
-    ///  least 4 bytes long.</param>
-    ///  <returns><c>Longint</c>. Unpacked long integer.</returns>
-    class function GetLong(PCh: PAnsiChar): Longint;
-
     ///  <summary>Copies data from one stream to another, computing checksums.
     ///  </summary>
     ///  <param name="SourceFileHandle">[in] Handle to file containing data to
@@ -49,8 +40,8 @@ type
     ///  <param name="DestFileHandle">[in] Handle to file to receive copied
     ///  data.</param>
     ///  <param name="Count">[in] Number of bytes to copy.</param>
-    ///  <param name="SourceCheckSum">[in] Checksum of data to be copied.
-    ///  </param>
+    ///  <param name="SourceCheckSum">[in] Checksum of data to be copied or 0 if
+    ///  checksum not required.</param>
     ///  <param name="SourceIsPatch">[in] Flag indicating whether
     ///  <c>SourceFileHandle</c> is a patch file (<c>True</c>) or a source file
     ///  (<c>False</c>).</param>
@@ -60,6 +51,27 @@ type
     ///  <summary>Creates a temporary file in the user's temp directory and
     ///  returns its name.</summary>
     class function GetTempFileName: string;
+
+    ///  <summary>Reads and validates patch file header.</summary>
+    ///  <param name="SourceLen">[out] Set to length of original file.</param>
+    ///  <param name="DestLen">[out] Set to length of file to be recreated.
+    ///  </param>
+    class procedure ReadHeader(out SourceLen, DestLen: Int32);
+
+    ///  <summary>Reads and validate a common data header.</summary>
+    ///  <param name="SourceLen">[in] Source file length.</param>
+    ///  <param name="DataSize">[out] Set to length of data being copied.
+    ///  </param>
+    ///  <param name="SourceFilePos">[out] Set to starting position of data to
+    ///  be copied.</param>
+    ///  <param name="Checksum">[out] Set to checksum of data being copied.
+    ///  </param>
+    class procedure ReadCommonHeader(const SourceLen: Int32;
+      out DataSize, SourceFilePos, Checksum: Int32);
+
+    ///  <summary>Reads and validate a add data header.</summary>
+    ///  <param name="DataSize">[out] Set to size of added data.</param>
+    class procedure ReadAddHeader(out DataSize: Int32);
 
   public
 
@@ -86,9 +98,9 @@ uses
   BPatch.InfoWriter,
   BPatch.IO,
   BPatch.Params,
-  Common.AppInfo,
   Common.CheckSum,
-  Common.Errors;
+  Common.Errors,
+  Common.PatchHeaders;
 
 
 { TPatcher }
@@ -97,17 +109,9 @@ class procedure TPatcher.Apply(const SourceFileName, DestFileName: string);
 begin
   var TempFileName: string; // temporary file name
   try
-    // read header from patch file on standard input
-    var Header: THeader;
-    if FileRead(TIO.StdIn, Header, Length(Header)) <> Length(Header) then
-      Error('Patch not in BINARY format');
-    if System.AnsiStrings.StrLComp(
-      Header, TAppInfo.PatchFileSignature, Length(TAppInfo.PatchFileSignature)
-    ) <> 0 then
-      Error('Patch not in BINARY format');
-    // get length of source and destination files from header
-    var SourceLen := GetLong(@Header[8]);
-    var DestLen := GetLong(@Header[12]);
+
+    var SourceLen, DestLen: Int32;
+    ReadHeader(SourceLen, DestLen);
 
     var DestFileHandle: THandle := 0;
     // open source file
@@ -131,38 +135,33 @@ begin
       // apply patch
       while True do
       begin
+
         var Ch := TIO.GetCh(TIO.StdIn);
         if Ch = EOF then
           Break;
+
         case Ch of
-          Integer('@'):
+
+          Integer(TPatchHeaders.CommonIndicator):
           begin
             // common block: copy from source
-            if FileRead(TIO.StdIn, Header, 12) <> 12 then
-              Error('Patch garbled - unexpected end of data');
-            var DataSize := GetLong(@Header[4]);
-            var SourceFilePos := GetLong(@Header[0]);
-            if (SourceFilePos < 0) or (DataSize <= 0)
-              or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
-              or (DataSize + SourceFilePos > SourceLen) then
-              Error('Patch garbled - invalid change request');
+            var DataSize, SourceFilePos, Checksum: Int32;
+            ReadCommonHeader(
+              SourceLen, DataSize, SourceFilePos, Checksum
+            );
             if not TIO.Seek(SourceFileHandle, SourceFilePos, SEEK_SET) then
               Error('Seek on source file failed');
             CopyData(
-              SourceFileHandle,
-              DestFileHandle,
-              DataSize,
-              GetLong(@Header[8]),
-              False
+              SourceFileHandle, DestFileHandle, DataSize, CheckSum, False
             );
             Dec(DestLen, DataSize);
           end;
-          Integer('+'):
+
+          Integer(TPatchHeaders.AddIndicator):
           begin
             // add data from patch file
-            if FileRead(TIO.StdIn, Header, 4) <> 4 then
-              Error('Patch garbled - unexpected end of data');
-            var DataSize := GetLong(@Header[0]);
+            var DataSize: Int32;
+            ReadAddHeader(DataSize);
             CopyData(TIO.StdIn, DestFileHandle, DataSize, 0, True);
             Dec(DestLen, DataSize);
           end;
@@ -251,19 +250,6 @@ begin
     Error('Source file does not match patch');
 end;
 
-class function TPatcher.GetLong(PCh: PAnsiChar): Longint;
-begin
-  var PB := PByte(PCh);
-  var LW: LongWord := PB^;
-  Inc(PB);
-  LW := LW + 256 * PB^;
-  Inc(PB);
-  LW := LW + 65536 * PB^;
-  Inc(PB);
-  LW := LW + 16777216 * PB^;
-  Result := LW;
-end;
-
 class function TPatcher.GetTempFileName: string;
 begin
   // Get temporary folder
@@ -275,6 +261,47 @@ begin
   ) = 0 then
     Error('Can''t create temporary file');
   Result := PChar(Result)
+end;
+
+class procedure TPatcher.ReadAddHeader(out DataSize: Int32);
+begin
+  var AddHeader: TPatchHeaders.TAddedData;
+  if FileRead(TIO.StdIn, AddHeader, SizeOf(AddHeader))
+    <> SizeOf(AddHeader) then
+    Error('Patch garbled - unexpected end of data');
+  DataSize := AddHeader.DataLength.Unpack;
+end;
+
+class procedure TPatcher.ReadCommonHeader(const SourceLen: Int32;
+  out DataSize, SourceFilePos, Checksum: Int32);
+begin
+  // read common data header
+  var CommonHeader: TPatchHeaders.TCommonData;
+  if FileRead(TIO.StdIn, CommonHeader, SizeOf(CommonHeader))
+    <> SizeOf(CommonHeader) then
+    Error('Patch garbled - unexpected end of data');
+  // get data from header
+  DataSize := CommonHeader.CopyLength.Unpack;
+  SourceFilePos := CommonHeader.CopyStart.Unpack;
+  Checksum := CommonHeader.CheckSum.Unpack;
+  // do reality check on header data
+  if (SourceFilePos < 0) or (DataSize <= 0)
+    or (SourceFilePos > SourceLen) or (DataSize > SourceLen)
+    or (DataSize + SourceFilePos > SourceLen) then
+    Error('Patch garbled - invalid change request');
+end;
+
+class procedure TPatcher.ReadHeader(out SourceLen, DestLen: Int32);
+begin
+  // read header from patch file on standard input
+  var Header: TPatchHeaders.THeader;
+  if FileRead(TIO.StdIn, Header, SizeOf(Header)) <> SizeOf(Header) then
+    Error('Patch not in BINARY format');
+  if not Header.IsValidSignature then
+    Error('Patch not in BINARY format');
+  // get length of source and destination files from header
+  SourceLen := Header.OldDataSize.Unpack;
+  DestLen := Header.NewDataSize.Unpack;
 end;
 
 end.
