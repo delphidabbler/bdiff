@@ -20,7 +20,7 @@ The environment variable can either be set in your global environment variables 
 
 This program is required to convert the `.vi` files that specify version information into an intermediate `.rc` file that is compiled by `BRCC32`.
 
-## Building releases using `Deploy.bat`
+### Building releases using `Deploy.bat`
 
 Once again, DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied) must be installed.
 

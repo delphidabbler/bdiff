@@ -1,43 +1,65 @@
-{
- * Static class containing main program logic for BDiff program.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Main BDiff program logic.</summary>
+///  <remarks>Used by BDiff only.</remarks>
 
-unit UBDiffMain;
+unit BDiff.Main;
+
 
 interface
 
+
 uses
-  UBDiffParams;
+  // Project
+  BDiff.Params;
+
 
 type
+
+  ///  <summary>Class containing main BDiff program logic.</summary>
   TMain = class(TObject)
-  private
+  strict private
+    ///  <summary>Displays the program help screen.</summary>
     class procedure DisplayHelp;
+    ///  <summary>Displays the program version information.</summary>
     class procedure DisplayVersion;
+    ///  <summary>Creates and outputs the diff.</summary>
+    ///  <param name="Params">[in] Command line parameters object containing
+    ///  options used to customise diff output.</param>
     class procedure CreateDiff(Params: TParams);
+    ///  <summary>Redirects a file to standard output.</summary>
+    ///  <param name="FileName">[in] Name of file to redirect.</param>
+    ///  <exception>Raises <c>EOSError</c> if file can't be redirected.
+    ///  </exception>
     class procedure RedirectStdOut(const FileName: string);
   public
+    ///  <summary>Runs the program.</summary>
     class procedure Run;
   end;
 
+
 implementation
 
+
 uses
+  // Delphi
   System.SysUtils,
-  UAppInfo, UDiffer, UBDiffInfoWriter, UBDiffIO, UErrors, ULogger;
+  // Project
+  BDiff.Differ,
+  BDiff.InfoWriter,
+  BDiff.IO,
+  BDiff.Logger,
+  Common.AppInfo,
+  Common.Errors;
+
 
 { TMain }
 
 class procedure TMain.CreateDiff(Params: TParams);
-var
-  Differ: TDiffer;
-  Logger: TLogger;
 begin
-  // create the diff
-  Logger := TLoggerFactory.Instance(Params.Verbose);
+  var Logger := TLoggerFactory.Instance(Params.Verbose);
   try
-    Differ := TDiffer.Create;
+    var Differ := TDiffer.Create;
     try
       Differ.MinMatchLength := Params.MinEqual;
       Differ.Format := Params.Format;
@@ -61,23 +83,18 @@ begin
 end;
 
 class procedure TMain.RedirectStdOut(const FileName: string);
-var
-  PatchFileHandle: THandle;
 begin
-  // redirect standard output to patch file
-  PatchFileHandle := FileCreate(FileName);
+  var PatchFileHandle: THandle := FileCreate(FileName);
   if NativeInt(PatchFileHandle) <= 0 then
     OSError;
   TIO.RedirectStdOut(PatchFileHandle);
 end;
 
 class procedure TMain.Run;
-var
-  Params: TParams;
 begin
   ExitCode := 0;
   try
-    Params := TParams.Create;
+    var Params := TParams.Create;
     try
       Params.Parse;
       if Params.Help then
@@ -105,3 +122,4 @@ begin
 end;
 
 end.
+

@@ -1,9 +1,11 @@
+/*! BSD 3-clause license: see LICENSE.md */
+
 /*
- * Resource file for BDiff. Includes all required resources except version
- * information.
- */
+  Resource file for BDiff.
+
+  Includes all required resources except version information.
+*/
 
 
 /* Manifest file */
 1 24 "BDiff.manifest"
-

@@ -1,27 +1,48 @@
-{
- * Static class containing main program logic for BPatch program.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Main BPatch program logic.</summary>
+///  <remarks>Used by BPatch only.</remarks>
 
-unit UBPatchMain;
+unit BPatch.Main;
+
 
 interface
 
+
 type
+
+  ///  <summary>Class containing main BPatch program logic.</summary>
   TMain = class(TObject)
-  private
+  strict private
+    ///  <summary>Displays the program help screen.</summary>
     class procedure DisplayHelp;
+    ///  <summary>Displays the program version information.</summary>
     class procedure DisplayVersion;
+    ///  <summary>Redirects a file to standard input.</summary>
+    ///  <param name="FileName">[in] Name of file to redirect.</param>
+    ///  <exception>Raises <c>EOSError</c> if file can't be redirected.
+    ///  </exception>
     class procedure RedirectStdIn(const FileName: string);
   public
+    ///  <summary>Runs the program.</summary>
     class procedure Run;
   end;
 
+
 implementation
 
+
 uses
+  // Delphi
   System.SysUtils,
-  UAppInfo, UPatcher, UBPatchInfoWriter, UBPatchParams, UBPatchIO, UErrors;
+  // Project
+  BPatch.InfoWriter,
+  BPatch.IO,
+  BPatch.Patcher,
+  BPatch.Params,
+  Common.AppInfo,
+  Common.Errors;
+
 
 { TMain }
 
@@ -36,21 +57,19 @@ begin
 end;
 
 class procedure TMain.RedirectStdIn(const FileName: string);
-var
-  PatchFileHandle: THandle;
 begin
-  PatchFileHandle := FileOpen(FileName, fmOpenRead or fmShareDenyNone);
+  var PatchFileHandle: THandle := FileOpen(
+    FileName, fmOpenRead or fmShareDenyNone
+  );
   if NativeInt(PatchFileHandle) <= 0 then
     OSError;
   TIO.RedirectStdIn(PatchFileHandle);
 end;
 
 class procedure TMain.Run;
-var
-  Params: TParams;
 begin
   ExitCode := 0;
-  Params := TParams.Create;
+  var Params := TParams.Create;
   try
     try
       Params.Parse;
@@ -78,5 +97,5 @@ begin
   end;
 end;
 
-
 end.
+

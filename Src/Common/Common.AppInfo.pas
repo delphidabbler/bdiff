@@ -1,44 +1,55 @@
-{
- * Provides information about program: file name, date and version info.
- * Common code used by both BDiff and BPatch.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Provides various pieces of information about the currently running
+///  program.</summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
-unit UAppInfo;
+unit Common.AppInfo;
 
 
 interface
 
+
 type
+
+  ///  <summary>Defines 8 character array used to store patch file signature.
+  ///  </summary>
   TPatchFileSignature = array[0..7] of AnsiChar;
 
+  ///  <summary>Provides information about the program.</summary>
   TAppInfo = class(TObject)
-  private
-    { Fully specified file name of program, with absolute path }
+  strict private
+    ///  <summary>Returns absolute path of program .exe file.</summary>
     class function ProgramPath: string;
   public
     const
-      // Patch file signature. Must be 8 bytes.
-      // Format is 'bdiff' + file-version + Ctrl+Z.
-      // where file-version is a two char string, here '02'.
-      // If file format is changed then increment the file version.
+      ///  <summary>Patch file signature.</summary>
+      ///  <remarks>
+      ///  <para>Format is <c>bdiff</c> + file-version + Ctrl+Z. Where
+      ///  file-version is a two character ANSI string, here <c>02</c>.</para>
+      ///  <para>If the file format is changed then increment the file version.
+      ///  Keep the length at 8 bytes.</para>
+      ///  </remarks>
       PatchFileSignature: TPatchFileSignature = 'bdiff02'#$1A;
-    { Name of program's executable file, without path }
+    ///  <summary>Name of program's executable file, without path.</summary>
     class function ProgramFileName: string;
-    { Name of program, without file extension }
+    ///  <summary>Name of program, without file extension.</summary>
     class function ProgramBaseName: string;
-    { Program's product version number }
+    ///  <summary>Program's product version number.</summary>
+    ///  <remarks>Read from version information resources.</remarks>
     class function ProgramVersion: string;
-    { Last modification date of program's executable file }
+    ///  <summary>Last modification date of program's executable file.</summary>
     class function ProgramExeDate: string;
   end;
 
 
 implementation
 
+
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows;
 
 
 { TAppInfo }
@@ -51,9 +62,8 @@ end;
 class function TAppInfo.ProgramExeDate: string;
 const
   InternationalDateFmtStr = 'yyyy"-"mm"-"dd';
-var
-  FileDate: TDateTime;  // date stamp of exe file
 begin
+  var FileDate: TDateTime;
   if FileAge(ProgramPath, FileDate) then
     // Use international date format
     Result := FormatDateTime(InternationalDateFmtStr, FileDate)
@@ -72,20 +82,16 @@ begin
 end;
 
 class function TAppInfo.ProgramVersion: string;
-var
-  Dummy: DWORD;           // unused variable required in API calls
-  VerInfoSize: Integer;   // size of version information data
-  VerInfoBuf: Pointer;    // buffer holding version information
-  ValPtr: Pointer;        // pointer to a version information value
-  FFI: TVSFixedFileInfo;  // fixed file information from version info
 begin
   Result := '';
   // Get fixed file info from program's version info
   // get size of version info
-  VerInfoSize := GetFileVersionInfoSize(PChar(ProgramPath), Dummy);
+  var Dummy: DWORD;
+  var VerInfoSize := GetFileVersionInfoSize(PChar(ProgramPath), Dummy);
   if VerInfoSize > 0 then
   begin
     // create buffer and read version info into it
+    var VerInfoBuf: Pointer;
     GetMem(VerInfoBuf, VerInfoSize);
     try
       if GetFileVersionInfo(
@@ -93,9 +99,10 @@ begin
       ) then
       begin
         // get fixed file info from version info (ValPtr points to it)
+        var ValPtr: Pointer;
         if VerQueryValue(VerInfoBuf, '\', ValPtr, Dummy) then
         begin
-          FFI := PVSFixedFileInfo(ValPtr)^;
+          var FFI := PVSFixedFileInfo(ValPtr)^;
           // Build version info string from product version field of FFI
           Result := Format(
             '%d.%d.%d',
@@ -114,3 +121,4 @@ begin
 end;
 
 end.
+

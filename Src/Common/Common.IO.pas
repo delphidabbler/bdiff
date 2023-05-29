@@ -1,36 +1,52 @@
-{
- * Contains utility functions used by both BDiff and BPatch.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Code to assist in working with stdin, stdout and stderr.</summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
-unit UCommonIO;
+unit Common.IO;
+
 
 interface
 
+
 type
+
+  ///  <summary>Static class that provides common IO functions required by both
+  ///  BDiff and BPatch to read/write from/to Windows handles.</summary>
   TCommonIO = class(TObject)
   public
-    { Returns Windows standard input handle }
+    ///  <summary>Returns Windows standard input handle.</summary>
     class function StdIn: THandle;
-    { Returns Windows standard output handle }
+    ///  <summary>Returns Windows standard output handle.</summary>
     class function StdOut: THandle;
-    { Returns Windows standard error handle }
+    ///  <summary>Returns Windows standard error handle.</summary>
     class function StdErr: THandle;
-    { Writes binary data to a file }
+    ///  <summary>Writes binary data from a buffer pointed to by <c>BufPtr</c>
+    ///  with length <c>Size</c> bytes. The data is written to the output
+    ///  identified by <c>Handle</c>.</summary>
     class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
-    { Writes a string to a file }
+    ///  <summary>Writes a Unicode string <c>S</c> to the output identified by
+    ///  <c>Handle</c>.</summary>
     class procedure WriteStr(Handle: THandle; const S: UnicodeString); overload;
+    ///  <summary>Writes ANSI string <c>S</c> to the output identified by
+    ///  <c>Handle</c>.</summary>
     class procedure WriteStr(Handle: THandle; const S: AnsiString); overload;
-    { Writes a string built from format string and arguments to file }
+    ///  <summary>Writes a string built from format string <c>Fmt</c> and
+    ///  arguments <c>Args</c> to the output identified by <c>Handle</c>.
+    ///  </summary>
     class procedure WriteStrFmt(Handle: THandle; const Fmt: string;
       Args: array of const);
   end;
 
+
 implementation
+
 
 uses
   // Delphi
-  System.SysUtils, Winapi.Windows;
+  System.SysUtils,
+  Winapi.Windows;
+
 
 { TCommonIO }
 
@@ -51,19 +67,16 @@ end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
   Size: Integer);
-var
-  Dummy: DWORD;
 begin
   if Size <= 0 then
     Exit;
+  var Dummy: DWORD;
   Winapi.Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
 end;
 
 class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);
-var
-  Bytes: TBytes;
 begin
-  Bytes := TEncoding.Default.GetBytes(S);
+  var Bytes := TEncoding.Default.GetBytes(S);
   WriteRaw(Handle, Bytes, Length(S));
 end;
 

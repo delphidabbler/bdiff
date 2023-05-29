@@ -1,22 +1,23 @@
-{
- * Helper routines to generate exceptions.
- * Common code used by both BDiff and BPatch.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Exception generation routines.</summary>
+///  <remarks>Code common to both BDiff and BPatch.</remarks>
 
-unit UErrors;
+unit Common.Errors;
 
 
 interface
 
 
-{ Raises an exception with given message }
+///  <summary>Raises an exception with given message.</summary>
 procedure Error(const Msg: string); overload;
 
-{ Raises an exception with message created from format string and values }
+///  <summary>Raises an exception with message created from format string and
+///  values.</summary>
 procedure Error(const Fmt: string; const Args: array of const); overload;
 
-{ Raises exception determined by last operating system error }
+///  <summary>Raises exception determined by last operating system error.
+///  </summary>
 procedure OSError;
 
 
@@ -24,29 +25,24 @@ implementation
 
 
 uses
-  // Project
+  // Delphi
   System.Sysutils;
 
 
-{ Raises an exception with given message }
 procedure Error(const Msg: string);
 begin
   raise Exception.Create(Msg);
 end;
 
-{ Raises an exception with message created from format string and values }
 procedure Error(const Fmt: string; const Args: array of const);
 begin
   raise Exception.CreateFmt(Fmt, Args);
 end;
 
-{ Raises exception determined by last operating system error }
 procedure OSError;
-var
-  LastError: Integer;
-  Err: EOSError;
 begin
-  LastError := GetLastError;
+  var Err: EOSError;
+  var LastError := GetLastError;
   if LastError <> 0 then
     Err := EOSError.Create(SysErrorMessage(LastError))
   else
@@ -56,3 +52,4 @@ begin
 end;
 
 end.
+
