@@ -198,7 +198,7 @@ begin
   var OldFile: TFileData := nil;
   var NewFile: TFileData := nil;
   var SortedOldData: PBlock := nil;
-  var PatchWriter := TPatchWriterFactory.Instance(fFormat);
+  var PatchWriter := TPatchWriterFactory.CreateInstance(fFormat);
   try
     Logger.Log('loading old file');
     OldFile := TFileData.Create(OldFileName);

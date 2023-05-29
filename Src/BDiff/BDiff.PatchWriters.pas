@@ -51,7 +51,7 @@ type
     ///  <summary>Creates and returns a <c>TPatchWriter</c> to write in format
     ///  given by <c>Format</c>.</summary>
     ///  <remarks>User must free the created objects.</remarks>
-    class function Instance(const Format: TFormat): TPatchWriter;
+    class function CreateInstance(const Format: TFormat): TPatchWriter;
   end;
 
 
@@ -181,8 +181,8 @@ type
 
 { TPatchWriterFactory }
 
-class function TPatchWriterFactory.Instance(
-  const Format: TFormat): TPatchWriter;
+class function TPatchWriterFactory.CreateInstance(const Format: TFormat):
+  TPatchWriter;
 begin
   case Format of
     FMT_BINARY: Result := TBinaryPatchWriter.Create;

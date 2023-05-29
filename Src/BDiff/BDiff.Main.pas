@@ -57,7 +57,7 @@ uses
 
 class procedure TMain.CreateDiff(Params: TParams);
 begin
-  var Logger := TLoggerFactory.Instance(Params.Verbose);
+  var Logger := TLoggerFactory.CreateInstance(Params.Verbose);
   try
     var Differ := TDiffer.Create;
     try

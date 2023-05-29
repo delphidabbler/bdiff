@@ -29,7 +29,7 @@ type
     ///  <returns><c>TLogger</c> required logger instance.</returns>
     ///  <remarks>Caller is reponsible for freeing the returned object instance.
     ///  </remarks>
-    class function Instance(Verbose: Boolean): TLogger;
+    class function CreateInstance(Verbose: Boolean): TLogger;
   end;
 
 
@@ -75,7 +75,7 @@ end;
 
 { TLoggerFactory }
 
-class function TLoggerFactory.Instance(Verbose: Boolean): TLogger;
+class function TLoggerFactory.CreateInstance(Verbose: Boolean): TLogger;
 begin
   if Verbose then
     Result := TVerboseLogger.Create
