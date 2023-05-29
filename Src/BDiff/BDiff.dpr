@@ -5,6 +5,8 @@
 program BDiff;
 
 {$APPTYPE CONSOLE}
+{$Resource VBDiff.res}        // version information
+{$Resource BDiffAssets.res}   // general resources
 
 uses
   BDiff.BlockSort in 'BDiff.BlockSort.pas',
@@ -18,14 +20,12 @@ uses
   BDiff.PatchWriters in 'BDiff.PatchWriters.pas',
   BDiff.Types in 'BDiff.Types.pas',
   Common.AppInfo in '..\Common\Common.AppInfo.pas',
-  Common.Params in '..\Common\Common.Params.pas',
   Common.CheckSum in '..\Common\Common.CheckSum.pas',
-  Common.IO in '..\Common\Common.IO.pas',
   Common.Errors in '..\Common\Common.Errors.pas',
-  Common.InfoWriter in '..\Common\Common.InfoWriter.pas';
-
-{$Resource VBDiff.res}    // version information
-{$Resource BDiffAssets.res}     // general resources
+  Common.InfoWriter in '..\Common\Common.InfoWriter.pas',
+  Common.IO in '..\Common\Common.IO.pas',
+  Common.Params in '..\Common\Common.Params.pas',
+  Common.PatchHeaders in '..\Common\Common.PatchHeaders.pas';
 
 begin
   TMain.Run;

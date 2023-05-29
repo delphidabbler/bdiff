@@ -88,13 +88,12 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="BDiff.PatchWriters.pas"/>
         <DCCReference Include="BDiff.Types.pas"/>
         <DCCReference Include="..\Common\Common.AppInfo.pas"/>
-        <DCCReference Include="..\Common\Common.Params.pas"/>
         <DCCReference Include="..\Common\Common.CheckSum.pas"/>
-        <DCCReference Include="..\Common\Common.IO.pas"/>
         <DCCReference Include="..\Common\Common.Errors.pas"/>
-        <DCCReference Include="..\Common\Common.InfoWriter.pas">
-            <Form>$Resource VBDiff.res</Form>
-        </DCCReference>
+        <DCCReference Include="..\Common\Common.InfoWriter.pas"/>
+        <DCCReference Include="..\Common\Common.IO.pas"/>
+        <DCCReference Include="..\Common\Common.Params.pas"/>
+        <DCCReference Include="..\Common\Common.PatchHeaders.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

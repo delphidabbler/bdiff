@@ -12,25 +12,12 @@ interface
 
 type
 
-  ///  <summary>Defines 8 character array used to store patch file signature.
-  ///  </summary>
-  TPatchFileSignature = array[0..7] of AnsiChar;
-
   ///  <summary>Provides information about the program.</summary>
   TAppInfo = class(TObject)
   strict private
     ///  <summary>Returns absolute path of program .exe file.</summary>
     class function ProgramPath: string;
   public
-    const
-      ///  <summary>Patch file signature.</summary>
-      ///  <remarks>
-      ///  <para>Format is <c>bdiff</c> + file-version + Ctrl+Z. Where
-      ///  file-version is a two character ANSI string, here <c>02</c>.</para>
-      ///  <para>If the file format is changed then increment the file version.
-      ///  Keep the length at 8 bytes.</para>
-      ///  </remarks>
-      PatchFileSignature: TPatchFileSignature = 'bdiff02'#$1A;
     ///  <summary>Name of program's executable file, without path.</summary>
     class function ProgramFileName: string;
     ///  <summary>Name of program, without file extension.</summary>
