@@ -28,6 +28,7 @@ type
       fPatchFileName: string;
       fNewFileName: string;
       fFormat: TFormat;
+      fOverrideMaxSize: Boolean;
 
     ///  <summary>Write accessor for <c>Format</c> property.</summary>
     ///  <remarks>Parses and validates property value <c>Value</c>.</remarks>
@@ -99,6 +100,10 @@ type
     ///  <summary>Format of patch output.</summary>
     property Format: TFormat read fFormat default FMT_QUOTED;
 
+    ///  <summary>Flag indicating whether to override maximum file size limit to
+    ///  permit oversize files to be diffed.</summary>
+    property OverrideMaxSize: Boolean read fOverrideMaxSize default False;
+
     ///  <summary>Flag indicating whether the program's help screen is to be
     ///  displayed or not.</summary>
     property Help;
@@ -130,6 +135,7 @@ begin
   fMinEqual := 24;
   fVerbose := False;
   fFormat := FMT_QUOTED;
+  fOverrideMaxSize := False;
 end;
 
 procedure TParams.Finalize;
@@ -160,8 +166,10 @@ begin
   if Result then
     Exit;
   Result := True;
+
   if Option = '--verbose' then
     fVerbose := True
+
   else if Option = '--output' then
   begin
     Inc(ParamIdx);
@@ -171,6 +179,7 @@ begin
   end
   else if AnsiStartsStr('--output=', Option) then
     fPatchFileName := StripLeadingChars(Option, Length('--output='))
+
   else if Option = '--format' then
   begin
     Inc(ParamIdx);
@@ -178,6 +187,7 @@ begin
   end
   else if AnsiStartsStr('--format=', Option) then
     SetFormat(StripLeadingChars(Option, Length('--format=')))
+
   else if Option = '--min-equal' then
   begin
     Inc(ParamIdx);
@@ -185,6 +195,10 @@ begin
   end
   else if AnsiStartsStr('--min-equal=', Option) then
     SetMinEqual(StripLeadingChars(Option, Length('--min-equal=')))
+
+  else if AnsiStartsStr('--permit-large-files', Option) then
+    fOverrideMaxSize := True
+
   else
     Result := False;
 end;

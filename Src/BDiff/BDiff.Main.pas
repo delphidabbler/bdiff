@@ -19,6 +19,10 @@ type
   ///  <summary>Class containing main BDiff program logic.</summary>
   TMain = class(TObject)
   strict private
+    const
+      ///  <summary>Maximum file size for which diffs can be calculated.
+      ///  </summary>
+      MaxFileSize = 10_485_760;
     ///  <summary>Displays the program help screen.</summary>
     class procedure DisplayHelp;
     ///  <summary>Displays the program version information.</summary>
@@ -32,6 +36,14 @@ type
     ///  <exception>Raises <c>EOSError</c> if file can't be redirected.
     ///  </exception>
     class procedure RedirectStdOut(const FileName: string);
+    ///  <summary>Checks that both input files are under the maximum supported
+    ///  file size. Does nothing if <c>--permit-large-files</c> option
+    ///  specified.</summary>
+    ///  <param name="Params">[in] Command line parameters object containing
+    ///  the old and new file names.</param>
+    ///  <exception>Raises <c>Exception</c> if either file is larger than
+    ///  maximum permitted.</exception>
+    class procedure CheckFileSizes(Params: TParams);
   public
     ///  <summary>Runs the program.</summary>
     class procedure Run;
@@ -44,6 +56,7 @@ implementation
 uses
   // Delphi
   System.SysUtils,
+  System.IOUtils,
   // Project
   BDiff.Differ,
   BDiff.InfoWriter,
@@ -54,6 +67,31 @@ uses
 
 
 { TMain }
+
+class procedure TMain.CheckFileSizes(Params: TParams);
+
+  procedure SizeError(const FileName: string);
+  begin
+    Error(
+      '"%s" is too large (> %.0n bytes)',
+      [FileName, Extended(MaxFileSize)],
+      TFormatSettings.Create
+    );
+  end;
+
+  function IsFileTooLarge(const FileName: string): Boolean;
+  begin
+    Result := TFile.GetSize(FileName) > MaxFileSize;
+  end;
+
+begin
+  if Params.OverrideMaxSize then
+    Exit;
+  if IsFileTooLarge(Params.OldFileName) then
+    SizeError(Params.OldFileName);
+  if IsFileTooLarge(Params.NewFileName) then
+    SizeError(Params.NewFileName);
+end;
 
 class procedure TMain.CreateDiff(Params: TParams);
 begin
@@ -103,6 +141,7 @@ begin
         DisplayVersion
       else
       begin
+        CheckFileSizes(Params);
         if (Params.PatchFileName <> '') and (Params.PatchFileName <> '-') then
           RedirectStdOut(Params.PatchFileName);
         CreateDiff(Params);
