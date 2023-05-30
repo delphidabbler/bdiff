@@ -37,7 +37,8 @@ type
     ///  </exception>
     class procedure RedirectStdOut(const FileName: string);
     ///  <summary>Checks that both input files are under the maximum supported
-    ///  file size.</summary>
+    ///  file size. Does nothing if <c>--permit-large-files</c> option
+    ///  specified.</summary>
     ///  <param name="Params">[in] Command line parameters object containing
     ///  the old and new file names.</param>
     ///  <exception>Raises <c>Exception</c> if either file is larger than
@@ -84,6 +85,8 @@ class procedure TMain.CheckFileSizes(Params: TParams);
   end;
 
 begin
+  if Params.OverrideMaxSize then
+    Exit;
   if IsFileTooLarge(Params.OldFileName) then
     SizeError(Params.OldFileName);
   if IsFileTooLarge(Params.NewFileName) then
