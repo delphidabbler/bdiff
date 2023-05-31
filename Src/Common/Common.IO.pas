@@ -36,6 +36,10 @@ type
     ///  </summary>
     class procedure WriteStrFmt(Handle: THandle; const Fmt: string;
       Args: array of const);
+    ///  <summary>Gets the size of a file identified by <c>Handle</c>.</summary>
+    ///  <returns><c>Int64</c>. File size or -1 on error.</returns>
+    ///  <remarks>File must have been opened for reading.</remarks>
+    class function FileSize(Handle: THandle): Int64;
   end;
 
 
@@ -49,6 +53,12 @@ uses
 
 
 { TCommonIO }
+
+class function TCommonIO.FileSize(Handle: THandle): Int64;
+begin
+  if not GetFileSizeEx(Handle, Result) then
+    Result := -1;
+end;
 
 class function TCommonIO.StdErr: THandle;
 begin

@@ -69,7 +69,7 @@ uses
 class function TIO.AtEOF(Handle: THandle): Boolean;
 begin
   var CurPos := System.SysUtils.FileSeek(Handle, Int64(0), 1);
-  var Size := Winapi.Windows.GetFileSize(Handle, nil);
+  var Size := FileSize(Handle);
   Result := CurPos = Size;
 end;
 
