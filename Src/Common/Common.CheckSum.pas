@@ -29,7 +29,7 @@ type
     procedure Add(Value: Int8);
     ///  <summary>Adds data from buffer of signed bytes pointed to by
     ///  <c>Data</c>, where buffer contains <c>Length</c>.</summary>
-    procedure AddBuffer(Data: PInt8; Length: UInt32);
+    procedure AddBuffer(Data: PInt8; Length: Int32);
     ///  <summary>The current checksum.</summary>
     property CheckSum: Int32 read fCheckSum;
   end;
@@ -46,7 +46,7 @@ begin
   fCheckSum := fCheckSum xor Value;
 end;
 
-procedure TCheckSum.AddBuffer(Data: PInt8; Length: UInt32);
+procedure TCheckSum.AddBuffer(Data: PInt8; Length: Int32);
 begin
   while Length > 0 do
   begin

@@ -24,7 +24,7 @@ type
     ///  <summary>Writes binary data from a buffer pointed to by <c>BufPtr</c>
     ///  with length <c>Size</c> bytes. The data is written to the output
     ///  identified by <c>Handle</c>.</summary>
-    class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
+    class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Int32);
     ///  <summary>Writes a Unicode string <c>S</c> to the output identified by
     ///  <c>Handle</c>.</summary>
     class procedure WriteStr(Handle: THandle; const S: UnicodeString); overload;
@@ -76,12 +76,12 @@ begin
 end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
-  Size: Integer);
+  Size: Int32);
 begin
   if Size <= 0 then
     Exit;
   var Dummy: DWORD;
-  Winapi.Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
+  Winapi.Windows.WriteFile(Handle, BufPtr^, DWORD(Size), Dummy, nil);
 end;
 
 class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);

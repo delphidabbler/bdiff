@@ -12,11 +12,13 @@ interface
 type
 
   ///  <summary>Type that enables array <c>[]</c> notation to be used with
-  ///  pointers to blocks of <c>Cardinal</c>.</summary>
+  ///  pointers to blocks of <c>Int32</c>.</summary>
   ///  <remarks>The original C code uses <c>*size_t</c> pointers that are
   ///  accessed using array <c>[]</c> notation. <c>TBlock</c> enables this to be
-  ///  done in Pascal.</remarks>
-  TBlock = array[0..0] of Cardinal;
+  ///  done in Pascal, except that <c>size_t</c> is replaced by <c>Int32</c>,
+  ///  since all file sizes and positions are in range 0..<c>MaxInt</c>.
+  ///  </remarks>
+  TBlock = array[0..0] of Int32;
 
   ///  <summary>Pointer to a <c>TBlock</c> array.</summary>
   PBlock = ^TBlock;

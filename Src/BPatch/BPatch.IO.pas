@@ -88,9 +88,7 @@ end;
 
 class procedure TIO.RedirectStdIn(const Handle: THandle);
 begin
-  Winapi.Windows.SetStdHandle(
-    Winapi.Windows.STD_INPUT_HANDLE, Cardinal(Handle)
-  );
+  Winapi.Windows.SetStdHandle(Winapi.Windows.STD_INPUT_HANDLE, Handle);
 end;
 
 class function TIO.Seek(Handle: THandle; Offset: Int64; Origin: Integer):

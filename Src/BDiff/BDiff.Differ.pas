@@ -27,21 +27,21 @@ type
     type
       ///  <summary>Structure for a matching block.</summary>
       TMatch = record
-        OldOffset: Cardinal;
-        NewOffset: Cardinal;
-        BlockLength: Cardinal;
+        OldOffset: Int32;
+        NewOffset: Int32;
+        BlockLength: Int32;
       end;
 
     var
       // Property values
-      fMinMatchLength: Cardinal;
+      fMinMatchLength: Int32;
       fFormat: TFormat;
 
     ///  <summary>Finds a maximum length match a given search string in the old
     ///  file and returns a <c>TMatch</c> record that describes the match.
     ///  </summary>
     function FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-      SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
+      SearchText: PCChar; SearchTextLength: Int32): TMatch;
 
     ///  <summary>Finds maximum length sub-string of <c>CompareData</c> that is
     ///  in <c>Data</c>.</summary>
@@ -55,10 +55,9 @@ type
     ///  <c>CompareData</c>.</param>
     ///  <param name="FoundPos">[out] Position in <c>Data</c> where sub-string
     ///  was found.</param>
-    ///  <returns><c>Cardinal</c>. Length of found sub-string.</returns>
-    function FindString(Data: PCCharArray; Block: PBlock; DataSize: Cardinal;
-      CompareData: PCChar; CompareDataSize: Cardinal; out FoundPos: Cardinal):
-      Cardinal;
+    ///  <returns><c>Int32</c>. Length of found sub-string.</returns>
+    function FindString(Data: PCCharArray; Block: PBlock; DataSize: Int32;
+      CompareData: PCChar; CompareDataSize: Int32; out FoundPos: Int32): Int32;
 
   public
 
@@ -77,7 +76,7 @@ type
 
     ///  <summary>Minimum length of data chunks that can be recognized as equal.
     ///  </summary>
-    property MinMatchLength: Cardinal
+    property MinMatchLength: Int32
       read fMinMatchLength write fMinMatchLength default 24;
 
     ///  <summary>Format of generated diff.</summary>
@@ -109,13 +108,13 @@ begin
 end;
 
 function TDiffer.FindMaxMatch(OldFile: TFileData; SortedOldData: PBlock;
-  SearchText: PCChar; SearchTextLength: Cardinal): TMatch;
+  SearchText: PCChar; SearchTextLength: Int32): TMatch;
 begin
   Result.BlockLength := 0;  {no match}
   Result.NewOffset := 0;
   while (SearchTextLength <> 0) do
   begin
-    var FoundPos: Cardinal;
+    var FoundPos: Int32;
     var FoundLen := FindString(
       OldFile.Data,
       SortedOldData,
@@ -136,12 +135,11 @@ begin
   end;
 end;
 
-function TDiffer.FindString(Data: PCCharArray; Block: PBlock;
-  DataSize: Cardinal; CompareData: PCChar; CompareDataSize: Cardinal;
-  out FoundPos: Cardinal): Cardinal;
+function TDiffer.FindString(Data: PCCharArray; Block: PBlock; DataSize: Int32;
+  CompareData: PCChar; CompareDataSize: Int32; out FoundPos: Int32): Int32;
 begin
-  var First: Cardinal := 0;
-  var Last: Cardinal := DataSize - 1;
+  var First: Int32 := 0;
+  var Last: Int32 := DataSize - 1;
   Result := 0;
   FoundPos := 0;
 
@@ -149,17 +147,17 @@ begin
   while First <= Last do
   begin
     // Get mid point of (sorted) Data to search
-    var Mid: Cardinal := (First + Last) div 2;
+    var Mid: Int32 := (First + Last) div 2;
     // Set pointer to start of Data search string
     var PData: PCChar := @Data[Block[Mid]];
     // Set pointer to start of CompareData
     var PCompareData: PCChar := CompareData;
     // Calculate maximum possible size of matching substring
-    var FoundMax: Cardinal := DataSize - Block[Mid];
+    var FoundMax: Int32 := DataSize - Block[Mid];
     if FoundMax > CompareDataSize then
       FoundMax := CompareDataSize;
     // Find and count match chars from Data and CompareData
-    var FoundSize: Cardinal := 0;
+    var FoundSize: Int32 := 0;
     while (FoundSize < FoundMax) and (PData^ = PCompareData^) do
     begin
       Inc(FoundSize);
@@ -212,7 +210,7 @@ begin
     PatchWriter.Header(OldFile, NewFile);
     // main loop
     var ToDo := NewFile.Size;
-    var NewOffset: Cardinal := 0;
+    var NewOffset: Int32 := 0;
     while (ToDo <> 0) do
     begin
       var Match := FindMaxMatch(
