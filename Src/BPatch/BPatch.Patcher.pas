@@ -131,7 +131,7 @@ begin
       while True do
       begin
         var Ch := TIO.GetCh(TIO.StdIn);
-        if Ch = EOF then
+        if Ch = TIO.EOF then
           Break;
         case Ch of
           Integer(TPatchHeaders.CommonIndicator):
@@ -141,7 +141,9 @@ begin
             ReadCommonHeader(
               SourceLen, DataSize, SourceFilePos, Checksum
             );
-            if not TIO.Seek(SourceFileHandle, SourceFilePos, SEEK_SET) then
+            if not TIO.Seek(
+              SourceFileHandle, SourceFilePos, TIO.SEEK_START
+            ) then
               Error('Seek on source file failed');
             CopyData(
               SourceFileHandle, DestFileHandle, DataSize, CheckSum, False

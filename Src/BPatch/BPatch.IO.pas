@@ -15,21 +15,22 @@ uses
   Common.IO;
 
 
-const
-
-  ///  <summary>Value representing end of file (as returned from
-  ///  <c>TIO.GetCh</c>).</summary>
-  EOF: Integer = -1;
-  ///  <summary>Seek flag used by <c>TIO.Seek</c> (other possible values not
-  ///  used in program).</summary>
-  SEEK_SET = 0;
-
 type
 
   ///  <summary>Static class that provides IO functions required by BPatch to
   ///  read/write from/to Windows handles.</summary>
   TIO = class sealed(TCommonIO)
   public
+    const
+      ///  <summary>Value representing end of file (as returned from
+      ///  <c>TIO.GetCh</c>).</summary>
+      EOF: Integer = -1;
+      ///  <summary>Seek flag for use with <c>TIO.Seek</c> to seek from start of
+      ///  file.</summary>
+      SEEK_START = 0;
+      ///  <summary>Seek flag for use with <c>TIO.Seek</c> to seek from current
+      ///  possition in file.</summary>
+      SEEK_CURRENT = 1;
     ///  <summary>Redirects standard input from file handle <c>Handle</c>.
     ///  </summary>
     class procedure RedirectStdIn(const Handle: THandle);
@@ -39,7 +40,7 @@ type
     ///  <param name="Offset">[in] Seek offset within the file.</param>
     ///  <param name="Origin">[in] Origin from which seek takes place.</param>
     ///  <returns><c>True</c> on success or <c>False</c> on failure.</returns>
-    class function Seek(Handle: THandle; Offset: Longint; Origin: Integer):
+    class function Seek(Handle: THandle; Offset: Int64; Origin: Integer):
       Boolean;
 
     ///  <summary>Checks if the given file handle is at end of file.</summary>
@@ -68,7 +69,7 @@ uses
 
 class function TIO.AtEOF(Handle: THandle): Boolean;
 begin
-  var CurPos := System.SysUtils.FileSeek(Handle, Int64(0), 1);
+  var CurPos := System.SysUtils.FileSeek(Handle, Int64(0), SEEK_CURRENT);
   var Size := FileSize(Handle);
   Result := CurPos = Size;
 end;
@@ -92,7 +93,8 @@ begin
   );
 end;
 
-class function TIO.Seek(Handle: THandle; Offset, Origin: Integer): Boolean;
+class function TIO.Seek(Handle: THandle; Offset: Int64; Origin: Integer):
+  Boolean;
 begin
   Result := System.SysUtils.FileSeek(Handle, Offset, Origin) >= 0;
 end;
