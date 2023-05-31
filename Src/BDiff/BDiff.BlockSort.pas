@@ -14,7 +14,8 @@ interface
 
 uses
   // Project
-  BDiff.Types;
+  BDiff.Types,
+  Common.Types;
 
 
 type

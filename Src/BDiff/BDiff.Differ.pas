@@ -15,7 +15,8 @@ uses
   // Project
   BDiff.FileData,
   BDiff.Logger,
-  BDiff.Types;
+  BDiff.Types,
+  Common.Types;
 
 
 type

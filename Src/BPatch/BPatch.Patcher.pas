@@ -9,6 +9,11 @@ unit BPatch.Patcher;
 interface
 
 
+uses
+  // Project
+  Common.Types;
+
+
 type
 
   ///  <summary>Class that recreates a new version of a file from the old file
@@ -22,7 +27,7 @@ type
 
     type
       ///  <summary>Buffer used when reading from a file.</summary>
-      TBuffer = array[0..Pred(BUFFER_SIZE)] of AnsiChar;
+      TBuffer = array[0..Pred(BUFFER_SIZE)] of TCChar;
 
     ///  <summary>Computes simple checksum of a data buffer.</summary>
     ///  <param name="Data">[in] Pointer to data to be checked.</param>
@@ -30,7 +35,7 @@ type
     ///  <param name="BFCheckSum">[in] Checksum b/f from any previous call.
     ///  </param>
     ///  <returns><c>Int32</c>. Updated checksum.</returns>
-    class function CheckSum(Data: PAnsiChar; DataSize, BFCheckSum: Int32):
+    class function CheckSum(const Data: TBuffer; DataSize, BFCheckSum: Int32):
       Int32;
 
     ///  <summary>Copies data from one stream to another, computing checksums.
@@ -186,12 +191,12 @@ begin
   end;
 end;
 
-class function TPatcher.CheckSum(Data: PAnsiChar; DataSize, BFCheckSum: Int32):
-  Int32;
+class function TPatcher.CheckSum(const Data: TBuffer;
+  DataSize, BFCheckSum: Int32): Int32;
 begin
   var CS := TCheckSum.Create(BFCheckSum);
   try
-    CS.AddBuffer(PInt8(Data), DataSize);
+    CS.AddBuffer(@Data, DataSize);
     Result := CS.CheckSum;
   finally
     CS.Free;

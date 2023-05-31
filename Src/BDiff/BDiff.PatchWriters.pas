@@ -15,7 +15,8 @@ interface
 uses
   // Project
   BDiff.Types,
-  BDiff.FileData;
+  BDiff.FileData,
+  Common.Types;
 
 
 type
@@ -208,7 +209,7 @@ function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Int32): Int32;
 begin
   var CS := TCheckSum.Create(0);
   try
-    CS.AddBuffer(PInt8(Data), Length);
+    CS.AddBuffer(Data, Length);
     Result := CS.CheckSum;
   finally
     CS.Free;

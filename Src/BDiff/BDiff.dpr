@@ -25,7 +25,8 @@ uses
   Common.InfoWriter in '..\Common\Common.InfoWriter.pas',
   Common.IO in '..\Common\Common.IO.pas',
   Common.Params in '..\Common\Common.Params.pas',
-  Common.PatchHeaders in '..\Common\Common.PatchHeaders.pas';
+  Common.PatchHeaders in '..\Common\Common.PatchHeaders.pas',
+  Common.Types in '..\Common\Common.Types.pas';
 
 begin
   TMain.Run;

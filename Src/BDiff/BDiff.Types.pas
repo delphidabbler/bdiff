@@ -9,6 +9,11 @@ unit BDiff.Types;
 interface
 
 
+uses
+  // Project
+  Common.Types;
+
+
 type
 
   ///  <summary>Type that enables array <c>[]</c> notation to be used with
@@ -22,15 +27,6 @@ type
 
   ///  <summary>Pointer to a <c>TBlock</c> array.</summary>
   PBlock = ^TBlock;
-
-  ///  <summary>Emulation of C's <c>char</c> type.</summary>
-  ///  <remarks>This type was defined since the original C code uses
-  ///  <c>char</c>, which is signed, while the Pascal <c>Char</c> type is
-  ///  unsigned. This type made translation of the C code easier.</remarks>
-  TCChar = type Int8;
-
-  ///  <summary>Pointer to <c>TCChar</c>.</summary>
-  PCChar = ^TCChar;
 
   ///  <summary>Array of <c>TCChar</c>.</summary>
   ///  <remarks>This class is provided to ease translation of the original C
