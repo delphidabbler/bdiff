@@ -15,7 +15,8 @@ interface
 uses
   // Project
   BDiff.Types,
-  BDiff.FileData;
+  BDiff.FileData,
+  Common.Types;
 
 
 type
@@ -32,15 +33,15 @@ type
     ///  <summary>Write added data record to patch file.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data, in bytes.</param>
-    procedure Add(Data: PCChar; Length: Cardinal); virtual; abstract;
+    procedure Add(Data: PCChar; Length: Int32); virtual; abstract;
 
     ///  <summary>Write common block record to patch file.</summary>
     ///  <param name="NewBuf">[in] Data in common block.</param>
     ///  <param name="NewPos">[in] Position of common block in new file.</param>
     ///  <param name="OldPos">[in] Position of common block in old file.</param>
     ///  <param name="Length">[in] Length of common block data.</param>
-    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
-      Length: Cardinal); virtual; abstract;
+    procedure Copy(NewBuf: PCCharArray; NewPos, OldPos, Length: Int32); virtual;
+      abstract;
 
   end;
 
@@ -61,6 +62,7 @@ implementation
 uses
   // Delphi
   System.SysUtils,
+  System.AnsiStrings,
   // Project
   BDiff.IO,
   Common.CheckSum,
@@ -77,8 +79,8 @@ type
     ///  <param name="Data">[in] Pointer to memory containing data for which
     ///  check sum is required.</param>
     ///  <param name="Length">[in] Length of <c>Data</c>.</param>
-    ///  <returns><c>Longint</c>. Required checksum.</returns>
-    function CheckSum(Data: PCChar; Length: Cardinal): Longint;
+    ///  <returns><c>Int32</c>. Required checksum.</returns>
+    function CheckSum(Data: PCChar; Length: Int32): Int32;
 
   public
 
@@ -90,15 +92,15 @@ type
     ///  <summary>Write added data record to patch file.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data, in bytes.</param>
-    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Add(Data: PCChar; Length: Int32); override;
 
     ///  <summary>Write common block record to patch file.</summary>
     ///  <param name="NewBuf">[in] Data in common block.</param>
     ///  <param name="NewPos">[in] Position of common block in new file.</param>
     ///  <param name="OldPos">[in] Position of common block in old file.</param>
     ///  <param name="Length">[in] Length of common block data.</param>
-    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
-      Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos, OldPos, Length: Int32);
+      override;
 
   end;
 
@@ -108,14 +110,14 @@ type
   strict protected
     ///  <summary>Checks if ANSI character <c>Ch</c> is a printable ASCII
     ///  character.</summary>
-    class function IsPrint(const Ch: AnsiChar): Boolean;
+    class function IsPrint(const Ch: TCChar): Boolean;
 
     ///  <summary>Writes a common data block header record.</summary>
     ///  <param name="NewPos">[in] Starting position of copied data.</param>
     ///  <param name="OldPos">[in] Length of copied data.</param>
     ///  <param name="Length">[in] Checksum used to validate copied data.
     ///  </param>
-    procedure CopyHeader(NewPos: Cardinal; OldPos: Cardinal; Length: Cardinal);
+    procedure CopyHeader(NewPos, OldPos, Length: Int32);
 
     ///  <summary>Write patch file header.</summary>
     ///  <param name="OldFile">[in] Information about old file.</param>
@@ -130,26 +132,26 @@ type
     ///  <summary>Writes data in quoted format.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data.</param>
-    procedure QuotedData(Data: PCChar; Length: Cardinal);
+    procedure QuotedData(Data: PCChar; Length: Int32);
 
     ///  <summary>Returns octal representation of given value as a 3 digit
     ///  string.</summary>
-    class function ByteToOct(const Value: Byte): string;
+    class function ByteToOct(const Value: UInt8): string;
 
   public
 
     ///  <summary>Write added data record to patch file.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data, in bytes.</param>
-    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Add(Data: PCChar; Length: Int32); override;
 
     ///  <summary>Write common block record to patch file.</summary>
     ///  <param name="NewBuf">[in] Data in common block.</param>
     ///  <param name="NewPos">[in] Position of common block in new file.</param>
     ///  <param name="OldPos">[in] Position of common block in old file.</param>
     ///  <param name="Length">[in] Length of common block data.</param>
-    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
-      Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos, OldPos, Length: Int32);
+      override;
 
   end;
 
@@ -160,22 +162,22 @@ type
     ///  <summary>Writes data in filtered format.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data.</param>
-    procedure FilteredData(Data: PCChar; Length: Cardinal);
+    procedure FilteredData(Data: PCChar; Length: Int32);
 
   public
 
     ///  <summary>Write added data record to patch file.</summary>
     ///  <param name="Data">[in] Pointer to data to be written.</param>
     ///  <param name="Length">[in] Length of data, in bytes.</param>
-    procedure Add(Data: PCChar; Length: Cardinal); override;
+    procedure Add(Data: PCChar; Length: Int32); override;
 
     ///  <summary>Write common block record to patch file.</summary>
     ///  <param name="NewBuf">[in] Data in common block.</param>
     ///  <param name="NewPos">[in] Position of common block in new file.</param>
     ///  <param name="OldPos">[in] Position of common block in old file.</param>
     ///  <param name="Length">[in] Length of common block data.</param>
-    procedure Copy(NewBuf: PCCharArray; NewPos: Cardinal; OldPos: Cardinal;
-      Length: Cardinal); override;
+    procedure Copy(NewBuf: PCCharArray; NewPos, OldPos, Length: Int32);
+      override;
 
   end;
 
@@ -194,7 +196,7 @@ end;
 
 { TBinaryPatchWriter }
 
-procedure TBinaryPatchWriter.Add(Data: PCChar; Length: Cardinal);
+procedure TBinaryPatchWriter.Add(Data: PCChar; Length: Int32);
 begin
   TIO.WriteStr(TIO.StdOut, TPatchHeaders.AddIndicator);
   var Rec: TPatchHeaders.TAddedData;
@@ -203,11 +205,11 @@ begin
   TIO.WriteRaw(TIO.StdOut, Data, Length);
 end;
 
-function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Cardinal): Longint;
+function TBinaryPatchWriter.CheckSum(Data: PCChar; Length: Int32): Int32;
 begin
   var CS := TCheckSum.Create(0);
   try
-    CS.AddBuffer(PInt8(Data), Length);
+    CS.AddBuffer(Data, Length);
     Result := CS.CheckSum;
   finally
     CS.Free;
@@ -215,7 +217,7 @@ begin
 end;
 
 procedure TBinaryPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
-  Length: Cardinal);
+  Length: Int32);
 begin
   TIO.WriteStr(TIO.StdOut, TPatchHeaders.CommonIndicator);
   var Rec: TPatchHeaders.TCommonData;
@@ -236,7 +238,7 @@ end;
 
 { TTextPatchWriter }
 
-procedure TTextPatchWriter.CopyHeader(NewPos, OldPos, Length: Cardinal);
+procedure TTextPatchWriter.CopyHeader(NewPos, OldPos, Length: Int32);
 begin
   TIO.WriteStrFmt(
     TIO.StdOut,
@@ -254,45 +256,45 @@ begin
   );
 end;
 
-class function TTextPatchWriter.IsPrint(const Ch: AnsiChar): Boolean;
+class function TTextPatchWriter.IsPrint(const Ch: TCChar): Boolean;
 begin
-  Result := Ch in [#32..#126];
+  Result := Ch in [32..126];
 end;
 
 { TQuotedPatchWriter }
 
-procedure TQuotedPatchWriter.Add(Data: PCChar; Length: Cardinal);
+procedure TQuotedPatchWriter.Add(Data: PCChar; Length: Int32);
 begin
   TIO.WriteStr(TIO.StdOut, '+');
   QuotedData(Data, Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-class function TQuotedPatchWriter.ByteToOct(const Value: Byte): string;
+class function TQuotedPatchWriter.ByteToOct(const Value: UInt8): string;
 begin
   Result := '';
-  var Remainder: Byte := Value;
+  var Remainder: UInt8 := Value;
   for var Idx := 1 to 3 do
   begin
-    var Digit: Byte := Remainder mod 8;
+    var Digit: UInt8 := Remainder mod 8;
     Remainder := Remainder div 8;
     Result := Chr(Digit + Ord('0')) + Result;
   end;
 end;
 
 procedure TQuotedPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
-  Length: Cardinal);
+  Length: Int32);
 begin
   CopyHeader(NewPos, OldPos, Length);
   QuotedData(@NewBuf[NewPos], Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-procedure TQuotedPatchWriter.QuotedData(Data: PCChar; Length: Cardinal);
+procedure TQuotedPatchWriter.QuotedData(Data: PCChar; Length: Int32);
 begin
   while (Length <> 0) do
   begin
-    if IsPrint(AnsiChar(Data^)) and (AnsiChar(Data^) <> '\') then
+    if IsPrint(Data^) and (AnsiChar(Data^) <> '\') then
       TIO.WriteStr(TIO.StdOut, AnsiChar(Data^))
     else
       TIO.WriteStr(TIO.StdOut, '\' + ByteToOct(Data^ and $FF));
@@ -303,7 +305,7 @@ end;
 
 { TFilteredPatchWriter }
 
-procedure TFilteredPatchWriter.Add(Data: PCChar; Length: Cardinal);
+procedure TFilteredPatchWriter.Add(Data: PCChar; Length: Int32);
 begin
   TIO.WriteStr(TIO.StdOut, '+');
   FilteredData(Data, Length);
@@ -311,18 +313,18 @@ begin
 end;
 
 procedure TFilteredPatchWriter.Copy(NewBuf: PCCharArray; NewPos, OldPos,
-  Length: Cardinal);
+  Length: Int32);
 begin
   CopyHeader(NewPos, OldPos, Length);
   FilteredData(@NewBuf[NewPos], Length);
   TIO.WriteStr(TIO.StdOut, #13#10);
 end;
 
-procedure TFilteredPatchWriter.FilteredData(Data: PCChar; Length: Cardinal);
+procedure TFilteredPatchWriter.FilteredData(Data: PCChar; Length: Int32);
 begin
   while Length <> 0  do
   begin
-    if IsPrint(AnsiChar(Data^)) then
+    if IsPrint(Data^) then
       TIO.WriteStr(TIO.StdOut, AnsiChar(Data^))
     else
       TIO.WriteStr(TIO.StdOut, '.');

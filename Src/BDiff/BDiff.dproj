@@ -94,6 +94,7 @@ $(PostBuildEvent)]]></PostBuildEvent>
         <DCCReference Include="..\Common\Common.IO.pas"/>
         <DCCReference Include="..\Common\Common.Params.pas"/>
         <DCCReference Include="..\Common\Common.PatchHeaders.pas"/>
+        <DCCReference Include="..\Common\Common.Types.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>

@@ -10,10 +10,11 @@ unit Common.CheckSum;
 interface
 
 
-type
+uses
+  Common.Types;
 
-  ///  <summary>Pointer to <c>Int8</c> type.</summary>
-  PInt8 = ^Int8;
+
+type
 
   ///  <summary>Checksum builder.</summary>
   TCheckSum = class(TObject)
@@ -26,10 +27,10 @@ type
     ///  </summary>
     constructor Create(Seed: Int32);
     ///  <summary>Adds a given signed byte to the checksum.</summary>
-    procedure Add(Value: Int8);
+    procedure Add(Value: TCChar);
     ///  <summary>Adds data from buffer of signed bytes pointed to by
     ///  <c>Data</c>, where buffer contains <c>Length</c>.</summary>
-    procedure AddBuffer(Data: PInt8; Length: UInt32);
+    procedure AddBuffer(Data: PCChar; Length: Int32);
     ///  <summary>The current checksum.</summary>
     property CheckSum: Int32 read fCheckSum;
   end;
@@ -40,13 +41,13 @@ implementation
 
 { TCheckSum }
 
-procedure TCheckSum.Add(Value: Int8);
+procedure TCheckSum.Add(Value: TCChar);
 begin
   fCheckSum := ((fCheckSum shr 30) and 3) or (fCheckSum shl 2);
   fCheckSum := fCheckSum xor Value;
 end;
 
-procedure TCheckSum.AddBuffer(Data: PInt8; Length: UInt32);
+procedure TCheckSum.AddBuffer(Data: PCChar; Length: Int32);
 begin
   while Length > 0 do
   begin

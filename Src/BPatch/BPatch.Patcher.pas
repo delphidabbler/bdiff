@@ -9,6 +9,11 @@ unit BPatch.Patcher;
 interface
 
 
+uses
+  // Project
+  Common.Types;
+
+
 type
 
   ///  <summary>Class that recreates a new version of a file from the old file
@@ -22,16 +27,16 @@ type
 
     type
       ///  <summary>Buffer used when reading from a file.</summary>
-      TBuffer = array[0..Pred(BUFFER_SIZE)] of AnsiChar;
+      TBuffer = array[0..Pred(BUFFER_SIZE)] of TCChar;
 
     ///  <summary>Computes simple checksum of a data buffer.</summary>
     ///  <param name="Data">[in] Pointer to data to be checked.</param>
     ///  <param name="DataSize">[in] Size of data in bytes.</param>
     ///  <param name="BFCheckSum">[in] Checksum b/f from any previous call.
     ///  </param>
-    ///  <returns><c>Longint</c>. Updated checksum.</returns>
-    class function CheckSum(Data: PAnsiChar; DataSize: Cardinal;
-      const BFCheckSum: Longint): Longint;
+    ///  <returns><c>Int32</c>. Updated checksum.</returns>
+    class function CheckSum(const Data: TBuffer; DataSize, BFCheckSum: Int32):
+      Int32;
 
     ///  <summary>Copies data from one stream to another, computing checksums.
     ///  </summary>
@@ -46,7 +51,7 @@ type
     ///  <c>SourceFileHandle</c> is a patch file (<c>True</c>) or a source file
     ///  (<c>False</c>).</param>
     class procedure CopyData(const SourceFileHandle, DestFileHandle: THandle;
-      Count, SourceCheckSum: Longint; const SourceIsPatch: Boolean);
+      Count, SourceCheckSum: Int32; const SourceIsPatch: Boolean);
 
     ///  <summary>Creates a temporary file in the user's temp directory and
     ///  returns its name.</summary>
@@ -131,7 +136,7 @@ begin
       while True do
       begin
         var Ch := TIO.GetCh(TIO.StdIn);
-        if Ch = EOF then
+        if Ch = TIO.EOF then
           Break;
         case Ch of
           Integer(TPatchHeaders.CommonIndicator):
@@ -141,7 +146,9 @@ begin
             ReadCommonHeader(
               SourceLen, DataSize, SourceFilePos, Checksum
             );
-            if not TIO.Seek(SourceFileHandle, SourceFilePos, SEEK_SET) then
+            if not TIO.Seek(
+              SourceFileHandle, SourceFilePos, TIO.SEEK_START
+            ) then
               Error('Seek on source file failed');
             CopyData(
               SourceFileHandle, DestFileHandle, DataSize, CheckSum, False
@@ -184,12 +191,12 @@ begin
   end;
 end;
 
-class function TPatcher.CheckSum(Data: PAnsiChar; DataSize: Cardinal;
-  const BFCheckSum: Integer): Longint;
+class function TPatcher.CheckSum(const Data: TBuffer;
+  DataSize, BFCheckSum: Int32): Int32;
 begin
   var CS := TCheckSum.Create(BFCheckSum);
   try
-    CS.AddBuffer(PInt8(Data), DataSize);
+    CS.AddBuffer(@Data, DataSize);
     Result := CS.CheckSum;
   finally
     CS.Free;
@@ -197,22 +204,21 @@ begin
 end;
 
 class procedure TPatcher.CopyData(const SourceFileHandle,
-  DestFileHandle: THandle; Count, SourceCheckSum: Integer;
+  DestFileHandle: THandle; Count, SourceCheckSum: Int32;
   const SourceIsPatch: Boolean);
 begin
-  var DestCheckSum: Longint := 0;
+  var DestCheckSum: Int32 := 0;
 
   while Count <> 0 do
   begin
-    var BytesToCopy: Cardinal;
+    var BytesToCopy: Int32;
     if Count > BUFFER_SIZE then
       BytesToCopy := BUFFER_SIZE
     else
       BytesToCopy := Count;
 
     var Buffer: TBuffer;
-    if FileRead(SourceFileHandle, Buffer, BytesToCopy)
-      <> Integer(BytesToCopy) then
+    if FileRead(SourceFileHandle, Buffer, BytesToCopy) <> BytesToCopy then
     begin
       if TIO.AtEOF(SourceFileHandle) then
       begin
@@ -231,8 +237,7 @@ begin
     end;
 
     if DestFileHandle <> 0 then
-      if FileWrite(DestFileHandle, Buffer, BytesToCopy)
-        <> Integer(BytesToCopy) then
+      if FileWrite(DestFileHandle, Buffer, BytesToCopy) <> BytesToCopy then
         Error('Error writing temporary file');
     DestCheckSum := CheckSum(Buffer, BytesToCopy, DestCheckSum);
     Dec(Count, BytesToCopy);

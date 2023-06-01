@@ -24,7 +24,7 @@ type
     var
       // Property values
       fData: PCCharArray;
-      fSize: Cardinal;
+      fSize: Int32;
       fName: string;
     ///  <summary>Loads data from the file into a memory block pointed to by the
     ///  <c>Data</c> property.</summary>
@@ -39,7 +39,7 @@ type
     ///  <summary>Name of file.</summary>
     property Name: string read fName;
     ///  <summary>Size of file's data.</summary>
-    property Size: Cardinal read fSize;
+    property Size: Int32 read fSize;
     ///  <summary>Pointer to memory containing file's content.</summary>
     ///  <remarks>Callers must not free the memory.</remarks>
     property Data: PCCharArray read fData;
@@ -54,6 +54,7 @@ uses
   System.SysUtils,
   Winapi.Windows,
   // Project
+  BDiff.IO,
   Common.Errors;
 
 
@@ -79,17 +80,20 @@ begin
   try
     if FileHandle = INVALID_HANDLE_VALUE then
       Error('Cannot open file %s', [fName]);
-    fSize := GetFileSize(FileHandle, nil);
-    if fSize = Cardinal(-1) then
-      Error('Cannot find size of file %s - may be to large', [fName]);
-    if fSize = 0 then
+    var FileSize: Int64 := TIO.FileSize(FileHandle);
+    if FileSize = -1 then
+      Error('Cannot find size of file %s', [fName]);
+    if FileSize = 0 then
       Error('File %s is empty', [fName]);
+    if FileSize > MaxInt then
+      Error('File %s is too large (>= 2GiB)', [fName]);
+    fSize := Int32(FileSize);
     try
       GetMem(fData, fSize);
-      var BytesRead: Integer := FileRead(FileHandle, fData^, fSize);
+      var BytesRead: Int32 := FileRead(FileHandle, fData^, fSize);
       if BytesRead = -1 then
         Error('Cannot read from file %s', [fName]);
-      if fSize <> Cardinal(BytesRead) then
+      if fSize <> BytesRead then
         Error('Error reading from file %s', [fName]);
     except
       if Assigned(fData) then

@@ -14,7 +14,8 @@ interface
 
 uses
   // Project
-  BDiff.Types;
+  BDiff.Types,
+  Common.Types;
 
 
 type
@@ -25,11 +26,11 @@ type
     ///  <summary>Compares elements of array of <c>TCChar</c> characters
     ///  starting from index <c>A</c>, with elements of same array starting at
     ///  index <c>B</c>.</summary>
-    class function Compare(A: Cardinal; B: Cardinal; Data: PCCharArray;
-      DataSize: Cardinal): Integer;
+    class function Compare(A, B: Int32; Data: PCCharArray; DataSize: Int32):
+      Int32;
     ///  <summary>Heap sort sink.</summary>
-    class procedure Sink(Left: Cardinal; Right: Cardinal; Block: PBlock;
-      Data: PCCharArray; DataSize: Cardinal);
+    class procedure Sink(Left, Right: Int32; Block: PBlock; Data: PCCharArray;
+      DataSize: Int32);
   public
     ///  <summary>Returns array of offsets into data, sorted by position.
     ///  </summary>
@@ -40,7 +41,7 @@ type
     ///  Caller must free.</returns>
     ///  <exception>Raises <c>EOutOfMemory</c> if the reutned data block can't
     ///  be allocated.</exception>
-    class function Execute(Data: PCCharArray; DataSize: Cardinal): PBlock;
+    class function Execute(Data: PCCharArray; DataSize: Int32): PBlock;
   end;
 
 
@@ -67,12 +68,12 @@ implementation
 
 { TBlockSort }
 
-class function TBlockSort.Compare(A, B: Cardinal; Data: PCCharArray;
-  DataSize: Cardinal): Integer;
+class function TBlockSort.Compare(A, B: Int32; Data: PCCharArray;
+  DataSize: Int32): Int32;
 begin
   var PA: PCChar := @Data[A];
   var PB: PCChar := @Data[B];
-  var Len: Cardinal := DataSize - A;
+  var Len: Int32 := DataSize - A;
   if DataSize - B < Len then
     Len := DataSize - B;
   while (Len <> 0) and (PA^ = PB^) do
@@ -86,13 +87,12 @@ begin
   Result := PA^ - PB^;
 end;
 
-class function TBlockSort.Execute(Data: PCCharArray; DataSize: Cardinal):
-  PBlock;
+class function TBlockSort.Execute(Data: PCCharArray; DataSize: Int32): PBlock;
 begin
   if DataSize = 0 then
     Exit(nil);
 
-  GetMem(Result, SizeOf(Cardinal) * DataSize);
+  GetMem(Result, SizeOf(Int32) * DataSize);
 
   // initialize unsorted data
   for var I := 0 to Pred(DataSize) do
@@ -116,8 +116,8 @@ begin
   end;
 end;
 
-class procedure TBlockSort.Sink(Left, Right: Cardinal; Block: PBlock;
-  Data: PCCharArray; DataSize: Cardinal);
+class procedure TBlockSort.Sink(Left, Right: Int32; Block: PBlock;
+  Data: PCCharArray; DataSize: Int32);
 begin
   var I := Left;
   var X := Block[I];

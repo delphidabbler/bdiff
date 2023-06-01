@@ -24,7 +24,7 @@ type
     ///  <summary>Writes binary data from a buffer pointed to by <c>BufPtr</c>
     ///  with length <c>Size</c> bytes. The data is written to the output
     ///  identified by <c>Handle</c>.</summary>
-    class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Integer);
+    class procedure WriteRaw(Handle: THandle; BufPtr: Pointer; Size: Int32);
     ///  <summary>Writes a Unicode string <c>S</c> to the output identified by
     ///  <c>Handle</c>.</summary>
     class procedure WriteStr(Handle: THandle; const S: UnicodeString); overload;
@@ -36,6 +36,10 @@ type
     ///  </summary>
     class procedure WriteStrFmt(Handle: THandle; const Fmt: string;
       Args: array of const);
+    ///  <summary>Gets the size of a file identified by <c>Handle</c>.</summary>
+    ///  <returns><c>Int64</c>. File size or -1 on error.</returns>
+    ///  <remarks>File must have been opened for reading.</remarks>
+    class function FileSize(Handle: THandle): Int64;
   end;
 
 
@@ -49,6 +53,12 @@ uses
 
 
 { TCommonIO }
+
+class function TCommonIO.FileSize(Handle: THandle): Int64;
+begin
+  if not GetFileSizeEx(Handle, Result) then
+    Result := -1;
+end;
 
 class function TCommonIO.StdErr: THandle;
 begin
@@ -66,12 +76,12 @@ begin
 end;
 
 class procedure TCommonIO.WriteRaw(Handle: THandle; BufPtr: Pointer;
-  Size: Integer);
+  Size: Int32);
 begin
   if Size <= 0 then
     Exit;
   var Dummy: DWORD;
-  Winapi.Windows.WriteFile(Handle, BufPtr^, Size, Dummy, nil);
+  Winapi.Windows.WriteFile(Handle, BufPtr^, DWORD(Size), Dummy, nil);
 end;
 
 class procedure TCommonIO.WriteStr(Handle: THandle; const S: UnicodeString);

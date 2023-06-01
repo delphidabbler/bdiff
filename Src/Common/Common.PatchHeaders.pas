@@ -17,7 +17,7 @@ type
   TPackedInt32 = record
   strict private
     var
-      fData: packed array[0..3] of Byte;
+      fData: packed array[0..3] of UInt8;
   public
     ///  <summary>Packs and stores integer <c>I</c>.</summary>
     procedure Pack(const I: Int32);
