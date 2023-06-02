@@ -19,7 +19,7 @@ Character Set=1252
 Language=2057
 
 [String File Info]
-File Description=Windows console application that outputs the difference of two binary files.
+File Description=Windows console application that outputs the difference between two files.
 Product Version=v<#P1>.<#P2>.<#P3><%version.suffix>
 Comments=<%version.license>
 Legal Copyright=<%version.copyright>

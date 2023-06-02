@@ -98,7 +98,7 @@ end;
 
 ## Administrativia
 
-This document relates to BDiff version 0.2.6 and later.
+This document relates to BDiff version 1.0.0-beta and later.
 
 See the file `LICENSE.md` for details of licensing and copyright.
 

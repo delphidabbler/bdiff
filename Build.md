@@ -4,9 +4,11 @@ These instructions only apply to building the current release of _BDiff / BPatch
 
 ## Introduction
 
-_BDiff / BPatch_ are written in Object Pascal and are targeted at Delphi 11 Alexandria. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
+_BDiff / BPatch_ are written in Object Pascal and are designed to be compiled with Delphi 11 Alexandria. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
 
-> Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names. This hasn't been tested.
+> Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names. However, no other compilers have been tested.
+
+Both _BDiff_ and _BPatch_ should only be compiled as 32 bit targets.
 
 Release builds are compiled and packaged using `Deploy.bat` run from the command line. This script calls `msbuild` to build the projects.
 
@@ -14,7 +16,7 @@ Release builds are compiled and packaged using `Deploy.bat` run from the command
 
 ### Compilation from the IDE
 
-You need DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied) to be installed. The `VIEDROOT` environment variable must be set to the program's install directory.
+You need DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied/releases) to be installed. The `VIEDROOT` environment variable must be set to the program's install directory.
 
 The environment variable can either be set in your global environment variables or from within the Delphi IDE by using the _IDE | Environment Variables_ page of Delphi's _Tools | Options_ dialogue box.
 
@@ -22,7 +24,7 @@ This program is required to convert the `.vi` files that specify version informa
 
 ### Building releases using `Deploy.bat`
 
-Once again, DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied) must be installed.
+Once again, DelphiDabbler [_Version Information Editor_](https://github.com/delphidabbler/vied/releases) must be installed.
 
 In addition _InfoZip_ `zip.exe` is required. This can be downloaded from <https://delphidabbler.com/extras/info-zip>.
 
@@ -51,11 +53,11 @@ Once you have the source code you should have a folder structure like this:
    |
    +-- Docs         { documentation files }
    |
-   +-- Src          { project group and master make files }
+   +-- Src          { project group & VERSION files }
    |   |
-   |   +-- BDiff    { source for BDiff }
+   |   +-- BDiff    { source code for BDiff }
    |   |
-   |   +-- BPatch   { source for BPatch }
+   |   +-- BPatch   { source code for BPatch }
    |   |
    |   +-- Common   { code common to both programs }
    |
@@ -110,6 +112,6 @@ If you want to create a zip file containing the executable programs and associat
 
     where `x.y.z` are the major, minor and patch versions for the release.
 
-This will build both `BDiff.exe` and `BPatch.exe` and then package them both, with documentation, in a zip file named `bdiff-exe-x.y.z.zip`.
+This will build both `BDiff.exe` and `BPatch.exe` and then package them both, with documentation and tests, in a zip file named `bdiff-exe-x.y.z.zip`.
 
 All files generated during the build process will be created in the `_build` directory, as described in the _Compile_ section above. The zip file will be located in the `_build/release` directory.
