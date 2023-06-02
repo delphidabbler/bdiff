@@ -46,17 +46,18 @@ begin
       + 'Difference between old-file and new-file written to standard output'
       + #13#10#13#10
       + 'Valid options:'#13#10
-      + ' -q                   Use QUOTED format'#13#10
-      + ' -f                   Use FILTERED format'#13#10
-      + ' -b                   Use BINARY format'#13#10
-      + '       --format=FMT   Use format FMT (''quoted'', ''filter[ed]'' '
+      + ' -q                         Use QUOTED format'#13#10
+      + ' -f                         Use FILTERED format'#13#10
+      + ' -b                         Use BINARY format'#13#10
+      + '       --format=FMT         Use format FMT (''quoted'', ''filter[ed]'' '
       + 'or ''binary'')'#13#10
-      + ' -m N  --min-equal=N  Minimum equal bytes to recognize an equal chunk'
+      + ' -m N  --min-equal=N        Minimum equal bytes to recognize an equal chunk'
       + #13#10
-      + ' -o FN --output=FN    Set output file name (instead of stdout)'#13#10
-      + ' -V    --verbose      Show status messages'#13#10
-      + ' -h    --help         Show this help screen'#13#10
-      + ' -v    --version      Show version information'#13#10,
+      + ' -o FN --output=FN          Set output file name (instead of stdout)'#13#10
+      + '       --permit-large-files Ignore 10MiB maximum file size limit'#13#10
+      + ' -V    --verbose            Show status messages'#13#10
+      + ' -h    --help               Show this help screen'#13#10
+      + ' -v    --version            Show version information'#13#10,
     [TAppInfo.ProgramFileName]
   );
 end;
