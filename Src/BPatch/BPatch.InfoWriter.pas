@@ -1,27 +1,40 @@
-{
- * Class that emits BPatch's version information and help screen on standard
- * output.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>Handles display of BPatch's version information and help screen.
+///  </summary>
+///  <remarks>Used by BPatch only.</remarks>
 
-unit UBPatchInfoWriter;
+unit BPatch.InfoWriter;
+
 
 interface
 
+
 uses
-  UInfoWriter;
+  // Project
+  Common.InfoWriter;
+
 
 type
-  TBPatchInfoWriter = class(TInfoWriter)
-  protected
+
+  ///  <summary>Class that writes BPatch help text and version information to
+  ///  stdout.</summary>
+  TBPatchInfoWriter = class sealed(TInfoWriter)
+  strict protected
+    ///  <summary>Writes the main BPatch help text.</summary>
     class function HelpText: string; override;
   end;
 
+
 implementation
 
+
 uses
-  SysUtils,
-  UAppInfo;
+  // Delphi
+  System.SysUtils,
+  // Project
+  Common.AppInfo;
+
 
 { TBPatchInfoWriter }
 
@@ -38,12 +51,10 @@ begin
       + ' -i FN --input=FN     Set input file name (instead of stdin)'
       + #13#10
       + ' -h    --help         Show this help screen'#13#10
-      + ' -v    --version      Show version information'#13#10
-      + #13#10
-      + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-      + '(c) copyright 2003-2016 Peter Johnson (@delphidabbler)'#13#10,
+      + ' -v    --version      Show version information'#13#10,
     [TAppInfo.ProgramFileName]
   );
 end;
 
 end.
+

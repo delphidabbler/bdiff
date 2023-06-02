@@ -14,6 +14,8 @@ BDiff computes differences between two binary files. Text files are treated as a
 
 BDiff handles insertion and deletion of data as well as changed bytes.
 
+Files larger than 10MiB will not be processed unless the `--permit-large-files` option is specified (see _Options_ below).
+
 ## Options
 
 | Short option | Long option | Description |
@@ -24,9 +26,10 @@ BDiff handles insertion and deletion of data as well as changed bytes.
 |              | `--format=FMT`| Select format by name: `FMT` is one of `binary`, `filtered` or `quoted`. |
 |`-m N`        | `--min-equal=N`| Two chunks of data are recognized as being identical if they are at least `N` bytes long, the default is `24`. |
 | `-o FILENAME` | `--output=FILENAME`| Write diff to specified file instead of standard output. Specifying `--output=-` does nothing. Use as an alternative to shell redirection. |
-| `-V`          |  `--verbose`| Print status messages while processing input. |
-|`-h`           |  `--help`   | Show help screen and exit. |
-|`-v`           |  `--version`| Show version number and exit. |
+| `-V`          | `--verbose`| Print status messages while processing input. |
+|               | `--permit-large-files` | Ignore maximum file size limit and permit files larger than the limit to be processed. |
+|`-h`           | `--help`   | Show help screen and exit. |
+|`-v`           | `--version`| Show version number and exit. |
 
 ## Algorithm
 
@@ -95,7 +98,7 @@ end;
 
 ## Administrativia
 
-This document relates to BDiff version 0.2.6 and later.
+This document relates to BDiff version 1.0.0-beta and later.
 
 See the file `LICENSE.md` for details of licensing and copyright.
 

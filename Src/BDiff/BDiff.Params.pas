@@ -1,52 +1,128 @@
-{
- * Implements a class that parses command lines and records parameters.
-}
+//!  BSD 3-clause license: see LICENSE.md
 
+///  <summary>BDiff command line parser.</summary>
+///  <remarks>Used by BDiff only.</remarks>
 
-unit UBDiffParams;
+unit BDiff.Params;
+
 
 interface
 
+
 uses
   // Project
-  UBaseParams, UBDiffTypes;
+  BDiff.Types,
+  Common.Params;
+
 
 type
 
-  TParams = class(TBaseParams)
-  private
-    fVerbose: Boolean;
-    fMinEqual: Integer;
-    fOldFileName: string;
-    fPatchFileName: string;
-    fNewFileName: string;
-    fFormat: TFormat;
+  ///  <summary>BDiff command line parser class.</summary>
+  TParams = class sealed(TBaseParams)
+  strict private
+    var
+      // Property values
+      fVerbose: Boolean;
+      fMinEqual: Integer;
+      fOldFileName: string;
+      fPatchFileName: string;
+      fNewFileName: string;
+      fFormat: TFormat;
+      fOverrideMaxSize: Boolean;
+
+    ///  <summary>Write accessor for <c>Format</c> property.</summary>
+    ///  <remarks>Parses and validates property value <c>Value</c>.</remarks>
     procedure SetFormat(const Value: string);
+
+    ///  <summary>Write accessor for <c>MinEqual</c> property.</summary>
+    ///  <remarks>Parses and validates property value <c>Value</c>.</remarks>
     procedure SetMinEqual(const Value: string);
-  protected
+
+  strict protected
+
+    ///  <summary>Parses options in long format (<c>--xxx</c>).</summary>
+    ///  <param name="Option">[in] The option to be processed.</param>
+    ///  <param name="ParamIdx">[in/out] The option index is passed in. If the
+    ///  option takes a parameter then this parameter must be increaed by one.
+    ///  </param>
+    ///  <param name="Terminated">[in/out] This parameter will always be
+    ///  <c>False</c> when called. It should be set to <c>True</c> if option
+    ///  processing should cease after processing this option.</param>
+    ///  <remarks>This method parses options unique to BDiff. The version and
+    ///  help options are parsed in the base class.</remarks>
     function ParseLongOption(const Option: string; var ParamIdx: Integer;
       var Terminated: Boolean): Boolean; override;
+
+    ///  <summary>Parses options in long format (<c>-x</c>).</summary>
+    ///  <param name="Option">[in] The option to be processed.</param>
+    ///  <param name="ParamIdx">[in/out] The option index is passed in. If the
+    ///  option takes a parameter then this parameter must be increaed by one.
+    ///  </param>
+    ///  <param name="Terminated">[in/out] This parameter will always be
+    ///  <c>False</c> when called. It should be set to <c>True</c> if option
+    ///  processing should cease after processing this option.</param>
+    ///  <remarks>This method parses options unique to BDiff. The version and
+    ///  help options are parsed in the base class.</remarks>
     function ParseShortOption(const Options: string; const OptionIdx: Integer;
       var ParamIdx: Integer; var Terminated: Boolean): Boolean; override;
+
+    ///  <summary>Parses and validates the given file name. Determines whether
+    ///  the file name is either the old or new file name.</summary>
     procedure ParseFileName(const FileName: string); override;
+
+    ///  <summary>Finalizes command line processing.</summary>
+    ///  <remarks>Validates the required file names have been provided.
+    ///  </remarks>
     procedure Finalize; override;
+
   public
+
+    ///  <summary>Object constructor. Sets default property values.</summary>
     constructor Create;
+
+    ///  <summary>Name of old file.</summary>
     property OldFileName: string read fOldFileName;
+
+    ///  <summary>Name of new file.</summary>
     property NewFileName: string read fNewFileName;
+
+    ///  <summary>Name of patch file.</summary>
     property PatchFileName: string read fPatchFileName;
+
+    ///  <summary>Minimum length of data chunks that can be recognized as equal.
+    ///  </summary>
     property MinEqual: Integer read fMinEqual default 24;
+
+    ///  <summary>Flag indicating whether output is to be verbose (<c>True</c>)
+    ///  or silent (<c>False</c>).</summary>
     property Verbose: Boolean read fVerbose default False;
-    property Help;
-    property Version;
+
+    ///  <summary>Format of patch output.</summary>
     property Format: TFormat read fFormat default FMT_QUOTED;
+
+    ///  <summary>Flag indicating whether to override maximum file size limit to
+    ///  permit oversize files to be diffed.</summary>
+    property OverrideMaxSize: Boolean read fOverrideMaxSize default False;
+
+    ///  <summary>Flag indicating whether the program's help screen is to be
+    ///  displayed or not.</summary>
+    property Help;
+
+    ///  <summary>Flag indicating whether the program's version information is
+    ///  to be displayed.</summary>
+    property Version;
+
   end;
+
 
 implementation
 
+
 uses
   // Delphi
-  SysUtils, StrUtils;
+  System.SysUtils,
+  System.StrUtils;
+
 
 { TParams }
 
@@ -59,6 +135,7 @@ begin
   fMinEqual := 24;
   fVerbose := False;
   fFormat := FMT_QUOTED;
+  fOverrideMaxSize := False;
 end;
 
 procedure TParams.Finalize;
@@ -89,8 +166,10 @@ begin
   if Result then
     Exit;
   Result := True;
+
   if Option = '--verbose' then
     fVerbose := True
+
   else if Option = '--output' then
   begin
     Inc(ParamIdx);
@@ -100,6 +179,7 @@ begin
   end
   else if AnsiStartsStr('--output=', Option) then
     fPatchFileName := StripLeadingChars(Option, Length('--output='))
+
   else if Option = '--format' then
   begin
     Inc(ParamIdx);
@@ -107,6 +187,7 @@ begin
   end
   else if AnsiStartsStr('--format=', Option) then
     SetFormat(StripLeadingChars(Option, Length('--format=')))
+
   else if Option = '--min-equal' then
   begin
     Inc(ParamIdx);
@@ -114,6 +195,10 @@ begin
   end
   else if AnsiStartsStr('--min-equal=', Option) then
     SetMinEqual(StripLeadingChars(Option, Length('--min-equal=')))
+
+  else if AnsiStartsStr('--permit-large-files', Option) then
+    fOverrideMaxSize := True
+
   else
     Result := False;
 end;
@@ -169,11 +254,10 @@ begin
 end;
 
 procedure TParams.SetMinEqual(const Value: string);
-var
-  X: Int64; // number parsed from command line
 begin
   if Value = '' then
     Error('missing argument to ''--min-equal'' / ''-m''');
+  var X: Int64;
   if not TryStrToInt64(Value, X) or (X < 0) then
     Error('malformed number on command line');
   if (X = 0) or (X > $7FFF) then

@@ -1,41 +1,39 @@
-;-------------------------------------------------------------------------------
-; Version information description file used to create VBDiff.res resource file.
+﻿;! BSD 3-clause license: see LICENSE.md
 ;
-; Usage:
-;   1) Generate a .rc resource source file from this file using DelphiDabbler
-;      Version Information Editor (https://delphidabbler.com/software/vied).
-;   2) Use the Borland BRCC32 resource compiler to compile the .rc file.
-;-------------------------------------------------------------------------------
+;  BDiff version information description file.
 
+[Macros]
+Import:version=..\VERSION
 
 [Fixed File Info]
-File Version #=0, 2, 9, 10
-Product Version #=0, 2, 9, 0
+File Version #=<%version.version>.<%version.build>
+Product Version #=<%version.version>
+File Sub-Type=0
 File OS=4
 File Type=1
-File Sub-Type=0
-File Flags Mask=63
 File Flags=0
+File Flags Mask=63
 
 [Variable File Info]
-Language=2057
 Character Set=1252
+Language=2057
 
 [String File Info]
-Comments=This program may be freely used and distributed providing the terms of the license are adhered to (see LICENSE.md).
-Company Name=
-File Description=Windows console application that outputs the difference of two binary files.
-File Version=v<#F1>.<#F2>.<#F3> Build <#F4>
+File Description=Windows console application that outputs the difference between two files.
+Product Version=v<#P1>.<#P2>.<#P3><%version.suffix>
+Comments=<%version.license>
+Legal Copyright=<%version.copyright>
 Internal Name=<SHORTFNAME>
-Legal Copyright=Original code copyright (C) 1999 by Stefan Reuther <Streu@gmx.de>. Portions copyright (C) 2003-<YEAR> by Peter Johnson (www.delphidabbler.com).
-Legal Trademark=
+Company Name=<%version.company>
 Original File Name=BDiff.exe
 Private Build=
-Product Name=<SHORTFNAME> <#P1>.<#P2>.<#P3>
-Product Version=Release <#P1>.<#P2>.<#P3>
+Product Name=<SHORTFNAME> <PRODUCTVERSION>
 Special Build=
+Legal Trademark=
+File Version=v<#F1>.<#F2>.<#F3> build <#F4>
 
 [Configuration Details]
-Identifier=
-NumRCComments=0
 ResOutputDir=
+NumRCComments=0
+Identifier=
+FileVersion=2

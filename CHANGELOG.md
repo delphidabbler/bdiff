@@ -1,5 +1,25 @@
 # BDiff / BPatch Change Log
 
+## v1.0.0-beta - 2023-06-02
+
+_BDiff_ v1.0.0-beta (build 11) & _BPatch_ v1.0.0-beta (build 11)
+
+* Added default limit of 10MiB on size of input files [issue #22].
+* Added `--permit-large-files` option to override 10MiB file size limit [issue #22].
+* Improved large file handling.
+* Fixed potential issue with temporary files [issue #29].
+* Fixed problematic detection of errors in opening and creating files [issue #30].
+* Changed to compile with Delphi 11.x [issue #12].
+* Removed `Makefile` and replaced with script to create and package releases [issue #26].
+* Significant refactoring and modernisation of code, including rationalisation of types and unit names.
+* License changed to BSD 3-clause license [issue #6].
+* Documentation:
+  * Rewrote `Build.md` re change from building from a makefile to building entirely from within Delphi IDE.
+  * Fixed errors and minor edits to documentation. 
+  * Updated BDiff manual page re file size limit and new `--permit-large-files` option.
+  * Updated copyright statement in help screens [issue #23].
+  * XMLDoc commented source code [issue #27].
+
 ## v0.2.9 - 2023-03-28
 
 _BDiff_ v0.2.9 (build 10) & _BPatch_ v0.2.9 (build 10)

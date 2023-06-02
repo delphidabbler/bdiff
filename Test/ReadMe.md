@@ -8,9 +8,9 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 2. Files named `Test1` and `Test2` must be located in the same directory as `Test.bat`. `Test1` and `Test2` must be different versions of the same file. Two sample files are provided. ***Do not modify `Test1` and `Test2`***.
 
-3. `Test.bat` must be able to find the copies of `BDiff.exe` and `BPatch.exe` that it is to test. By default they are expected to be in the `..\Build\Exe` directory relative to the directory where `Test.bat` is located.
+3. `Test.bat` must be able to find the copies of `BDiff.exe` and `BPatch.exe` that it is to test. By default they are expected to be in the `..\_build\exe` directory relative to the directory where `Test.bat` is located.
 
-    If the programs are not in `..\Build\Exe` then the `BDIFFPATH` environment variable must be set to the directory that contains both programs. Do not include a backslash at the end of the path.
+    If the programs are not in `..\_build\exe` then the `BDIFFPATH` environment variable must be set to the directory that contains both programs. Do not include a backslash at the end of the path.
 
 4. Files `Diff-b`, `Diff-f` and `Diff-q` must be in the test directory and ***must not be modified***. These files are used to check for the expected output from `test patch`, `test quoted` and `test filtered`, respectively. The tests will fail if these files or `Test1` or `Test2` have been modified.
 

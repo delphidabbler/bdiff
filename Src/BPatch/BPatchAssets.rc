@@ -1,0 +1,11 @@
+/*! BSD 3-clause license: see LICENSE.md */
+
+/*
+  Resource file for BPatch.
+
+  Includes all required resources except version information.
+*/
+
+
+/* Manifest file */
+1 24 "BPatch.manifest"
