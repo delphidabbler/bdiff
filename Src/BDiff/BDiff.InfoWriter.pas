@@ -51,12 +51,15 @@ begin
       + ' -b                         Use BINARY format'#13#10
       + '       --format=FMT         Use format FMT (''quoted'', ''filter[ed]'' '
       + 'or ''binary'')'#13#10
-      + ' -m N  --min-equal=N        Minimum equal bytes to recognize an equal chunk'
+      + ' -m N  --min-equal=N        Minimum equal bytes to recognize an equal '
+      + 'chunk'
       + #13#10
       + '                            Range 8..1024. Default 24.'
       + #13#10
-      + ' -o FN --output=FN          Set output file name (instead of stdout)'#13#10
-      + '       --permit-large-files Ignore 10MiB maximum file size limit'#13#10
+      + ' -o FN --output=FN          Set output file name (instead of stdout)'
+      + #13#10
+      + '       --permit-large-files Lifts the maximum file size limit from '
+      + '10MiB to 2GiB-1.'#13#10
       + ' -V    --verbose            Show status messages'#13#10
       + ' -h    --help               Show this help screen'#13#10
       + ' -v    --version            Show version information'#13#10,
