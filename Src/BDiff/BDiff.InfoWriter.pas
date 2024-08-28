@@ -53,6 +53,8 @@ begin
       + 'or ''binary'')'#13#10
       + ' -m N  --min-equal=N        Minimum equal bytes to recognize an equal chunk'
       + #13#10
+      + '                            Range 8..1024. Default 24.'
+      + #13#10
       + ' -o FN --output=FN          Set output file name (instead of stdout)'#13#10
       + '       --permit-large-files Ignore 10MiB maximum file size limit'#13#10
       + ' -V    --verbose            Show status messages'#13#10
