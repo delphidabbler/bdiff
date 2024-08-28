@@ -14,7 +14,7 @@ BDiff computes differences between two binary files. Text files are treated as a
 
 BDiff handles insertion and deletion of data as well as changed bytes.
 
-Files larger than 10MiB will not be processed unless the `--permit-large-files` option is specified (see _Options_ below).
+Files larger than 10MiB (10,485,760 bytes) will not be processed unless the `--permit-large-files` option is specified (see _Options_ below). When this option is specified files up to 2GiB -1 (2,147,483,647 bytes) can be processed, which is the maximum file size supported by the bdiff [binary file format](#binary-format). However, bdiff may report an out of memory for files below this limit, depending on the amount of memory available.
 
 ## Options
 
@@ -27,7 +27,7 @@ Files larger than 10MiB will not be processed unless the `--permit-large-files` 
 |`-m N`        | `--min-equal=N`| Two chunks of data are recognized as being identical if they are at least `N` bytes long. The value must be in the range `8..1024`. The default is `24`. |
 | `-o FILENAME` | `--output=FILENAME`| Write diff to specified file instead of standard output. Specifying `--output=-` does nothing. Use as an alternative to shell redirection. |
 | `-V`          | `--verbose`| Print status messages while processing input. |
-|               | `--permit-large-files` | Ignore maximum file size limit and permit files larger than the limit to be processed. |
+|               | `--permit-large-files` | Lifts the maximum file size limit from 10MiB to 2GiB-1. |
 |`-h`           | `--help`   | Show help screen and exit. |
 |`-v`           | `--version`| Show version number and exit. |
 

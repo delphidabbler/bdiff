@@ -20,9 +20,13 @@ type
   TMain = class(TObject)
   strict private
     const
-      ///  <summary>Maximum file size for which diffs can be calculated.
+      ///  <summary>Maximum file size for which diffs can be calculated unless
+      ///  maximum file size limit is overridden.
       ///  </summary>
-      MaxFileSize = 10_485_760;
+      RestrictedMaxFileSize: Int32 = 10_485_760;  // 10 MiB
+      ///  <summary>Absolute maximum file size supported by binary diff file
+      ///  format.</summary>
+      AbsoluteMaxFileSize: Int32 = High(Int32);   // 2GiB - 1
     ///  <summary>Displays the program help screen.</summary>
     class procedure DisplayHelp;
     ///  <summary>Displays the program version information.</summary>
@@ -70,27 +74,30 @@ uses
 
 class procedure TMain.CheckFileSizes(Params: TParams);
 
-  procedure SizeError(const FileName: string);
+  procedure SizeError(const AFileName: string; AMaxSize: Int32);
   begin
     Error(
       '"%s" is too large (> %.0n bytes)',
-      [FileName, Extended(MaxFileSize)],
+      [AFileName, Extended(AMaxSize)],
       TFormatSettings.Create
     );
   end;
 
-  function IsFileTooLarge(const FileName: string): Boolean;
+  function IsFileTooLarge(const AFileName: string; AMaxSize: Int32): Boolean;
   begin
-    Result := TFile.GetSize(FileName) > MaxFileSize;
+    Result := TFile.GetSize(AFileName) > AMaxSize;
   end;
 
 begin
+  var MaxFileSize: Int32;
   if Params.OverrideMaxSize then
-    Exit;
-  if IsFileTooLarge(Params.OldFileName) then
-    SizeError(Params.OldFileName);
-  if IsFileTooLarge(Params.NewFileName) then
-    SizeError(Params.NewFileName);
+    MaxFileSize := AbsoluteMaxFileSize
+  else
+    MaxFileSize := RestrictedMaxFileSize;
+  if IsFileTooLarge(Params.OldFileName, MaxFileSize) then
+    SizeError(Params.OldFileName, MaxFileSize);
+  if IsFileTooLarge(Params.NewFileName, MaxFileSize) then
+    SizeError(Params.NewFileName, MaxFileSize);
 end;
 
 class procedure TMain.CreateDiff(Params: TParams);
