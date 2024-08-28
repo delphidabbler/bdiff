@@ -75,35 +75,25 @@ begin
   // get size of version info
   var Dummy: DWORD;
   var VerInfoSize := GetFileVersionInfoSize(PChar(ProgramPath), Dummy);
-  if VerInfoSize > 0 then
-  begin
-    // create buffer and read version info into it
-    var VerInfoBuf: Pointer;
-    GetMem(VerInfoBuf, VerInfoSize);
-    try
-      if GetFileVersionInfo(
-        PChar(ProgramPath), Dummy, VerInfoSize, VerInfoBuf
-      ) then
-      begin
-        // get fixed file info from version info (ValPtr points to it)
-        var ValPtr: Pointer;
-        if VerQueryValue(VerInfoBuf, '\', ValPtr, Dummy) then
-        begin
-          var FFI := PVSFixedFileInfo(ValPtr)^;
-          // Build version info string from product version field of FFI
-          Result := Format(
-            '%d.%d.%d',
-            [
-              HiWord(FFI.dwProductVersionMS),
-              LoWord(FFI.dwProductVersionMS),
-              HiWord(FFI.dwProductVersionLS)
-            ]
-          );
-        end
-      end;
-    finally
-      FreeMem(VerInfoBuf);
-    end;
+  if VerInfoSize = 0 then
+    Exit;
+
+  // create buffer and read version info into it
+  var VerInfoBuf: Pointer;
+  GetMem(VerInfoBuf, Integer(VerInfoSize));
+  try
+    if not GetFileVersionInfo(
+      PChar(ProgramPath), Dummy, VerInfoSize, VerInfoBuf
+    ) then
+      Exit;
+    var PBuf: Pointer;
+    var Len: UINT;
+    const SubBlock = '\StringFileInfo\080904E4\ProductVersion';
+    if not VerQueryValue(VerInfoBuf, PChar(SubBlock), PBuf, Len) then
+      Exit;
+    Result := PChar(PBuf);
+  finally
+    FreeMem(VerInfoBuf);
   end;
 end;
 
