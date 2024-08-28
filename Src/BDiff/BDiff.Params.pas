@@ -20,6 +20,10 @@ type
   ///  <summary>BDiff command line parser class.</summary>
   TParams = class sealed(TBaseParams)
   strict private
+    const
+      MinMinEqual = 8;
+      MaxMinEqual = 1024;
+      DefMinEqual = 24;
     var
       // Property values
       fVerbose: Boolean;
@@ -132,7 +136,7 @@ begin
   fOldFileName := '';
   fNewFileName := '';
   fPatchFileName := '';
-  fMinEqual := 24;
+  fMinEqual := DefMinEqual;
   fVerbose := False;
   fFormat := FMT_QUOTED;
   fOverrideMaxSize := False;
@@ -260,8 +264,11 @@ begin
   var X: Int64;
   if not TryStrToInt64(Value, X) or (X < 0) then
     Error('malformed number on command line');
-  if (X = 0) or (X > $7FFF) then
-    Error('number out of range on command line');
+  if (X < MinMinEqual) or (X > MaxMinEqual) then
+    Error(
+      '''--min-equal'' / ''-m'': value must be in range %0:d..%1:d',
+      [MinMinEqual, MaxMinEqual]
+    );
   fMinEqual := Integer(X);
 end;
 
