@@ -24,7 +24,7 @@ Files larger than 10MiB will not be processed unless the `--permit-large-files` 
 | `-f`         |             | Use filtered format. |
 | `-b`         |             | Use binary format. |
 |              | `--format=FMT`| Select format by name: `FMT` is one of `binary`, `filtered` or `quoted`. |
-|`-m N`        | `--min-equal=N`| Two chunks of data are recognized as being identical if they are at least `N` bytes long, the default is `24`. |
+|`-m N`        | `--min-equal=N`| Two chunks of data are recognized as being identical if they are at least `N` bytes long. The value must be in the range `8..1024`. The default is `24`. |
 | `-o FILENAME` | `--output=FILENAME`| Write diff to specified file instead of standard output. Specifying `--output=-` does nothing. Use as an alternative to shell redirection. |
 | `-V`          | `--verbose`| Print status messages while processing input. |
 |               | `--permit-large-files` | Ignore maximum file size limit and permit files larger than the limit to be processed. |
