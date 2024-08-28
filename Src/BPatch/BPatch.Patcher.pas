@@ -23,7 +23,7 @@ type
 
     const
       ///  <summary>Size of buffer used when reading files.</summary>
-      BUFFER_SIZE = 4096;
+      BUFFER_SIZE = 1_048_576; // 1MiB
 
     type
       ///  <summary>Buffer used when reading from a file.</summary>
