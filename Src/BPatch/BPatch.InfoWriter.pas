@@ -49,9 +49,9 @@ const
     If new-file is not provided old-file is updated in place
 
     Valid options:
-     -i FN --input=FN     Set input file name (instead of stdin)
-     -h    --help         Show this help screen
-     -v    --version      Show version information
+     -i FN --input=FN     Set input file name (instead of stdin).
+     -h    --help         Show this help screen.
+     -v    --version      Show version information.
 
     ''';
 begin
