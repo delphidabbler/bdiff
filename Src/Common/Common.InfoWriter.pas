@@ -45,7 +45,7 @@ begin
   Result := '''
 
     (c) copyright 1999 Stefan Reuther <Streu@gmx.de>
-    (c) copyright 2003-2023 Peter Johnson <https://delphidabbler.com>
+    (c) copyright 2003-2024 Peter Johnson <https://delphidabbler.com>
     ''';
 end;
 
