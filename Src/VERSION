@@ -4,8 +4,8 @@
 
 # Version & build numbers
 version=1.0.0
-build=11
-suffix=-beta
+build=12
+suffix=-beta.2
 
 # String file information
 copyright=Copyright (C) 1999-<YEAR> by Stefan Reuther <Streu@gmx.de> and Peter Johnson (delphidabbler.com).

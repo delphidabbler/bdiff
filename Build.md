@@ -4,9 +4,9 @@ These instructions only apply to building the current release of _BDiff / BPatch
 
 ## Introduction
 
-_BDiff / BPatch_ are written in Object Pascal and are designed to be compiled with Delphi 11 Alexandria. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
+_BDiff / BPatch_ are written in Object Pascal and are designed to be compiled with Delphi 12.1. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
 
-> Versions of Delphi other than Delphi 11 Alexandria may work, providing they support fully qualified unit scope names. However, no other compilers have been tested.
+> Versions of Delphi later than Delphi 12.0 may work. Older compilers will fail to compile the code. However, no other compilers have been tested.
 
 Both _BDiff_ and _BPatch_ should only be compiled as 32 bit targets.
 
@@ -20,7 +20,7 @@ You need DelphiDabbler [_Version Information Editor_](https://github.com/delphid
 
 The environment variable can either be set in your global environment variables or from within the Delphi IDE by using the _IDE | Environment Variables_ page of Delphi's _Tools | Options_ dialogue box.
 
-This program is required to convert the `.vi` files that specify version information into an intermediate `.rc` file that is compiled by `BRCC32`.
+_Version Information Editor_ is required to convert the `.vi` files that specify version information into an intermediate `.rc` file that is compiled by `BRCC32`.
 
 ### Building releases using `Deploy.bat`
 
