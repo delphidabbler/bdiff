@@ -14,7 +14,7 @@ _BDiff_ and _BPatch_ are derived from Stefan Reuther's _bdiff_ and _bpatch_ v0.2
 
 The original C source was translated into Object Pascal by [Peter D Johnson](https://gravatar.com/delphidabbler). The programs are based on updates of the Pascal code base.
 
-The programs should run on any current version of Windows.
+The programs should run on Windows 7 SP1 and later.
 
 For more information see the see the [project web pages](http://delphidabbler.com/software/bdiff).
 

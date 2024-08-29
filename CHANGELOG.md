@@ -1,5 +1,22 @@
 # BDiff / BPatch Change Log
 
+## v1.0.0-beta.2 - 2024-08-29
+
+_BDiff_ v1.0.0-beta.2 (build 12) & _BPatch_ v1.0.0-beta.2 (build 12)
+
+* Imposed limits to the value of the _BDiff_ `--min-equal` option. Values must fall with the range 8..1024 [issue #33].
+* Increased the size of the _BPatch_ file read buffer from 4KiB to 64KiB [issue #34].
+* Set an absolute limit to the size of files that can be processed by _BDiff_ when the `--permit-large-files` is used. This is 2,147,483,647 bytes, the largest file size supported by the binary diff file format [issue #32].
+* Fixed bug where the `--version` command of both _BDiff_ and _BPatch_ was not reporting beta status [issue #35].
+* Updated the _BDiff_ help screen re the changes to the `--min-equal` option, the absolute file size limit and to add a note of default values, where appropriate. The help screen was reformatted.
+* Minor punctuation changes to the _BPatch_ help screen.
+* Refactored methods that display _BDiff_ and _BPatch_ help and copyright text to use multi-line string literals.
+* Changed to compile with Delphi 12.1 [issue #38].
+* Documentation:
+  * Updated the _BDiff_ manual page re changes to the `--min-equal` option and the absolute file size limit, to note a default value and to fix a typo.
+  * Updated `README.md` to correct error in note of supported Windows versions.
+  * Updated `Build.md` re change from Delphi 11 to Delphi 12, along with minor edits.
+
 ## v1.0.0-beta - 2023-06-02
 
 _BDiff_ v1.0.0-beta (build 11) & _BPatch_ v1.0.0-beta (build 11)
