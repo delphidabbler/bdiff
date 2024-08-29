@@ -39,21 +39,23 @@ uses
 { TBPatchInfoWriter }
 
 class function TBPatchInfoWriter.HelpText: string;
+const
+  Content = '''
+    %0:s: binary 'patch' - apply binary patch
+
+    Usage: %0:s [options] old-file [new-file] [<patch-file]
+
+    Creates new-file from old-file and patch-file
+    If new-file is not provided old-file is updated in place
+
+    Valid options:
+     -i FN --input=FN     Set input file name (instead of stdin)
+     -h    --help         Show this help screen
+     -v    --version      Show version information
+
+    ''';
 begin
-  Result := Format(
-    '%0:s: binary ''patch'' - apply binary patch'#13#10
-      + #13#10
-      + 'Usage: %0:s [options] old-file [new-file] [<patch-file]'#13#10#13#10
-      + 'Creates new-file from old-file and patch-file'#13#10
-      + 'If new-file is not provided old-file is updated in place'#13#10
-      + #13#10
-      + 'Valid options:'#13#10
-      + ' -i FN --input=FN     Set input file name (instead of stdin)'
-      + #13#10
-      + ' -h    --help         Show this help screen'#13#10
-      + ' -v    --version      Show version information'#13#10,
-    [TAppInfo.ProgramFileName]
-  );
+  Result := Format(Content, [TAppInfo.ProgramFileName]);
 end;
 
 end.

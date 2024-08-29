@@ -42,10 +42,11 @@ uses
 
 class function  TInfoWriter.CopyrightHelpText: string;
 begin
-  Result := #13#10
-    + '(c) copyright 1999 Stefan Reuther <Streu@gmx.de>'#13#10
-    + '(c) copyright 2003-2023 Peter Johnson <https://delphidabbler.com>'
-    + #13#10;
+  Result := '''
+
+    (c) copyright 1999 Stefan Reuther <Streu@gmx.de>
+    (c) copyright 2003-2023 Peter Johnson <https://delphidabbler.com>
+    ''';
 end;
 
 class procedure TInfoWriter.HelpScreen;
