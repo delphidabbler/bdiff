@@ -42,7 +42,7 @@ For information on how to build the Pascal source, see `Build.md` in the root of
 
 ### C Source
 
-The original C source code can be downloaded from http://phost.de/~stefan/Files/bdiff-02.zip.
+The original C source code can be downloaded from [Google Drive](https://drive.google.com/file/d/1KQ3k44NFkOdSDU7-OtNi7JKVs5Mr_gt1/view).
 
 ## Copyright and License
 
