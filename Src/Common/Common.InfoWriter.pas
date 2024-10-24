@@ -62,8 +62,13 @@ begin
   // file instead
   TCommonIO.WriteStrFmt(
     TCommonIO.StdOut,
-    '%s-%s %s '#13#10,
-    [TAppInfo.ProgramBaseName, TAppInfo.ProgramVersion, TAppInfo.ProgramExeDate]
+    '%s-%s %s (%s)'#13#10,
+    [
+      TAppInfo.ProgramBaseName,
+      TAppInfo.ProgramVersion,
+      TAppInfo.ProgramExeDate,
+      TAppInfo.ProgramPlatform
+    ]
   );
 end;
 
