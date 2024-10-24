@@ -38,7 +38,7 @@ if "%1"=="" goto paramerror
 
 :: Check for required environment variables
 if "%ZipRoot%"=="" goto envvarerror
-if "%VIEdRoot"=="" goto envvarerror
+if "%VIEdRoot%"=="" goto envvarerror
 
 :: Set variables
 set Version=%1
