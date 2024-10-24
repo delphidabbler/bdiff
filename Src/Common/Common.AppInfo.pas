@@ -27,6 +27,8 @@ type
     class function ProgramVersion: string;
     ///  <summary>Last modification date of program's executable file.</summary>
     class function ProgramExeDate: string;
+    ///  <summary>The platform for which the program was compiled.</summary>
+    class function ProgramPlatform: string;
   end;
 
 
@@ -66,6 +68,17 @@ end;
 class function TAppInfo.ProgramPath: string;
 begin
   Result := ParamStr(0);
+end;
+
+class function TAppInfo.ProgramPlatform: string;
+begin
+  {$IF Defined(WIN32)}
+  Result := 'Windows 32 bit';
+  {$ELSEIF Defined(WIN64)}
+  Result := 'Windows 64 bit';
+  {$ELSE}
+  {$Message Fatal 'Unsupported platform'}
+  {$IFEND}
 end;
 
 class function TAppInfo.ProgramVersion: string;
