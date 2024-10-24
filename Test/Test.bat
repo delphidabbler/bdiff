@@ -1,8 +1,10 @@
-@rem ---------------------------------------------------------------------------
-@rem Script used to run tests on BDiff and BPatch.
-@rem
-@rem See file ReadMe.md for a description of available tests and requirements.
-@rem ---------------------------------------------------------------------------
+::!  BSD 3-clause license: see LICENSE.md
+
+:: ---------------------------------------------------------------------------
+:: Script used to run tests on BDiff and BPatch.
+::
+:: See file ReadMe.md for a description of available tests and requirements.
+:: ---------------------------------------------------------------------------
 
 
 @echo off
