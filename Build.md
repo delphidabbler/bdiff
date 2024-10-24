@@ -4,7 +4,7 @@ These instructions only apply to building the current release of _BDiff / BPatch
 
 ## Introduction
 
-_BDiff / BPatch_ are written in Object Pascal and are designed to be compiled with Delphi 12.1. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
+_BDiff / BPatch_ are written in Object Pascal and are designed to be compiled with Delphi 12.2. The programs can be built entirely from within the Delphi IDE, provided that some [prerequisites](#prerequisites) are met.
 
 > Versions of Delphi later than Delphi 12.0 may work. Older compilers will fail to compile the code. However, no other compilers have been tested.
 
