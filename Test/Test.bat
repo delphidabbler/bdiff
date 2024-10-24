@@ -32,6 +32,7 @@ goto usage
 
 rem Run patch test
 :DoPatchTest
+if "%2"=="large" goto DoLargePatchTest
 echo --- Creating Patch with bdiff ---
 %BDiff% Test1 Test2 --output=Patch --verbose -b
 if errorlevel 1 set ErrorMsg=BDiff failed
@@ -46,6 +47,22 @@ if not "%ErrorMsg%"=="" goto error
 echo.
 echo --- Testing patched file against original with fc ---
 fc Test2 Test3
+echo.
+goto end
+
+rem Run Large patch test
+:DoLargePatchTest
+echo --- Creating large Patch with bdiff ---
+%BDiff% Test1_Large Test2_Large --output=Patch_Large --verbose -b
+if errorlevel 1 set ErrorMsg=BDiff failed with large binary test
+echo.
+echo --- Applying Patch with bpatch ---
+%BPatch% Test1_Large Test3_Large --input=Patch_Large
+if errorlevel 1 set ErrorMsg=BPatch failed on large binary test
+if not "%ErrorMsg%"=="" goto error
+echo.
+echo --- Testing patched file against original with fc ---
+fc Test2_Large Test3_Large
 echo.
 goto end
 
@@ -97,15 +114,17 @@ goto end
 rem Remove generated files
 :DoClean
 del Test3 2>nul
+del Test3_Large 2>nul
 del Diff 2>nul
 del Patch 2>nul
+del Patch_Large 2>nul
 goto end
 
 :usage
 if not "%ErrorMsg%" == "" echo *** ERROR: %ErrorMsg%
 echo Usage is:
-echo   test.bat patch
-echo     test binary patching
+echo   test.bat patch [large]
+echo     test binary patching (specify large to use larger test files)
 echo   test.bat quoted [view]
 echo     test quoted text diff (specify view to display diff in notepad)
 echo   test.bat filtered [view]

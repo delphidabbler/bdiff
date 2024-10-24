@@ -6,7 +6,7 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 1. `Test.bat` must be run from a command line console which has its current directory set to the directory that contains `Test.bat`.
 
-2. Files named `Test1` and `Test2` must be located in the same directory as `Test.bat`. `Test1` and `Test2` must be different versions of the same file. Two sample files are provided. ***Do not modify `Test1` and `Test2`***.
+2. Files named `Test1`, `Test2`, `Test1_Large` and `Test2_Large` must be located in the same directory as `Test.bat`. `Test1` and `Test2` must be different versions of the same file and must be smaller than 64KiB. `Test1_Large` and `Test2_Large` must be different versions of the same file and must be larger than 128KiB. Sample files are provided. ***Do not modify `Test1` and `Test2`***. `Test1_Large` and `Test2_Large` _may_ be modified, but don't make them the same.
 
 3. `Test.bat` must be able to find the copies of `BDiff.exe` and `BPatch.exe` that it is to test. By default they are expected to be in the `..\_build\exe` directory relative to the directory where `Test.bat` is located.
 
@@ -16,13 +16,23 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 ## Tests
 
-### Patching test
+### Patching tests
+
+#### Small file test
 
 Run the test by entering the command: 
 
     Test.bat patch
     
 BDiff is run on `Test1` and `Test2` and creates a binary diff file named `Patch`. BPatch then applies `Patch` to `Test1` to create `Test3`, which should be identical to `Test2`. The Windows FC command is used to verify that `Test2` and `Test3` are in fact the same and that `Patch` is as expected (it must be the same as `Diff-p`).
+
+#### Large file test
+
+Run the test by entering the command: 
+
+    Test.bat patch large
+    
+BDiff is run on `Test1_Large` and `Test2_Large` and creates a binary diff file named `Patch_Large`. BPatch then applies `Patch_Large` to `Test1_Large` to create `Test3_Large`, which should be identical to `Test2_Large`. The Windows FC command is used to verify that `Test2_Large` and `Test3_Large` are in fact the same. There is no check that `Patch_Large` is as expected.
 
 ### Quoted format diff test
 
