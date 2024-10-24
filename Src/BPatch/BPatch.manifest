@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 
 <!--
+ *!BSD 3-clause license: see LICENSE.md
+ *
  * Manifest file for BPatch. Specifies execution level required for Vista.
  *
  * Based on a sample manifest in "Windows Vista User Account Control (UAC) and

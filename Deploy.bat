@@ -2,8 +2,9 @@
 ::
 ::  Deploy script for BDiff/BPatch.
 ::
-::  This script compiles release versions BDiff, including BDiff & BPatch and
-::  places then into a single zip file ready for release.
+::  This script compiles the 32 and 64 bit Windows releases versions of BDiff,
+::  including BDiff & BPatch, and stores both programs in zip files ready for
+::  release. There are different zip files for the 32 and 64 bit releases.
 ::
 ::  This script uses MSBuild and InfoZip's zip.exe. The MSBuild project also
 ::  requires the DelphiDabbler Version Information Editor.
@@ -34,18 +35,23 @@ echo Deploying BDiff Release
 echo -----------------------
 
 :: Check for required parameter
+
 if "%1"=="" goto paramerror
 
 :: Check for required environment variables
+
 if "%ZipRoot%"=="" goto envvarerror
 if "%VIEdRoot%"=="" goto envvarerror
 
 :: Set variables
+
 set Version=%1
 set BuildRoot=.\_build
-set ExeDir=%BuildRoot%\exe
+set Exe32Dir=%BuildRoot%\Win32\exe
+set Exe64Dir=%BuildRoot%\Win64\exe
 set ReleaseDir=%BuildRoot%\release
-set ZipFile=%ReleaseDir%\bdiff-exe-%Version%.zip
+set ZipFile32=%ReleaseDir%\bdiff-exe32-%Version%.zip
+set ZipFile64=%ReleaseDir%\bdiff-exe64-%Version%.zip
 set SrcDir=Src
 set DocsDir=Docs
 
@@ -54,36 +60,48 @@ if exist %BuildRoot% rmdir /S /Q %BuildRoot%
 mkdir %ReleaseDir%
 
 :: Build Pascal
+
+:: BDiff
 setlocal
 cd %SrcDir%\BDiff
 echo.
 echo Building BDiff
 echo.
 msbuild BDiff.dproj /p:config=Base /p:platform=Win32
+msbuild BDiff.dproj /p:config=Base /p:platform=Win64
 echo.
 endlocal
 
+:: BPatch
 setlocal
 cd %SrcDir%\BPatch
 echo.
 echo Building BPatch
 echo.
 msbuild BPatch.dproj /p:config=Base /p:platform=Win32
+msbuild BPatch.dproj /p:config=Base /p:platform=Win64
 echo.
 endlocal
 
 :: Create zip files
+
 echo.
 echo Creating zip files
-%ZipRoot%\zip.exe -j -9 %ZipFile% %ExeDir%\BDiff.exe
-%ZipRoot%\zip.exe -j -9 %ZipFile% %ExeDir%\BPatch.exe
-%ZipRoot%\zip.exe -r -9 %ZipFile% %DocsDir%\BDiff.md
-%ZipRoot%\zip.exe -r -9 %ZipFile% %DocsDir%\BPatch.md
-%ZipRoot%\zip.exe -j -9 %ZipFile% README.md LICENSE.md CHANGELOG.md
-%ZipRoot%\zip.exe -r -9 %ZipFile% Test
+:: 32 bit
+%ZipRoot%\zip.exe -j -9 %ZipFile32% %Exe32Dir%\BDiff.exe
+%ZipRoot%\zip.exe -j -9 %ZipFile32% %Exe32Dir%\BPatch.exe
+%ZipRoot%\zip.exe -r -9 %ZipFile32% %DocsDir%\BDiff.md
+%ZipRoot%\zip.exe -r -9 %ZipFile32% %DocsDir%\BPatch.md
+%ZipRoot%\zip.exe -j -9 %ZipFile32% README.md LICENSE.md CHANGELOG.md
+%ZipRoot%\zip.exe -r -9 %ZipFile32% Test
+:: 64 bit
+%ZipRoot%\zip.exe -j -9 %ZipFile64% %Exe64Dir%\BDiff.exe
+%ZipRoot%\zip.exe -j -9 %ZipFile64% %Exe64Dir%\BPatch.exe
+%ZipRoot%\zip.exe -r -9 %ZipFile64% %DocsDir%\BDiff.md
+%ZipRoot%\zip.exe -r -9 %ZipFile64% %DocsDir%\BPatch.md
+%ZipRoot%\zip.exe -j -9 %ZipFile64% README.md LICENSE.md CHANGELOG.md
+%ZipRoot%\zip.exe -r -9 %ZipFile64% Test
 
-
-del %ReadMe%
 
 echo.
 echo ---------------
@@ -107,4 +125,5 @@ echo.
 goto end
 
 :: End
+
 :end

@@ -1,5 +1,23 @@
 # BDiff / BPatch Change Log
 
+## v1.0.0-rc.1 - 2024-10-24
+
+_BDiff_ v1.0.0-rc.1 (build 13) & _BPatch_ v1.0.0-rc.1 (build 13)
+
+* Added 64 bit versions of both _BDiff_ and _BPatch_ [issue #36].
+* _BDiff_ and _BPatch_ `--version` commands now display platform information to make it possible to distinguish between 32 and 64 bit versions.
+* Changed to compile with Delphi 12.2.
+* Revised `Deploy.bat` to compile and package 32 and 64 bit releases in separate zip files.
+* Fixed bug in `Deploy.bat` [issue #42].
+* Changes to tests:
+  * Added new binary patch test for larger (> 64KiB) files [issue #40].
+  * Revised to be able to test both 32 and 64 bit executable files located in `_build\Win32` and `_build\Win64` directories using new `Test32.bat` and `Test64.bat` scripts.
+  * Refactored `Test.bat`.
+* Documentation:
+  * Changed link to original C source code in `README.md` [issue #41].
+  * Updated `README.md` and `Build.md` re addition of 64 bit build and release of _BDiff_ and _BPatch_.
+  * Updated `Test\ReadMe.md` re changes to tests.
+
 ## v1.0.0-beta.2 - 2024-08-29
 
 _BDiff_ v1.0.0-beta.2 (build 12) & _BPatch_ v1.0.0-beta.2 (build 12)
