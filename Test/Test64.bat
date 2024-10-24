@@ -12,7 +12,10 @@
 
 setlocal
 
+:: Set path to 64 bit exe directory relative to Test directory
 set BDIFFPATH=..\_build\Win64\exe
+
+:: Run Test script, passing along all parameters
 call Test %*
 
 endlocal
