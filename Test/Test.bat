@@ -10,11 +10,23 @@
 setlocal
 
 rem Get directory containing BDiff and BPatch
-set ExeDir=..\_build\exe
-if not "%BDIFFPATH%" == "" set ExeDir=%BDIFFPATH%
-rem Record path to BDiff and BPatch
-set BDiff=%ExeDir%\BDiff.exe
-set BPatch=%ExeDir%\BPatch.exe
+if "%BDIFFPATH%" == "" (
+    set ErrorMsg=BDIFFPATH must be set to directory containing BDiff.exe and BPatch.exe
+    goto error
+)
+set ExeDir=%BDIFFPATH%
+
+rem Record and validate path to BDiff and BPatch
+set BDiff="%ExeDir%\BDiff.exe"
+set BPatch="%ExeDir%\BPatch.exe"
+if not exist %BDiff% (
+    set ErrorMsg=BDiff.exe does not exist in %BDIFFPATH%
+    goto error
+)
+if not exist %BPatch% (
+    set ErrorMsg=BPatch.exe does not exist in %BDIFFPATH%
+    goto error
+)
 
 rem Clear error message
 set ErrorMsg=
