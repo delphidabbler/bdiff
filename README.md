@@ -18,9 +18,15 @@ The programs should run on Windows 7 SP1 and later.
 
 For more information see the see the [project web pages](http://delphidabbler.com/software/bdiff).
 
-## Installation
+## Installation & Uninstallation
 
-Copy the provided executable files to the required location. No further installation is required.
+_BDiff_ and _BPatch_ are available as both 32 bit and 64 bit Windows console applications.
+
+The latest release can be downloaded from the project's [GitHub releases page](https://github.com/delphidabbler/bdiff/releases).
+
+Both programs are packaged together in a zip file. There is one zip file for the 32 bit Windows version and another for the 64 bit Windows version. Download the desired version and unzip the file.
+
+Copy the both executable files to the required location. Always place both programs in the same directory. No further installation is required.
 
 You may want to modify the Windows PATH environment variable to include the location of the programs.
 
@@ -28,7 +34,7 @@ To uninstall simply delete the programs. They make no changes to the system. If 
 
 ## Tests
 
-You can test the operation of _BDiff_ and _BPatch_ using the `Test.bat` script in the `Test` directory. See `ReadMe.md` in that directory for details.
+You can test the operation of _BDiff_ and _BPatch_ using the `Test.bat`, `Test32.bat` and `Test64.bat` scripts in the `Test` directory. See `ReadMe.md` in that directory for details.
 
 ## Source Code
 
