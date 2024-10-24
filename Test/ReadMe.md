@@ -6,11 +6,11 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 1. `Test.bat` must be run from a command line console which has its current directory set to the directory that contains `Test.bat`.
 
-2. Files named `Test1`, `Test2`, `Test1_Large` and `Test2_Large` must be located in the same directory as `Test.bat`. `Test1` and `Test2` must be different versions of the same file and must be smaller than 64KiB. `Test1_Large` and `Test2_Large` must be different versions of the same file and must be larger than 128KiB. Sample files are provided. ***Do not modify `Test1` and `Test2`***. `Test1_Large` and `Test2_Large` _may_ be modified, but don't make them the same.
+2. The `BDIFFPATH` environment variable must be set to the directory containing both `BDiff.exe` and `BPatch.exe`. `Test.bat` uses this environment variable to find the correct versions of the programs to test. 
 
-3. `Test.bat` must be able to find the copies of `BDiff.exe` and `BPatch.exe` that it is to test. By default they are expected to be in the `..\_build\exe` directory relative to the directory where `Test.bat` is located.
+    `Test.bat` will stop with an error if `BDIFFPATH` is not set or if either of `BDiff.exe` or `BPatch.exe` is not in the directory stored in `BDIFFPATH`.
 
-    If the programs are not in `..\_build\exe` then the `BDIFFPATH` environment variable must be set to the directory that contains both programs. Do not include a backslash at the end of the path.
+3. Files named `Test1`, `Test2`, `Test1_Large` and `Test2_Large` must be located in the same directory as `Test.bat`. `Test1` and `Test2` must be different versions of the same file and must be smaller than 64KiB. `Test1_Large` and `Test2_Large` must be different versions of the same file and must be larger than 128KiB. ***Do not modify `Test1` and `Test2`***. `Test1_Large` and `Test2_Large` _may_ be modified, but don't make them the same. Samples of all these files are provided. 
 
 4. Files `Diff-b`, `Diff-f` and `Diff-q` must be in the test directory and ***must not be modified***. These files are used to check for the expected output from `test patch`, `test quoted` and `test filtered`, respectively. The tests will fail if these files or `Test1` or `Test2` have been modified.
 
@@ -22,7 +22,7 @@ This directory contains a set of tests of _BDiff_ and _BPatch_. They are run by 
 
 Run the test by entering the command: 
 
-    Test.bat patch
+    Test patch
     
 BDiff is run on `Test1` and `Test2` and creates a binary diff file named `Patch`. BPatch then applies `Patch` to `Test1` to create `Test3`, which should be identical to `Test2`. The Windows FC command is used to verify that `Test2` and `Test3` are in fact the same and that `Patch` is as expected (it must be the same as `Diff-p`).
 
@@ -30,7 +30,7 @@ BDiff is run on `Test1` and `Test2` and creates a binary diff file named `Patch`
 
 Run the test by entering the command: 
 
-    Test.bat patch large
+    Test patch large
     
 BDiff is run on `Test1_Large` and `Test2_Large` and creates a binary diff file named `Patch_Large`. BPatch then applies `Patch_Large` to `Test1_Large` to create `Test3_Large`, which should be identical to `Test2_Large`. The Windows FC command is used to verify that `Test2_Large` and `Test3_Large` are in fact the same. There is no check that `Patch_Large` is as expected.
 
@@ -38,11 +38,11 @@ BDiff is run on `Test1_Large` and `Test2_Large` and creates a binary diff file n
 
 Run the test by entering the command: 
 
-    Test.bat quoted
+    Test quoted
 
 or
 
-    Test.bat quoted view
+    Test quoted view
     
 BDiff is run on `Test1` and `Test2` and creates a quoted text diff file named `Diff` that is compared against the expected content in `Diff-q`. If the optional `view` parameter is provided `Diff` is displayed in NotePad.
 
@@ -50,11 +50,11 @@ BDiff is run on `Test1` and `Test2` and creates a quoted text diff file named `D
 
 Run the test by entering the command: 
 
-    Test.bat filtered
+    Test filtered
     
 or
 
-    Test.bat filtered view
+    Test filtered view
 
 BDiff is run on `Test1` and `Test2` and creates a filtered text diff file named `Diff` that is compared against the expected content in `Diff-f`. If the optional `view` parameter is provided `Diff` is displayed in NotePad.
 
@@ -62,7 +62,7 @@ BDiff is run on `Test1` and `Test2` and creates a filtered text diff file named 
 
 Run the test by entering the command: 
 
-    Test.bat version
+    Test version
     
 Both BDiff and BPatch are called with the `--version` option and both output their current version on the console. You should check that they report the expected version numbers.
 
@@ -70,17 +70,28 @@ Both BDiff and BPatch are called with the `--version` option and both output the
 
 Run the test by entering the command: 
 
-    Test.bat help
+    Test help
 
 Both BDiff and BPatch are called with the `--help` option and both output their help screen on the console.
 
-## Clean up
+### Clean up
 
 To delete all the files generated by running tests run the command:
 
-    Test.bat clean
+    Test clean
 
-## Example
+## Helper scripts
+
+The most common use case for `Test.bat` is to test the programs that have just been compiled. For this reason two helper script files are provided. They are:
+
+1. `Test32.bat`
+2. `Test64.bat`
+
+These files set the `%BDIFFPATH%` environment variable to the directories where the compiler outputs the 32 bit and 64 bit Windows executables, respectively. Both scripts then call `Test.bat`, passing along all parameters.
+
+## Examples
+
+### Example 1
 
 Suppose the versions of BDiff and BPatch to be tested are in `C:\Utils` and you want to:
 
@@ -92,15 +103,15 @@ Assume that `Test.bat` is stored in `D:\BDiff\Test`.
 
 Open a command console then enter the following commands. In the following, items preceded by `>` are the commands you type and any following text represents the output (your output may vary).
 
-    >cd D:\BDiff\Test
+    >cd C:\BDiff\Test
     
     >D:
     
     >set BDIFFPATH=C:\Utils
    
     >Test version
-    bdiff-0.2.6 02 Aug 2009
-    bpatch-0.2.6 02 Aug 2009
+    bdiff-1.0.0-rc.1 2024-10-24 (Windows 64 bit)
+    bpatch-1.0.0-rc.1 2024-10-24 (Windows 64 bit)
     Done
     
     >Test patch
@@ -124,4 +135,42 @@ Open a command console then enter the following commands. In the following, item
     Done
 
     >Test clean
+    Done
+
+### Example 2
+
+Assume that `Test.bat` and `Test64.bat` are both in `D:\BDiff\Test` and that Delphi has compiled the 64 bit of the programs into `D:\BDiff\_build\Win64\exe`. You can test recently built 64 bit versions of the programs with the following:
+
+    >cd C:\BDiff\Test
+    
+    >D:
+
+    >Test64 version
+    bdiff-1.0.0-rc.1 2024-10-24 (Windows 64 bit)
+    bpatch-1.0.0-rc.1 2024-10-24 (Windows 64 bit)
+    Done
+
+    >Test64 patch
+    << output omitted: same as example 1 >>
+
+    >Test64 clean
+    Done
+
+### Example 3
+
+Assume that `Test.bat` and `Test32.bat` are both in `D:\BDiff\Test` and that Delphi has compiled the 64 bit of the programs into `D:\BDiff\_build\Win32\exe`. You can test recently built 64 bit versions of the programs with the following:
+
+    >cd C:\BDiff\Test
+    
+    >D:
+
+    >Test32 version
+    bdiff-1.0.0-rc.1 2024-10-24 (Windows 32 bit)
+    bpatch-1.0.0-rc.1 2024-10-24 (Windows 32 bit)
+    Done
+
+    >Test32 patch
+    << output omitted: same as example 1 >>
+
+    >Test32 clean
     Done
